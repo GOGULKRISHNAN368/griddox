@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import hero1 from "@/assets/hero-1.jpg";
 import hero2 from "@/assets/hero-2.jpg";
+import hero3 from "@/assets/hero-3.png";
 
 const slides = [
   {
@@ -15,6 +16,12 @@ const slides = [
     title: "This Season's New Arrivals",
     offer: "Buy 2 Save ₹200 · Buy 3 Save ₹500",
     cta: "SHOP NOW",
+  },
+  {
+    image: hero3,
+    subtitle: "RADIANT AND ELEGANT",
+    title: "Premium Contemporary ethnic",
+    cta: "DISCOVER MORE",
   },
 ];
 
@@ -37,11 +44,13 @@ const HeroCarousel = () => {
         style={{ transform: `translateX(-${current * 100}%)` }}
       >
         {slides.map((slide, i) => (
-          <div key={i} className="relative w-full flex-shrink-0">
+          <div key={i} className="relative w-full flex-shrink-0 overflow-hidden">
             <img
               src={slide.image}
               alt={slide.title}
-              className="w-full h-[60vh] md:h-[75vh] object-cover"
+              className={`w-full h-[40vh] sm:h-[50vh] md:h-[60vh] lg:h-[65vh] object-cover object-top ${
+                i === current ? "animate-hero-zoom-out" : "scale-110"
+              }`}
               width={1920}
               height={800}
               {...(i === 0 ? {} : { loading: "lazy" as const })}

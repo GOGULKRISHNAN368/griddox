@@ -20,7 +20,7 @@ const Header = () => {
 
         {/* Logo */}
         <div className="font-heading text-2xl md:text-3xl font-bold tracking-tight text-foreground">
-          HAY<span className="text-accent">!</span>
+          Gridox<span className="text-accent">!</span>
         </div>
 
         {/* Desktop nav */}

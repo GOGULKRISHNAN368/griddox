@@ -92,10 +92,15 @@ export default {
             height: "0",
           },
         },
+        "hero-zoom-out": {
+          from: { transform: "scale(1.1)" },
+          to: { transform: "scale(1)" },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
+        "hero-zoom-out": "hero-zoom-out 10s ease-out forwards",
       },
     },
   },
