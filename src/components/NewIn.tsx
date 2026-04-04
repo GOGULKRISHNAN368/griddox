@@ -1,3 +1,4 @@
+import { useState, useRef } from "react";
 import { Heart, ShoppingBag } from "lucide-react";
 import img1 from "@/assets/hero-1.jpg";
 import img2 from "@/assets/cat-kurta-set-v2.jpg";
@@ -44,6 +45,36 @@ const products = [
 ];
 
 const NewIn = () => {
+  const [activeIndex, setActiveIndex] = useState(0);
+  const scrollRef = useRef<HTMLDivElement>(null);
+
+  const handleScroll = () => {
+    if (scrollRef.current) {
+      const scrollPosition = scrollRef.current.scrollLeft;
+      const cardElement = scrollRef.current.children[0] as HTMLElement;
+      if (!cardElement) return;
+      const cardWidth = cardElement.clientWidth;
+      const index = Math.round(scrollPosition / cardWidth);
+      if (index >= 0 && index < products.length) {
+        setActiveIndex(index);
+      }
+    }
+  };
+
+  const scrollTo = (index: number) => {
+    if (scrollRef.current) {
+      const cardElement = scrollRef.current.children[0] as HTMLElement;
+      if (!cardElement) return;
+      const cardWidth = cardElement.clientWidth;
+      const gap = 12; // Corresponding to gap-3 (12px)
+      scrollRef.current.scrollTo({
+        left: index * (cardWidth + gap),
+        behavior: "smooth"
+      });
+      setActiveIndex(index);
+    }
+  };
+
   return (
     <section className="py-10 md:py-16 w-full max-w-7xl mx-auto">
       <div className="text-center px-4 mb-8">
@@ -54,7 +85,11 @@ const NewIn = () => {
       </div>
 
       <div className="relative">
-        <div className="flex overflow-x-auto snap-x snap-mandatory gap-3 px-4 pb-4 md:grid md:grid-cols-4 md:gap-6 md:px-6 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+        <div 
+          ref={scrollRef}
+          onScroll={handleScroll}
+          className="flex overflow-x-auto snap-x snap-mandatory gap-3 px-4 pb-4 md:grid md:grid-cols-4 md:gap-6 md:px-6 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
+        >
           {products.map((product) => (
             <div 
               key={product.id} 
@@ -108,11 +143,17 @@ const NewIn = () => {
         </div>
 
         {/* Pagination Dots (Mobile Only) */}
-        <div className="flex justify-center gap-1.5 mt-6 md:hidden">
-          <div className="w-1.5 h-1.5 rounded-full bg-gray-800 cursor-pointer" />
-          <div className="w-1.5 h-1.5 rounded-full bg-gray-300 cursor-pointer" />
-          <div className="w-1.5 h-1.5 rounded-full bg-gray-300 cursor-pointer" />
-          <div className="w-1.5 h-1.5 rounded-full bg-gray-300 cursor-pointer" />
+        <div className="flex justify-center gap-2 mt-4 md:hidden">
+          {products.map((_, idx) => (
+            <button
+              key={idx}
+              onClick={() => scrollTo(idx)}
+              className={`w-1.5 h-1.5 rounded-full transition-colors ${
+                activeIndex === idx ? "bg-gray-800" : "bg-gray-300"
+              }`}
+              aria-label={`Go to slide ${idx + 1}`}
+            />
+          ))}
         </div>
       </div>
     </section>
