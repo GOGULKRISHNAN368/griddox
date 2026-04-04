@@ -2,12 +2,12 @@ import aboutImage from "@/assets/hero-1.jpg";
 
 const AboutUs = () => {
   return (
-    <section id="about" className="bg-secondary text-secondary-foreground w-full py-8 md:py-10 px-4 sm:px-6">
-      <div className="max-w-4xl mx-auto flex flex-col md:flex-row items-center gap-6 md:gap-8 bg-background/50 p-6 md:p-8 rounded-xl shadow-sm border border-border/40">
+    <section id="about" className="bg-secondary text-secondary-foreground w-full py-10 md:py-16 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-5xl mx-auto flex flex-col md:flex-row items-center gap-8 md:gap-12">
         
         {/* Left Side: Image */}
-        <div className="w-full md:w-[35%] flex justify-center">
-          <div className="aspect-[3/4] relative overflow-hidden rounded-md shadow-md w-full max-w-[240px]">
+        <div className="w-full md:w-2/5">
+          <div className="aspect-[4/5] relative overflow-hidden rounded-md shadow-lg max-w-sm mx-auto md:max-w-none">
             <img 
               src={aboutImage} 
               alt="Gridox About Us" 
@@ -18,12 +18,12 @@ const AboutUs = () => {
         </div>
 
         {/* Right Side: Content */}
-        <div className="w-full md:w-[65%] flex flex-col justify-center text-center md:text-left space-y-3 md:space-y-4">
-          <h2 className="font-heading text-lg md:text-2xl tracking-widest uppercase font-semibold text-foreground">
+        <div className="w-full md:w-3/5 flex flex-col justify-center text-center md:text-left space-y-4 md:space-y-6">
+          <h2 className="font-heading text-xl md:text-3xl tracking-widest uppercase font-semibold text-foreground">
             About Gridox
           </h2>
           
-          <div className="space-y-2.5 text-[11px] md:text-xs leading-relaxed opacity-90 text-justify md:text-left font-body font-normal">
+          <div className="space-y-3 text-xs md:text-sm leading-relaxed opacity-90 text-justify md:text-left font-body font-normal">
             <p>
               Gridox is inspired by modern women who balance multiple roles effortlessly. That’s why our collections are designed to be versatile, timeless, and easy to wear, without compromising on elegance.
             </p>
@@ -33,7 +33,7 @@ const AboutUs = () => {
             <p>
               What truly sets us apart is our end-to-end in-house manufacturing. From fabric selection to final stitching, every step happens under our direct supervision. This gives us complete creative freedom and consistent quality.
             </p>
-            <p className="font-medium text-foreground italic text-xs md:text-sm pt-2 tracking-wide">
+            <p className="font-medium text-foreground italic text-sm md:text-base pt-3 tracking-wide">
               GriDox isn’t just what you wear. It’s how you feel wearing it.
             </p>
           </div>
