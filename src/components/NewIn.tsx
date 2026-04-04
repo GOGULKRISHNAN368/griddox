@@ -54,11 +54,11 @@ const NewIn = () => {
       </div>
 
       <div className="relative">
-        <div className="flex overflow-x-auto snap-x snap-mandatory gap-4 px-4 pb-2 md:grid md:grid-cols-4 md:px-6 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+        <div className="flex overflow-x-auto snap-x snap-mandatory gap-3 px-4 pb-4 md:grid md:grid-cols-4 md:gap-6 md:px-6 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
           {products.map((product) => (
             <div 
               key={product.id} 
-              className="min-w-[65vw] sm:min-w-[40vw] md:min-w-0 snap-start shrink-0 flex flex-col group cursor-pointer"
+              className="w-[45vw] sm:w-[35vw] md:w-full snap-start shrink-0 flex flex-col group cursor-pointer"
             >
               {/* Image Container */}
               <div className="relative aspect-[3/4] w-full rounded-xl overflow-hidden bg-gray-100">
