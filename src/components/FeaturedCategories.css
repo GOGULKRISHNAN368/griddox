@@ -326,12 +326,12 @@
 /* Mobile Adjustments */
 @media screen and (max-width: 768px) {
     .featured-carousel {
-        height: 100dvh;
-        max-height: 100dvh;
+        height: 85dvh;
+        max-height: 85dvh;
     }
     .featured-carousel .list .item .content {
         padding-right: 0;
-        top: 20%;
+        top: 25%;
         left: 5%;
         transform: none;
         width: 90%;
