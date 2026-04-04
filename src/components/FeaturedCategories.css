@@ -331,7 +331,7 @@
     }
     .featured-carousel .list .item .content {
         padding-right: 0;
-        top: 10%;
+        top: 20%;
         left: 5%;
         transform: none;
         width: 90%;
@@ -340,27 +340,28 @@
     }
     .featured-carousel .list .item .content .title,
     .featured-carousel .list .item .content .topic {
-        font-size: 2.2rem;
+        font-size: 1.8rem;
+        line-height: 1.1;
         white-space: normal;
         word-break: break-word;
     }
     .featured-carousel .list .item .content .author {
-        font-size: 0.9rem;
+        font-size: 0.85rem;
     }
     .featured-carousel .list .item .content .des {
         font-size: 0.85rem;
-        margin-top: 10px;
+        margin-top: 15px;
     }
     .featured-carousel .list .item .content .buttons {
-        gap: 10px;
-        margin-top: 15px;
+        gap: 12px;
+        margin-top: 25px;
     }
     .featured-carousel .list .item .content button {
         padding: 8px 16px;
         font-size: 0.8rem;
     }
     .featured-carousel .thumbnail {
-        bottom: 3%;
+        bottom: 60px;
         left: 5%;
         right: 5%;
         width: 90%;
@@ -390,7 +391,8 @@
         border-radius: 4px;
     }
     .featured-carousel .arrows {
-        top: 58%;
+        top: auto;
+        bottom: 200px;
         left: 5%;
         width: 90%;
         right: auto;
@@ -405,7 +407,7 @@
     .featured-carousel.next .list .item:nth-child(1) .main-img-container {
         width: 90px;
         height: 130px;
-        bottom: 3%;
+        bottom: 60px;
         left: 5%;
         border-radius: 20px;
         animation: showImageMobile 0.5s linear 1 forwards;
@@ -426,7 +428,7 @@
         to {
             width: 90px;
             height: 130px;
-            bottom: 3%;
+            bottom: 60px;
             left: 5%;
             border-radius: 20px;
         }
