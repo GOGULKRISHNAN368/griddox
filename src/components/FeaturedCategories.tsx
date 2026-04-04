@@ -1,13 +1,13 @@
-import catNewArrivals from "@/assets/cat-new-arrivals.jpg";
-import catBestSellers from "@/assets/cat-best-sellers.jpg";
-import catOnlineExclusive from "@/assets/cat-online-exclusive.jpg";
-import catKurtas from "@/assets/cat-kurtas.jpg";
-import catCoOrds from "@/assets/cat-co-ords.jpg";
-import catDresses from "@/assets/cat-dresses.jpg";
-import catMaternity from "@/assets/cat-maternity.jpg";
-import catKurtaSet from "@/assets/cat-kurta-set.jpg";
-import catAnkleLeggings from "@/assets/cat-ankle-leggings.jpg";
-import catChuridar from "@/assets/cat-churidar.jpg";
+import catNewArrivals from "@/assets/cat-new-arrivals-v2.jpg";
+import catBestSellers from "@/assets/cat-best-sellers-v2.jpg";
+import catOnlineExclusive from "@/assets/cat-online-exclusive-v2.jpg";
+import catKurtas from "@/assets/cat-kurtas-v2.jpg";
+import catCoOrds from "@/assets/cat-co-ords-v2.jpg";
+import catDresses from "@/assets/cat-dresses-v2.jpg";
+import catMaternity from "@/assets/cat-maternity-v2.jpg";
+import catKurtaSet from "@/assets/cat-kurta-set-v2.jpg";
+import catAnkleLeggings from "@/assets/cat-ankle-leggings-v2.jpg";
+import catChuridar from "@/assets/cat-churidar-v2.jpg";
 
 const categories = [
   { name: "NEW ARRIVALS", image: catNewArrivals },
@@ -35,14 +35,14 @@ const FeaturedCategories = () => {
             href="#"
             className="flex flex-col items-center gap-3 group"
           >
-            <div className="w-full aspect-[3/4] rounded-2xl overflow-hidden">
+            <div className="w-full aspect-square overflow-hidden">
               <img
                 src={cat.image}
                 alt={cat.name}
                 className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                 loading="lazy"
                 width={512}
-                height={640}
+                height={512}
               />
             </div>
             <span className="text-xs md:text-sm font-semibold tracking-wider text-foreground text-center whitespace-pre-line">
