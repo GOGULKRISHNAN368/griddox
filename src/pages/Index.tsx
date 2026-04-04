@@ -3,6 +3,7 @@ import AnnouncementBar from "@/components/AnnouncementBar";
 import Header from "@/components/Header";
 import HeroCarousel from "@/components/HeroCarousel";
 import FeaturedCategories from "@/components/FeaturedCategories";
+import AboutUs from "@/components/AboutUs";
 import BottomNav from "@/components/BottomNav";
 import WhatsAppButton from "@/components/WhatsAppButton";
 
@@ -14,6 +15,7 @@ const Index = () => {
       <Header />
       <HeroCarousel />
       <FeaturedCategories />
+      <AboutUs />
       <BottomNav />
       <WhatsAppButton />
     </div>
