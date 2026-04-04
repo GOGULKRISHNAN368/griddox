@@ -1,7 +1,14 @@
 import { Search, User, ShoppingCart, Menu, X } from "lucide-react";
 import { useState } from "react";
 
-const navLinks = ["HOME", "NEW", "SHOP", "TRACK ORDER", "STORE LOCATOR", "FRANCHISE ENQUIRY"];
+const navLinks = [
+  { name: "HOME", href: "/" },
+  { name: "NEW", href: "#" },
+  { name: "SHOP", href: "#" },
+  { name: "TRACK ORDER", href: "#" },
+  { name: "STORE LOCATOR", href: "#" },
+  { name: "ABOUT US", href: "/#about" }
+];
 
 const Header = () => {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -27,11 +34,11 @@ const Header = () => {
         <nav className="hidden md:flex items-center gap-8">
           {navLinks.map((link) => (
             <a
-              key={link}
-              href="#"
-              className="text-sm font-medium tracking-wider text-foreground hover:text-accent transition-colors"
+              key={link.name}
+              href={link.href}
+              className="text-sm font-medium tracking-wider text-foreground hover:text-accent transition-colors whitespace-nowrap"
             >
-              {link}
+              {link.name}
             </a>
           ))}
         </nav>
@@ -55,11 +62,12 @@ const Header = () => {
         <nav className="md:hidden bg-background border-t border-border px-4 pb-4">
           {navLinks.map((link) => (
             <a
-              key={link}
-              href="#"
+              key={link.name}
+              href={link.href}
               className="block py-3 text-sm font-medium tracking-wider text-foreground hover:text-accent border-b border-border last:border-b-0"
+              onClick={() => setMenuOpen(false)}
             >
-              {link}
+              {link.name}
             </a>
           ))}
         </nav>
