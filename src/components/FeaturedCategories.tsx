@@ -1,52 +1,128 @@
+import { useState, useEffect, useRef } from "react";
+import "./FeaturedCategories.css";
+import { ChevronLeft, ChevronRight } from "lucide-react";
+
 import catCoOrds from "@/assets/cat-co-ords-v2.jpg";
 import catKurtaSet from "@/assets/cat-kurta-set-v2.jpg";
 import catKurtas from "@/assets/cat-kurtas-v2.jpg";
 import catDresses from "@/assets/cat-dresses-v2.jpg";
 import catMaternity from "@/assets/cat-maternity-v2.jpg";
-// For lounge wear we use churidar as a placeholder if no specific image exists
 import catChuridar from "@/assets/cat-churidar-v2.jpg";
 import catAnkleLeggings from "@/assets/cat-ankle-leggings-v2.jpg";
 
-const categories = [
-  { name: "PEPLUM CO-ORDS", image: catCoOrds },
-  { name: "COTTON KURTI SET", image: catKurtaSet },
-  { name: "PEPLUM TOPS", image: catKurtas },
-  { name: "PREMIUM RAW SILK SET", image: catDresses },
-  { name: "MATERNITY WEAR", image: catMaternity },
-  { name: "LOUNGE WEAR", image: catChuridar },
-  { name: "BOTTOM WEAR", image: catAnkleLeggings },
+interface Category {
+  id: string;
+  name: string;
+  image: string;
+  description: string;
+}
+
+const initialCategories: Category[] = [
+  { id: "1", name: "PEPLUM CO-ORDS", image: catCoOrds, description: "Discover our latest collection of Peplum Co-ords. Stylish and comfortable fits for every occasion." },
+  { id: "2", name: "COTTON KURTI SET", image: catKurtaSet, description: "Traditional yet modern cotton kurti sets for everyday elegance." },
+  { id: "3", name: "PEPLUM TOPS", image: catKurtas, description: "Trendy peplum tops perfect for pairing with your favorite bottoms." },
+  { id: "4", name: "RAW SILK SET", image: catDresses, description: "Experience luxury with our premium raw silk sets, designed for special occasions." },
+  { id: "5", name: "MATERNITY WEAR", image: catMaternity, description: "Comfortable and stylish maternity wear for expecting mothers." },
+  { id: "6", name: "LOUNGE WEAR", image: catChuridar, description: "Relax in style with our premium quality lounge wear collection." },
+  { id: "7", name: "BOTTOM WEAR", image: catAnkleLeggings, description: "Versatile bottom wear collection spanning from leggings to palazzo." },
 ];
 
 const FeaturedCategories = () => {
+  const [categories, setCategories] = useState<Category[]>(initialCategories);
+  const [animatingClass, setAnimatingClass] = useState<"next" | "prev" | "">("");
+  
+  // Timing variables
+  const timeRunning = 1500; // time corresponding to css animation duration + buffer
+  
+  const runTimeOut = useRef<NodeJS.Timeout | null>(null);
+
+  const handleNext = () => {
+    if (animatingClass !== "") return;
+    
+    setCategories((prev) => {
+      const newItems = [...prev];
+      const first = newItems.shift();
+      if (first) newItems.push(first);
+      return newItems;
+    });
+    
+    setAnimatingClass("next");
+    resetAutoRun();
+  };
+
+  const handlePrev = () => {
+    if (animatingClass !== "") return;
+    
+    setCategories((prev) => {
+      const newItems = [...prev];
+      const last = newItems.pop();
+      if (last) newItems.unshift(last);
+      return newItems;
+    });
+    
+    setAnimatingClass("prev");
+    resetAutoRun();
+  };
+
+  const resetAutoRun = () => {
+    if (runTimeOut.current) clearTimeout(runTimeOut.current);
+    
+    runTimeOut.current = setTimeout(() => {
+      setAnimatingClass("");
+    }, timeRunning);
+  };
+
+  // Optional auto-play
+  // useEffect(() => {
+  //   const auto = setInterval(() => {
+  //     handleNext();
+  //   }, 7000);
+  //   return () => clearInterval(auto);
+  // }, [animatingClass]);
+
   return (
-    <section className="py-10 md:py-16 px-4 max-w-7xl mx-auto">
-      <h2 className="font-heading text-2xl md:text-4xl text-center text-foreground italic mb-8 md:mb-12">
-        Featured Categories
-      </h2>
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 md:gap-8">
+    <div className={`featured-carousel ${animatingClass}`}>
+      <div className="list">
         {categories.map((cat) => (
-          <a
-            key={cat.name}
-            href="#"
-            className="flex flex-col items-center gap-3 group"
-          >
-            <div className="w-full aspect-square overflow-hidden bg-muted/10">
-              <img
-                src={cat.image}
-                alt={cat.name}
-                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                loading="lazy"
-                width={512}
-                height={512}
-              />
+          <div key={cat.id} className="item">
+            <div className="main-img-container">
+               <img src={cat.image} alt={cat.name} className="main-img" />
             </div>
-            <span className="text-xs md:text-sm font-semibold tracking-wider text-foreground text-center whitespace-pre-line">
-              {cat.name}
-            </span>
-          </a>
+            <div className="content">
+              <div className="author">GRIDOX</div>
+              <div className="title">CATEGORIES</div>
+              <div className="topic">{cat.name}</div>
+              <div className="des">{cat.description}</div>
+              <div className="buttons">
+                <button>SHOP NOW</button>
+                <button>SEE ALL</button>
+              </div>
+            </div>
+          </div>
         ))}
       </div>
-    </section>
+
+      <div className="thumbnail">
+        {categories.map((cat, index) => (
+            <div key={`thumb-${cat.id}`} className="item" onClick={() => {
+               if (index !== 0) handleNext();
+            }}>
+                <img src={cat.image} alt={cat.name} />
+                <div className="content">
+                    <div className="title">{cat.name}</div>
+                    <div className="description">Explore</div>
+                </div>
+            </div>
+        ))}
+      </div>
+
+      <div className="arrows">
+        <button id="prev" onClick={handlePrev}><ChevronLeft size={24} /></button>
+        <button id="next" onClick={handleNext}><ChevronRight size={24} /></button>
+      </div>
+
+      <div className="time"></div>
+    </div>
   );
 };
 
