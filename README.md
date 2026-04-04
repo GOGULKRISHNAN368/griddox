@@ -1,3 +1,3 @@
-# Welcome to your Lovable project
+# Gridox
 
 TODO: Document your project here
