@@ -2,6 +2,7 @@ import OfferBanner from "@/components/OfferBanner";
 import AnnouncementBar from "@/components/AnnouncementBar";
 import Header from "@/components/Header";
 import HeroCarousel from "@/components/HeroCarousel";
+import NewIn from "@/components/NewIn";
 import FeaturedCategories from "@/components/FeaturedCategories";
 import AboutUs from "@/components/AboutUs";
 import BottomNav from "@/components/BottomNav";
@@ -14,6 +15,7 @@ const Index = () => {
       <AnnouncementBar />
       <Header />
       <HeroCarousel />
+      <NewIn />
       <FeaturedCategories />
       <AboutUs />
       <BottomNav />
