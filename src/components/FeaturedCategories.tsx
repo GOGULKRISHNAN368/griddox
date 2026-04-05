@@ -97,8 +97,8 @@ const FeaturedCategories = () => {
               <div className="topic">{cat.name}</div>
               <div className="des">{cat.description}</div>
               <div className="buttons">
-                <button>SHOP NOW</button>
-                <button>SEE ALL</button>
+                <button onClick={() => navigate(`/category/${cat.slug}`)}>SHOP NOW</button>
+                <button onClick={() => navigate(`/category/${cat.slug}`)}>SEE ALL</button>
               </div>
             </div>
           </div>
