@@ -1,4 +1,5 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useRef } from "react";
+import { useNavigate } from "react-router-dom";
 import "./FeaturedCategories.css";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
