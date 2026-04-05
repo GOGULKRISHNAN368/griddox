@@ -1,4 +1,5 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useRef } from "react";
+import { useNavigate } from "react-router-dom";
 import "./FeaturedCategories.css";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
@@ -15,19 +16,21 @@ interface Category {
   name: string;
   image: string;
   description: string;
+  slug: string;
 }
 
 const initialCategories: Category[] = [
-  { id: "1", name: "PEPLUM CO-ORDS", image: catCoOrds, description: "Discover our latest collection of Peplum Co-ords. Stylish and comfortable fits for every occasion." },
-  { id: "2", name: "COTTON KURTI SET", image: catKurtaSet, description: "Traditional yet modern cotton kurti sets for everyday elegance." },
-  { id: "3", name: "PEPLUM TOPS", image: catKurtas, description: "Trendy peplum tops perfect for pairing with your favorite bottoms." },
-  { id: "4", name: "RAW SILK SET", image: catDresses, description: "Experience luxury with our premium raw silk sets, designed for special occasions." },
-  { id: "5", name: "MATERNITY WEAR", image: catMaternity, description: "Comfortable and stylish maternity wear for expecting mothers." },
-  { id: "6", name: "LOUNGE WEAR", image: catChuridar, description: "Relax in style with our premium quality lounge wear collection." },
-  { id: "7", name: "BOTTOM WEAR", image: catAnkleLeggings, description: "Versatile bottom wear collection spanning from leggings to palazzo." },
+  { id: "1", name: "PEPLUM CO-ORDS", image: catCoOrds, description: "Discover our latest collection of Peplum Co-ords. Stylish and comfortable fits for every occasion.", slug: "peplum-co-ords" },
+  { id: "2", name: "COTTON KURTI SET", image: catKurtaSet, description: "Traditional yet modern cotton kurti sets for everyday elegance.", slug: "cotton-kurti-set" },
+  { id: "3", name: "PEPLUM TOPS", image: catKurtas, description: "Trendy peplum tops perfect for pairing with your favorite bottoms.", slug: "peplum-tops" },
+  { id: "4", name: "RAW SILK SET", image: catDresses, description: "Experience luxury with our premium raw silk sets, designed for special occasions.", slug: "raw-silk-set" },
+  { id: "5", name: "MATERNITY WEAR", image: catMaternity, description: "Comfortable and stylish maternity wear for expecting mothers.", slug: "maternity-wear" },
+  { id: "6", name: "LOUNGE WEAR", image: catChuridar, description: "Relax in style with our premium quality lounge wear collection.", slug: "lounge-wear" },
+  { id: "7", name: "BOTTOM WEAR", image: catAnkleLeggings, description: "Versatile bottom wear collection spanning from leggings to palazzo.", slug: "bottom-wear" },
 ];
 
 const FeaturedCategories = () => {
+  const navigate = useNavigate();
   const [categories, setCategories] = useState<Category[]>(initialCategories);
   const [animatingClass, setAnimatingClass] = useState<"next" | "prev" | "">("");
   
@@ -94,8 +97,8 @@ const FeaturedCategories = () => {
               <div className="topic">{cat.name}</div>
               <div className="des">{cat.description}</div>
               <div className="buttons">
-                <button>SHOP NOW</button>
-                <button>SEE ALL</button>
+                <button onClick={() => navigate(`/category/${cat.slug}`)}>SHOP NOW</button>
+                <button onClick={() => navigate(`/category/${cat.slug}`)}>SEE ALL</button>
               </div>
             </div>
           </div>
