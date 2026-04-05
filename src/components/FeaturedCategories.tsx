@@ -16,6 +16,7 @@ interface Category {
   name: string;
   image: string;
   description: string;
+  slug: string;
 }
 
 const initialCategories: Category[] = [
