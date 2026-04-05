@@ -3,13 +3,13 @@ import { useNavigate } from "react-router-dom";
 import "./FeaturedCategories.css";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
-import catCoOrds from "@/assets/cat-co-ords-v2.jpg";
-import catKurtaSet from "@/assets/cat-kurta-set-v2.jpg";
-import catKurtas from "@/assets/cat-kurtas-v2.jpg";
-import catDresses from "@/assets/cat-dresses-v2.jpg";
-import catMaternity from "@/assets/cat-maternity-v2.jpg";
-import catChuridar from "@/assets/cat-churidar-v2.jpg";
-import catAnkleLeggings from "@/assets/cat-ankle-leggings-v2.jpg";
+import catCoOrds from "@/assets/cat_peplum_coords_1775373099016.png";
+import catKurtaSet from "@/assets/cat_cotton_kurti_1775373114325.png";
+import catKurtas from "@/assets/cat_peplum_tops_1775373133551.png";
+import catDresses from "@/assets/cat_raw_silk_1775373150282.png";
+import catMaternity from "@/assets/cat_maternity_1775373167092.png";
+import catChuridar from "@/assets/cat_lounge_wear_1775373183467.png";
+import catAnkleLeggings from "@/assets/cat_bottom_wear_1775373197874.png";
 
 interface Category {
   id: string;
