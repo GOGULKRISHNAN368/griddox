@@ -30,6 +30,7 @@ const initialCategories: Category[] = [
 ];
 
 const FeaturedCategories = () => {
+  const navigate = useNavigate();
   const [categories, setCategories] = useState<Category[]>(initialCategories);
   const [animatingClass, setAnimatingClass] = useState<"next" | "prev" | "">("");
   
