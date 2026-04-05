@@ -1,5 +1,6 @@
 import { useParams, Link } from "react-router-dom";
 import { Heart, ChevronLeft } from "lucide-react";
+import { useEffect } from "react";
 import categories from "@/data/categoryProducts";
 import Header from "@/components/Header";
 import AnnouncementBar from "@/components/AnnouncementBar";
@@ -10,6 +11,10 @@ import WhatsAppButton from "@/components/WhatsAppButton";
 const CategoryPage = () => {
   const { slug } = useParams<{ slug: string }>();
   const category = categories.find((c) => c.slug === slug);
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [slug]);
 
   if (!category) {
     return (

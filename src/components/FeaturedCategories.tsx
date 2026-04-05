@@ -67,6 +67,19 @@ const FeaturedCategories = () => {
     resetAutoRun();
   };
 
+  const handleThumbnailClick = (index: number) => {
+    if (index === 0 || animatingClass !== "") return;
+    
+    setCategories((prev) => {
+      const newItems = [...prev];
+      const shifted = newItems.splice(0, index);
+      return [...newItems, ...shifted];
+    });
+    
+    setAnimatingClass("next");
+    resetAutoRun();
+  };
+
   const resetAutoRun = () => {
     if (runTimeOut.current) clearTimeout(runTimeOut.current);
     
@@ -107,9 +120,7 @@ const FeaturedCategories = () => {
 
       <div className="thumbnail">
         {categories.map((cat, index) => (
-            <div key={`thumb-${cat.id}`} className="item" onClick={() => {
-               if (index !== 0) handleNext();
-            }}>
+            <div key={`thumb-${cat.id}`} className="item" onClick={() => handleThumbnailClick(index)}>
                 <img src={cat.image} alt={cat.name} />
                 <div className="content">
                     <div className="title">{cat.name}</div>

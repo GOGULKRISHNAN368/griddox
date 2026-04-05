@@ -115,10 +115,25 @@ body {
     position: absolute;
     bottom: 50px;
     left: 55%;
-    width: max-content;
+    width: 40vw;
     z-index: 100;
     display: flex;
     gap: 20px;
+    overflow-x: auto;
+    padding-bottom: 15px;
+    scrollbar-width: thin;
+    scrollbar-color: #f1683a transparent;
+}
+
+.featured-carousel .thumbnail::-webkit-scrollbar {
+    height: 6px;
+}
+.featured-carousel .thumbnail::-webkit-scrollbar-track {
+    background: transparent;
+}
+.featured-carousel .thumbnail::-webkit-scrollbar-thumb {
+    background-color: #f1683a;
+    border-radius: 10px;
 }
 
 .featured-carousel .thumbnail .item {
