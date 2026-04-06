@@ -92,7 +92,7 @@ const CategoryPage = () => {
                   </span>
                 </div>
               </div>
-            </div>
+            </Link>
           ))}
         </div>
       </div>
