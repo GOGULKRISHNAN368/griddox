@@ -9,6 +9,7 @@ import OfferBanner from "@/components/OfferBanner";
 import BottomNav from "@/components/BottomNav";
 import WhatsAppButton from "@/components/WhatsAppButton";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import SimilarProducts from "@/components/SimilarProducts";
 import { toast } from "sonner";
 
 const ProductDetailPage = () => {
@@ -263,6 +264,13 @@ const ProductDetailPage = () => {
           </div>
         </div>
       </div>
+
+      {/* Similar Products */}
+      <SimilarProducts 
+        products={category.products} 
+        currentProductId={product.id} 
+        categorySlug={category.slug} 
+      />
 
       <BottomNav />
       <WhatsAppButton />

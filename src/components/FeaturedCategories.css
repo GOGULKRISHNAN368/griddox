@@ -9,6 +9,7 @@ body {
     position: relative;
     background-color: #000;
     overflow: hidden;
+    z-index: 10;
 }
 
 .featured-carousel .list .item {

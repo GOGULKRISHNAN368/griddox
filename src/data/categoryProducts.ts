@@ -4,6 +4,10 @@ import peplumCoordsSide from "@/assets/products/peplum-coords-side.jpg";
 import peplumCoordsBack from "@/assets/products/peplum-coords-back.jpg";
 import peplumCoordsDetail from "@/assets/products/peplum-coords-detail.jpg";
 import peplumCoordsWalk from "@/assets/products/peplum-coords-walk.jpg";
+import peplumCoords3 from "@/assets/products/peplum-coords-3.png";
+import peplumCoords4 from "@/assets/products/peplum-coords-4.png";
+import peplumCoords5 from "@/assets/products/peplum-coords-5.png";
+import peplumCoords6 from "@/assets/products/peplum-coords-6.png";
 
 import kurtiSet1 from "@/assets/products/kurti-set-1.jpg";
 import kurtiSet2 from "@/assets/products/kurti-set-2.jpg";
@@ -11,6 +15,7 @@ import kurtiSetSide from "@/assets/products/kurti-set-side.jpg";
 import kurtiSetBack from "@/assets/products/kurti-set-back.jpg";
 import kurtiSetDetail from "@/assets/products/kurti-set-detail.jpg";
 import kurtiSetWalk from "@/assets/products/kurti-set-walk.jpg";
+import kurtiSetOrange from "@/assets/products/kurti-set-orange.png";
 
 import peplumTops1 from "@/assets/products/peplum-tops-1.jpg";
 import peplumTops2 from "@/assets/products/peplum-tops-2.jpg";
@@ -84,7 +89,7 @@ const categories: CategoryData[] = [
       },
       {
         id: "pc3", name: "Maroon Floral Peplum Co-Ord Set",
-        images: [peplumCoords1, peplumCoordsBack, peplumCoordsSide, peplumCoordsDetail, peplumCoordsWalk],
+        images: [peplumCoords3, peplumCoordsBack, peplumCoordsSide, peplumCoordsDetail, peplumCoordsWalk],
         price: 3199, originalPrice: 5499, discount: 42, tag: "SAME DAY DISPATCH",
         description: "Beautiful maroon floral peplum co-ord set with traditional motifs. A perfect blend of modern silhouette and classic design.",
         fabric: "Rayon", fit: "Relaxed", neckline: "V-Neck", sleeve: "3/4 Sleeves", sizes: [34, 36, 38, 40, 42],
@@ -92,7 +97,7 @@ const categories: CategoryData[] = [
       },
       {
         id: "pc4", name: "Blush Pink Peplum Co-Ord Set",
-        images: [peplumCoords2, peplumCoordsWalk, peplumCoordsBack, peplumCoordsSide, peplumCoordsDetail],
+        images: [peplumCoords4, peplumCoordsWalk, peplumCoordsBack, peplumCoordsSide, peplumCoordsDetail],
         price: 2799, originalPrice: 4999, discount: 44, badge: "NEW",
         description: "Soft blush pink peplum co-ord set with subtle embroidery. Ideal for brunch dates and festive gatherings.",
         fabric: "Georgette", fit: "Slim", neckline: "Boat Neck", sleeve: "Half Sleeves", sizes: [32, 34, 36, 38],
@@ -100,7 +105,7 @@ const categories: CategoryData[] = [
       },
       {
         id: "pc5", name: "Royal Blue Peplum Co-Ord Set",
-        images: [peplumCoords1, peplumCoordsSide, peplumCoordsDetail, peplumCoordsBack, peplumCoordsWalk],
+        images: [peplumCoords5, peplumCoordsSide, peplumCoordsDetail, peplumCoordsBack, peplumCoordsWalk],
         price: 3499, originalPrice: 5999, discount: 42, badge: "MOST LOVED", tag: "SAME DAY DISPATCH",
         description: "Stunning royal blue peplum co-ord set with golden embroidery. Makes a statement at every occasion.",
         fabric: "Silk Blend", fit: "Regular", neckline: "Round Neck", sleeve: "Full Sleeves", sizes: [32, 34, 36, 38, 40, 42],
@@ -108,7 +113,7 @@ const categories: CategoryData[] = [
       },
       {
         id: "pc6", name: "Pastel Peplum Co-Ord Set",
-        images: [peplumCoords2, peplumCoordsBack, peplumCoordsWalk, peplumCoordsSide, peplumCoordsDetail],
+        images: [peplumCoords6, peplumCoordsBack, peplumCoordsWalk, peplumCoordsSide, peplumCoordsDetail],
         price: 2699, originalPrice: 4499, discount: 40,
         description: "A serene pastel peplum co-ord set with minimal embroidery. Perfect for everyday elegance.",
         fabric: "Cotton", fit: "Regular", neckline: "Round Neck", sleeve: "Short Sleeves", sizes: [34, 36, 38, 40],
@@ -130,7 +135,7 @@ const categories: CategoryData[] = [
       },
       {
         id: "ck2", name: "Orange Embroidered Chanderi Kurti Set",
-        images: [kurtiSet2, kurtiSetSide, kurtiSetBack, kurtiSetWalk, kurtiSetDetail],
+        images: [kurtiSetOrange, kurtiSetSide, kurtiSetBack, kurtiSetWalk, kurtiSetDetail],
         price: 2599, originalPrice: 4999, discount: 48, badge: "MOST LOVED",
         description: "Vibrant orange chanderi kurti set with golden embroidery. Perfect for festive celebrations.",
         fabric: "Chanderi", fit: "Regular", neckline: "V-Neck", sleeve: "3/4 Sleeves", sizes: [32, 34, 36, 38, 42],

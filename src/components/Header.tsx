@@ -14,7 +14,7 @@ const Header = () => {
   const [menuOpen, setMenuOpen] = useState(false);
 
   return (
-    <header className="bg-background border-b border-border sticky top-0 z-50">
+    <header className="bg-background border-b border-border sticky top-0 z-[1000]">
       <div className="container mx-auto flex items-center justify-between px-4 py-3 md:py-4">
         {/* Mobile menu button */}
         <button
