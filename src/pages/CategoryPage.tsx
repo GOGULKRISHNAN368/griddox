@@ -47,11 +47,11 @@ const CategoryPage = () => {
       <div className="max-w-7xl mx-auto px-4 pb-12">
         <div className="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-6">
           {category.products.map((product) => (
-            <div key={product.id} className="group cursor-pointer">
+            <Link to={`/category/${category.slug}/product/${product.id}`} key={product.id} className="group cursor-pointer">
               {/* Image Container */}
               <div className="relative overflow-hidden rounded-sm bg-muted">
                 <img
-                  src={product.image}
+                  src={product.images[0]}
                   alt={product.name}
                   loading="lazy"
                   className="w-full aspect-[3/4] object-cover object-top group-hover:scale-105 transition-transform duration-500"
@@ -92,7 +92,7 @@ const CategoryPage = () => {
                   </span>
                 </div>
               </div>
-            </div>
+            </Link>
           ))}
         </div>
       </div>
