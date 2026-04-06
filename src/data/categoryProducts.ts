@@ -466,7 +466,5 @@ const categories: CategoryData[] = [
   },
 ];
 
-// Helper: free size constant
-const Free = 0;
-
 export default categories;
+
