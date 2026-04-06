@@ -231,7 +231,7 @@ const ProductDetailPage = () => {
               </AccordionItem>
               <AccordionItem value="wash">
                 <AccordionTrigger className="font-bold text-sm tracking-wide">
-                  WASH & CARE
+                  WASH AND CARE
                 </AccordionTrigger>
                 <AccordionContent>
                   <p className="text-sm text-muted-foreground">
@@ -241,7 +241,7 @@ const ProductDetailPage = () => {
               </AccordionItem>
               <AccordionItem value="delivery">
                 <AccordionTrigger className="font-bold text-sm tracking-wide">
-                  DELIVERY & RETURNS
+                  DELIVERY AND RETURNS
                 </AccordionTrigger>
                 <AccordionContent>
                   <p className="text-sm text-muted-foreground">

@@ -126,7 +126,7 @@ const categories: CategoryData[] = [
     title: "COTTON KURTI SET",
     products: [
       {
-        id: "ck1", name: "White & Pink Embroidered Kurti Set",
+        id: "ck1", name: "White AND Pink Embroidered Kurti Set",
         images: [kurtiSet1, kurtiSetSide, kurtiSetBack, kurtiSetWalk, kurtiSetDetail],
         price: 2399, originalPrice: 3999, discount: 40, badge: "MOST LOVED", tag: "SAME DAY DISPATCH",
         description: "Elegant white cotton kurti set with pink embroidered dupatta. Crafted from pure cotton for the ultimate comfort and breathability.",
@@ -358,7 +358,7 @@ const categories: CategoryData[] = [
     title: "LOUNGE WEAR",
     products: [
       {
-        id: "lw1", name: "Pink & Grey Cotton Lounge Set",
+        id: "lw1", name: "Pink AND Grey Cotton Lounge Set",
         images: [lounge1, lounge2, loungeDetail, lounge1, lounge2],
         price: 1499, originalPrice: 2999, discount: 50, badge: "MOST LOVED", tag: "SAME DAY DISPATCH",
         description: "Ultra-soft pink and grey cotton lounge set for ultimate relaxation. Premium quality fabric for all-day comfort.",
