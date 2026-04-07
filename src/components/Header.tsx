@@ -1,17 +1,36 @@
 import { Search, User, ShoppingCart, Menu, X } from "lucide-react";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { NAV_TARGETS } from "@/fixes/navConfig"; // fix: nav scroll links
 
 const navLinks = [
-  { name: "HOME", href: "/" },
-  { name: "NEW", href: "#" },
-  { name: "SHOP", href: "#" },
-  { name: "TRACK ORDER", href: "#" },
-  { name: "STORE LOCATOR", href: "#" },
-  { name: "ABOUT US", href: "/#about" }
+  { name: "HOME" },
+  { name: "NEW" },
+  { name: "SHOP" },
+  { name: "TRACK ORDER" },
+  { name: "STORE LOCATOR" },
+  { name: "ABOUT US" },
 ];
+
+function handleNavClick(name: string, navigate: ReturnType<typeof useNavigate>) { // fix: nav scroll links
+  const target = NAV_TARGETS[name];
+  if (!target) return;
+  if (target.type === "path") {
+    navigate(target.value);
+  } else {
+    const el = document.getElementById(target.value);
+    if (el) {
+      el.scrollIntoView({ behavior: "smooth" });
+    } else {
+      // If not on home page, navigate home then scroll
+      navigate(`/#${target.value}`);
+    }
+  }
+}
 
 const Header = () => {
   const [menuOpen, setMenuOpen] = useState(false);
+  const navigate = useNavigate(); // fix: nav scroll links
 
   return (
     <header className="bg-background border-b border-border sticky top-0 z-[1000]">
@@ -33,13 +52,13 @@ const Header = () => {
         {/* Desktop nav */}
         <nav className="hidden md:flex items-center gap-8">
           {navLinks.map((link) => (
-            <a
+            <button
               key={link.name}
-              href={link.href}
-              className="text-sm font-medium tracking-wider text-foreground hover:text-accent transition-colors whitespace-nowrap"
+              onClick={() => handleNavClick(link.name, navigate)} // fix: nav scroll links
+              className="text-sm font-medium tracking-wider text-foreground hover:text-accent transition-colors whitespace-nowrap bg-transparent border-none cursor-pointer"
             >
               {link.name}
-            </a>
+            </button>
           ))}
         </nav>
 
@@ -48,10 +67,10 @@ const Header = () => {
           <button aria-label="Search" className="text-foreground hover:text-accent transition-colors">
             <Search size={20} />
           </button>
-          <button aria-label="Account" className="hidden md:block text-foreground hover:text-accent transition-colors">
+          <button aria-label="Account" onClick={() => navigate("/account")} className="hidden md:block text-foreground hover:text-accent transition-colors"> {/* fix: account route */}
             <User size={20} />
           </button>
-          <button aria-label="Cart" className="text-foreground hover:text-accent transition-colors relative">
+          <button aria-label="Cart" onClick={() => navigate("/cart")} className="text-foreground hover:text-accent transition-colors relative"> {/* fix: cart route */}
             <ShoppingCart size={20} />
           </button>
         </div>
@@ -61,14 +80,13 @@ const Header = () => {
       {menuOpen && (
         <nav className="md:hidden bg-background border-t border-border px-4 pb-4">
           {navLinks.map((link) => (
-            <a
+            <button
               key={link.name}
-              href={link.href}
-              className="block py-3 text-sm font-medium tracking-wider text-foreground hover:text-accent border-b border-border last:border-b-0"
-              onClick={() => setMenuOpen(false)}
+              onClick={() => { handleNavClick(link.name, navigate); setMenuOpen(false); }} // fix: nav scroll links
+              className="block w-full text-left py-3 text-sm font-medium tracking-wider text-foreground hover:text-accent border-b border-border last:border-b-0 bg-transparent cursor-pointer"
             >
               {link.name}
-            </a>
+            </button>
           ))}
         </nav>
       )}
