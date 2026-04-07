@@ -1,3 +1,3 @@
 # Gridox
 
-TODO: Document your project here
+Online ecommerce website
