@@ -6,40 +6,41 @@
 
 @layer base {
   :root {
+    /* Primary: Deep Red #B31217 | Secondary: White #FFFFFF | Accent: Soft Beige #F5EDE6 */
     --background: 0 0% 100%;
-    --foreground: 140 10% 20%;
+    --foreground: 358 80% 20%;
 
     --card: 0 0% 100%;
-    --card-foreground: 140 10% 20%;
+    --card-foreground: 358 80% 20%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 140 10% 20%;
+    --popover-foreground: 358 80% 20%;
 
-    --primary: 140 12% 28%;
-    --primary-foreground: 0 0% 98%;
+    --primary: 358 82% 38%;
+    --primary-foreground: 0 0% 100%;
 
-    --secondary: 30 20% 96%;
-    --secondary-foreground: 140 12% 28%;
+    --secondary: 0 0% 100%;
+    --secondary-foreground: 358 82% 38%;
 
-    --muted: 30 15% 95%;
-    --muted-foreground: 140 5% 45%;
+    --muted: 22 47% 94%;
+    --muted-foreground: 358 20% 45%;
 
-    --accent: 340 45% 55%;
-    --accent-foreground: 0 0% 100%;
+    --accent: 22 47% 94%;
+    --accent-foreground: 358 82% 38%;
 
     --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive-foreground: 0 0% 100%;
 
-    --border: 30 15% 88%;
-    --input: 30 15% 88%;
-    --ring: 140 12% 28%;
+    --border: 22 30% 88%;
+    --input: 22 30% 88%;
+    --ring: 358 82% 38%;
 
     --radius: 0.5rem;
 
-    --nav-bg: 140 12% 22%;
-    --nav-foreground: 0 0% 95%;
-    --announcement-bg: 140 15% 18%;
-    --announcement-foreground: 0 0% 95%;
+    --nav-bg: 358 82% 38%;
+    --nav-foreground: 0 0% 100%;
+    --announcement-bg: 358 82% 28%;
+    --announcement-foreground: 0 0% 100%;
     --hero-overlay: 0 0% 0%;
 
     --sidebar-background: 0 0% 98%;

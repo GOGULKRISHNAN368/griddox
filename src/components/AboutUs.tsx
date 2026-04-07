@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { User, Layers, Scissors, Factory, ArrowRight, ChevronDown, ChevronUp } from "lucide-react";
+import { User, Layers, Scissors, Factory, ArrowRight, ChevronDown, ChevronUp, MapPin, Phone, Clock, Mail } from "lucide-react";
 
 const AboutUs = () => {
   const [isExpanded, setIsExpanded] = useState(false);
@@ -53,10 +53,10 @@ const AboutUs = () => {
             <div className="w-full space-y-8 flex flex-col items-center">
               <button 
                 onClick={() => setIsExpanded(!isExpanded)}
-                className="group flex items-center gap-3 text-gray-900 font-semibold tracking-widest text-sm uppercase transition-all hover:text-[#8b231a]"
+                className="group flex items-center gap-3 text-gray-900 font-semibold tracking-widest text-sm uppercase transition-all hover:text-[#B31217]"
               >
                 {isExpanded ? 'READ LESS' : 'READ OUR MANIFESTO'}
-                <div className={`p-2 rounded-full transition-all duration-300 ${isExpanded ? 'bg-gray-100' : 'bg-[#8b231a] text-white group-hover:translate-x-1'}`}>
+                <div className={`p-2 rounded-full transition-all duration-300 ${isExpanded ? 'bg-gray-100' : 'bg-[#B31217] text-white group-hover:translate-x-1'}`}>
                   {isExpanded ? <ChevronUp size={18} /> : <ArrowRight size={18} />}
                 </div>
               </button>
@@ -73,13 +73,58 @@ const AboutUs = () => {
                     What truly sets us apart is our complete creative freedom, consistent quality, and the ability to innovate faster than conventional brands.
                   </p>
                   <div className="pt-6">
-                    <p className="text-[#8b231a] text-lg md:text-xl font-heading italic font-medium relative inline-block px-10">
+                    <p className="text-[#B31217] text-lg md:text-xl font-heading italic font-medium relative inline-block px-10">
                       <span className="absolute left-0 top-0 text-3xl opacity-20">"</span>
                       Gridox isn't just what you wear. It's how you feel wearing it.
                       <span className="absolute right-0 bottom-0 text-3xl opacity-20">"</span>
                     </p>
                   </div>
                 </div>
+              </div>
+            </div>
+
+            {/* Store Details — moved from Store Locator */}
+            <div className="w-full border-t border-gray-100 pt-12">
+              <div className="inline-block px-3 py-1 border border-[#B31217]/20 text-[#B31217] text-[10px] uppercase tracking-widest font-medium mb-6">
+                Visit Us
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-left">
+                {[
+                  {
+                    name: "Gridox Studio — Main Store",
+                    address: "123, Fashion Street, Anna Nagar, Chennai — 600 040",
+                    phone: "+91 99999 99999",
+                    hours: "Mon – Sat: 10:00 AM – 8:00 PM",
+                    email: "store@gridox.in",
+                  },
+                  {
+                    name: "Gridox Outlet — T. Nagar",
+                    address: "45, Pondy Bazaar, T. Nagar, Chennai — 600 017",
+                    phone: "+91 88888 88888",
+                    hours: "Mon – Sun: 10:00 AM – 9:00 PM",
+                    email: "tnagar@gridox.in",
+                  },
+                ].map((store) => (
+                  <div key={store.name} className="bg-[#F5EDE6] rounded-sm p-6 space-y-3">
+                    <h3 className="font-heading text-base font-bold text-gray-900">{store.name}</h3>
+                    <div className="flex items-start gap-2 text-sm text-gray-600">
+                      <MapPin size={15} className="text-[#B31217] mt-0.5 shrink-0" />
+                      <span>{store.address}</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-sm text-gray-600">
+                      <Phone size={15} className="text-[#B31217] shrink-0" />
+                      <span>{store.phone}</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-sm text-gray-600">
+                      <Clock size={15} className="text-[#B31217] shrink-0" />
+                      <span>{store.hours}</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-sm text-gray-600">
+                      <Mail size={15} className="text-[#B31217] shrink-0" />
+                      <span>{store.email}</span>
+                    </div>
+                  </div>
+                ))}
               </div>
             </div>
 

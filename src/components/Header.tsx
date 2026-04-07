@@ -7,8 +7,6 @@ const navLinks = [
   { name: "HOME" },
   { name: "NEW" },
   { name: "SHOP" },
-  { name: "TRACK ORDER" },
-  { name: "STORE LOCATOR" },
   { name: "ABOUT US" },
 ];
 
