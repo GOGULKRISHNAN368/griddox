@@ -40,7 +40,7 @@ const CartPage = () => {
             <p className="text-lg">Your cart is empty</p>
             <button
               onClick={() => navigate("/")}
-              className="mt-2 px-6 py-2 bg-foreground text-background text-sm font-medium tracking-wider hover:opacity-80 transition-opacity"
+              className="mt-2 px-6 py-2 bg-primary text-primary-foreground text-sm font-medium tracking-wider hover:opacity-80 transition-opacity"
             >
               CONTINUE SHOPPING
             </button>
@@ -94,7 +94,7 @@ const CartPage = () => {
                 <span>Total</span>
                 <span>₹{subtotal.toLocaleString()}</span>
               </div>
-              <button className="w-full py-3 bg-foreground text-background text-sm font-medium tracking-wider hover:opacity-80 transition-opacity">
+              <button className="w-full py-3 bg-primary text-primary-foreground text-sm font-medium tracking-wider hover:opacity-80 transition-opacity">
                 PROCEED TO CHECKOUT
               </button>
             </div>
