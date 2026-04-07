@@ -1,5 +1,7 @@
 import { useState, useRef } from "react";
+import { useNavigate } from "react-router-dom";
 import { Heart, ShoppingBag } from "lucide-react";
+import { HOME_PRODUCT_LINKS } from "@/fixes/homeProductLinks"; // fix: home product links
 import img1 from "@/assets/hero-1.jpg";
 import img2 from "@/assets/cat-kurta-set-v2.jpg";
 import img3 from "@/assets/cat-dresses-v2.jpg";
@@ -45,6 +47,7 @@ const products = [
 ];
 
 const NewIn = () => {
+  const navigate = useNavigate(); // fix: home product links
   const [activeIndex, setActiveIndex] = useState(0);
   const scrollRef = useRef<HTMLDivElement>(null);
 
@@ -94,6 +97,7 @@ const NewIn = () => {
             <div 
               key={product.id} 
               className="w-[45vw] sm:w-[35vw] md:w-full snap-start shrink-0 flex flex-col group cursor-pointer"
+              onClick={() => { const l = HOME_PRODUCT_LINKS[product.id]; if (l) navigate(`/category/${l.categorySlug}/product/${l.productId}`); }} // fix: home product links
             >
               {/* Image Container */}
               <div className="relative aspect-[3/4] w-full rounded-xl overflow-hidden bg-gray-100">

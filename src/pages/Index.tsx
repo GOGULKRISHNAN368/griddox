@@ -15,9 +15,9 @@ const Index = () => {
       <AnnouncementBar />
       <Header />
       <HeroCarousel />
-      <NewIn />
-      <FeaturedCategories />
-      <AboutUs />
+      <div id="new-arrivals"><NewIn /></div>  {/* fix: nav scroll links */}
+      <div id="shop"><FeaturedCategories /></div>  {/* fix: nav scroll links */}
+      <div id="about"><AboutUs /></div>  {/* fix: nav scroll links */}
       <BottomNav />
       <WhatsAppButton />
     </div>
