@@ -130,12 +130,12 @@ const ProductDetailPage = () => {
               </div>
               <div className="flex flex-wrap gap-2">
                 {product.sizes.map((size) => (
-                  <button
+                   <button
                     key={size}
                     onClick={() => setSelectedSize(size)}
                     className={`w-12 h-12 rounded-full border-2 text-sm font-medium transition-all ${
                       selectedSize === size
-                        ? "border-foreground bg-foreground text-background"
+                         ? "border-foreground bg-foreground text-background"
                         : "border-muted-foreground/30 hover:border-foreground"
                     }`}
                   >

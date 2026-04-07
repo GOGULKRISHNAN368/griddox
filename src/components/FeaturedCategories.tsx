@@ -141,3 +141,4 @@ const FeaturedCategories = () => {
 };
 
 export default FeaturedCategories;
+
