@@ -3,8 +3,8 @@ body {
 }
 
 .featured-carousel {
-    height: 650px;
-    max-height: 80vh;
+    height: 100vh;
+    width: 100vw;
     margin-left: calc(50% - 50vw);
     position: relative;
     background-color: #000;
@@ -323,6 +323,8 @@ body {
     }
 }
 
+
+
 .featured-carousel .time {
     position: absolute;
     z-index: 1000;
@@ -344,8 +346,8 @@ body {
 /* Mobile Adjustments */
 @media screen and (max-width: 768px) {
     .featured-carousel {
-        height: 500px;
-        max-height: 70dvh;
+        height: 85dvh;
+        max-height: 85dvh;
     }
     .featured-carousel .list .item .content {
         padding-right: 0;

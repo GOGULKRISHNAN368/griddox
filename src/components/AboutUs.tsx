@@ -5,18 +5,18 @@ const AboutUs = () => {
   const [isExpanded, setIsExpanded] = useState(false);
 
   return (
-    <section id="about" className="relative w-full py-12 md:py-20 bg-white overflow-hidden">
+    <section id="about" className="relative w-full py-20 md:py-32 bg-white overflow-hidden">
       <div className="container mx-auto px-4">
         <div className="max-w-4xl mx-auto">
           
-          <div className="flex flex-col items-center text-center space-y-10">
+          <div className="flex flex-col items-center text-center space-y-12">
             
             {/* Header Content */}
-            <div className="space-y-4">
-              <div className="inline-block px-3 py-1 border border-[#8b231a]/20 text-[#8b231a] text-[10px] uppercase tracking-widest font-medium mb-1">
+            <div className="space-y-6">
+              <div className="inline-block px-3 py-1 border border-[#8b231a]/20 text-[#8b231a] text-[10px] uppercase tracking-widest font-medium mb-2">
                 Our Story
               </div>
-              <h2 className="font-heading text-3xl md:text-5xl text-gray-900 leading-tight">
+              <h2 className="font-heading text-4xl md:text-5xl lg:text-6xl text-gray-900 leading-tight">
                 About Gridox
               </h2>
               <h3 className="font-heading text-xl md:text-2xl text-[#8b231a] italic opacity-90">

@@ -76,9 +76,9 @@ const NewIn = () => {
   };
 
   return (
-    <section className="py-8 md:py-12 w-full max-w-7xl mx-auto">
-      <div className="text-center px-4 mb-6">
-        <h2 className="font-heading text-3xl md:text-4xl font-normal mb-2 text-[#1a1a1a]">New Arrivals</h2>
+    <section className="py-10 md:py-16 w-full max-w-7xl mx-auto">
+      <div className="text-center px-4 mb-8">
+        <h2 className="font-heading text-3xl md:text-4xl font-normal mb-3 text-[#1a1a1a]">New Arrivals</h2>
         <p className="text-sm md:text-base text-gray-600 max-w-md mx-auto">
           Discover the latest trends and fresh picks in our new collection.
         </p>
