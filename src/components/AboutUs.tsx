@@ -82,50 +82,6 @@ const AboutUs = () => {
               </div>
             </div>
 
-            {/* Store Details */}
-            <div className="w-full border-t border-border pt-12">
-              <div className="inline-block px-3 py-1 border border-primary/20 text-primary text-[10px] uppercase tracking-widest font-medium mb-6">
-                Visit Us
-              </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-left">
-                {[
-                  {
-                    name: "Gridox Studio — Main Store",
-                    address: "123, Fashion Street, Anna Nagar, Chennai — 600 040",
-                    phone: "+91 99999 99999",
-                    hours: "Mon – Sat: 10:00 AM – 8:00 PM",
-                    email: "store@gridox.in",
-                  },
-                  {
-                    name: "Gridox Outlet — T. Nagar",
-                    address: "45, Pondy Bazaar, T. Nagar, Chennai — 600 017",
-                    phone: "+91 88888 88888",
-                    hours: "Mon – Sun: 10:00 AM – 9:00 PM",
-                    email: "tnagar@gridox.in",
-                  },
-                ].map((store) => (
-                  <div key={store.name} className="bg-card rounded-sm p-6 space-y-3">
-                    <h3 className="font-heading text-base font-bold text-foreground">{store.name}</h3>
-                    <div className="flex items-start gap-2 text-sm text-muted-foreground">
-                      <MapPin size={15} className="text-primary mt-0.5 shrink-0" />
-                      <span>{store.address}</span>
-                    </div>
-                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                      <Phone size={15} className="text-primary shrink-0" />
-                      <span>{store.phone}</span>
-                    </div>
-                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                      <Clock size={15} className="text-primary shrink-0" />
-                      <span>{store.hours}</span>
-                    </div>
-                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                      <Mail size={15} className="text-primary shrink-0" />
-                      <span>{store.email}</span>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
 
           </div>
         </div>

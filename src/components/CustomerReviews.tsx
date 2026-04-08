@@ -132,7 +132,7 @@ const CustomerReviews = () => {
             {reviews.map((review) => (
               <div 
                 key={review.id} 
-                className="flex-shrink-0 w-[190px] md:w-[220px] snap-start bg-[#fcfcfc] overflow-hidden"
+                className="flex-shrink-0 w-[190px] md:w-[220px] snap-start bg-white overflow-hidden"
               >
                 <div className="aspect-[1/1.2] overflow-hidden rounded-md mb-4 shadow-sm">
                   <img 

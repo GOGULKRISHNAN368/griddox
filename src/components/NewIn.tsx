@@ -100,7 +100,7 @@ const NewIn = () => {
               onClick={() => { const l = HOME_PRODUCT_LINKS[product.id]; if (l) navigate(`/category/${l.categorySlug}/product/${l.productId}`); }} // fix: home product links
             >
               {/* Image Container */}
-              <div className="relative aspect-[3/4] w-full rounded-xl overflow-hidden bg-gray-100">
+              <div className="relative aspect-[3/4] w-full rounded-xl overflow-hidden bg-white">
                 <img 
                   src={product.image} 
                   alt={product.name} 

@@ -11,7 +11,7 @@ const StoreLocator = () => {
   const mapEmbedUrl = `https://maps.google.com/maps?q=${encodeURIComponent(address)}&t=&z=17&ie=UTF8&iwloc=&output=embed`;
 
   return (
-    <div className="min-h-screen bg-[#fcfaf7] pb-20 md:pb-0 font-body">
+    <div className="min-h-screen bg-white pb-20 md:pb-0 font-body">
       <Header />
       <AnnouncementBar />
       
@@ -46,7 +46,7 @@ const StoreLocator = () => {
               <div className="space-y-8">
                 <div className="space-y-4">
                   <h2 className="font-heading text-3xl md:text-4xl text-[#1a1a1a] leading-tight">
-                    Visit us in the heart of <span className="text-[#8b231a] italic">Tiruppur</span>
+                    Our Flagship Boutique in <span className="text-[#8b231a] italic">Tiruppur</span>
                   </h2>
                   <p className="text-gray-500 text-lg leading-relaxed max-w-md">
                     Experience our latest collections and personalized styling in our signature boutique setting.

@@ -48,74 +48,74 @@ const ProductDetailPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-black text-white pb-16 md:pb-0">
+    <div className="min-h-screen bg-white text-[#1a1a1a] pb-16 md:pb-0 font-body">
       <OfferBanner />
       <AnnouncementBar />
       <Header />
 
       {/* Breadcrumb */}
-      <div className="max-w-7xl mx-auto px-4 py-3">
-        <div className="flex items-center gap-2 text-[10px] text-gray-500 uppercase tracking-widest">
-          <Link to="/" className="hover:text-white transition-colors">HOME</Link>
+      <div className="max-w-7xl mx-auto px-4 py-8">
+        <div className="flex items-center gap-2 text-[10px] text-gray-400 uppercase tracking-widest font-bold">
+          <Link to="/" className="hover:text-black transition-colors">HOME</Link>
           <span>/</span>
-          <Link to={`/category/${category.slug}`} className="hover:text-white transition-colors">
+          <Link to={`/category/${category.slug}`} className="hover:text-black transition-colors">
             {category.title}
           </Link>
           <span>/</span>
-          <span className="text-gray-300">{product.name}</span>
+          <span className="text-[#8b231a]">{product.name}</span>
         </div>
       </div>
 
       {/* Product Layout */}
       <div className="max-w-7xl mx-auto px-4 pb-12">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-10">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-14 items-start">
           {/* Left: Image Gallery */}
           <div className="w-full">
             <ProductGallery images={product.images} productName={product.name} />
           </div>
 
           {/* Right: Product Info */}
-          <div className="space-y-5">
+          <div className="space-y-8">
             {/* Title */}
-            <div>
-              <h1 className="text-xl md:text-2xl font-bold tracking-widest uppercase text-white">
+            <div className="space-y-2">
+              <h1 className="font-heading text-2xl md:text-4xl font-normal leading-tight italic text-[#1a1a1a]">
                 {product.name}
               </h1>
+              <p className="text-[10px] text-gray-400 uppercase tracking-[0.3em] font-bold">Premium Ensemble</p>
             </div>
 
             {/* Price */}
-            <div className="flex items-baseline gap-3">
-              <span className="text-2xl font-bold text-white">₹{product.price.toLocaleString()}</span>
-              <span className="text-sm text-gray-500 font-medium">MRP</span>
-              <span className="text-sm text-gray-500 line-through">
-                ₹{product.originalPrice.toLocaleString()}
-              </span>
-              <span className="text-sm font-semibold text-orange-500">
-                {product.discount}% OFF
-              </span>
+            <div className="flex items-center gap-4">
+              <span className="text-3xl font-bold text-[#1a1a1a]">₹{product.price.toLocaleString()}</span>
+              <div className="flex flex-col">
+                <span className="text-xs text-gray-400 line-through">
+                  ₹{product.originalPrice.toLocaleString()}
+                </span>
+                <span className="text-xs font-bold text-[#8b231a] tracking-wider uppercase">
+                  {product.discount}% OFF
+                </span>
+              </div>
             </div>
-            <p className="text-[10px] text-gray-500 uppercase tracking-widest">Inclusive of all taxes</p>
 
             {/* Colors */}
             {product.colors.length > 0 && (
-              <div>
-                <h3 className="font-bold text-sm mb-2 tracking-wide">SELECT COLOR</h3>
-                <div className="flex gap-3">
+              <div className="space-y-3">
+                <h3 className="font-bold text-[10px] tracking-widest text-gray-500 uppercase">Select Color</h3>
+                <div className="flex gap-4">
                   {product.colors.map((color, idx) => (
                     <button
                       key={color.name}
                       onClick={() => setSelectedColorIdx(idx)}
-                      className={`flex flex-col items-center gap-1`}
+                      className="group flex flex-col items-center gap-2"
                     >
                       <div
-                        className={`w-10 h-10 rounded-full border-2 transition-all ${
+                        className={`w-10 h-10 rounded-full border-2 transition-all ring-offset-2 ${
                           selectedColorIdx === idx
-                            ? "border-foreground ring-2 ring-foreground/20"
-                            : "border-muted"
+                            ? "border-[#1a1a1a] ring-2 ring-[#1a1a1a]/20 scale-110"
+                            : "border-transparent group-hover:border-gray-200"
                         }`}
                         style={{ backgroundColor: color.hex }}
                       />
-                      <span className="text-xs">{color.name}</span>
                     </button>
                   ))}
                 </div>
@@ -123,20 +123,20 @@ const ProductDetailPage = () => {
             )}
 
             {/* Size */}
-            <div>
-              <div className="flex items-center justify-between mb-2">
-                <h3 className="font-bold text-xs tracking-widest text-gray-400">SELECT SIZE</h3>
-                <button className="text-xs text-orange-500 hover:underline tracking-widest">SIZE GUIDE</button>
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <h3 className="font-bold text-[10px] tracking-widest text-gray-500 uppercase">Select Size</h3>
+                <button className="text-[10px] text-[#8b231a] font-bold tracking-widest hover:underline uppercase">Size Guide</button>
               </div>
-              <div className="flex flex-wrap gap-2">
+              <div className="flex flex-wrap gap-3">
                 {product.sizes.map((size) => (
                    <button
                     key={size}
                     onClick={() => setSelectedSize(size)}
-                    className={`w-12 h-12 rounded-full border text-xs font-bold tracking-tighter transition-all ${
+                    className={`w-12 h-12 rounded-full border text-xs font-bold transition-all ${
                       selectedSize === size
-                         ? "border-white bg-white text-black"
-                        : "border-gray-800 text-gray-400 hover:border-gray-600"
+                         ? "border-[#1a1a1a] bg-[#1a1a1a] text-white"
+                        : "border-gray-200 text-[#1a1a1a] hover:border-[#1a1a1a]"
                     }`}
                   >
                     {size === 0 ? "FS" : size}
@@ -146,131 +146,127 @@ const ProductDetailPage = () => {
             </div>
 
             {/* CTA Buttons */}
-            <div className="flex gap-3 pt-2">
+            <div className="flex flex-col md:flex-row gap-4 pt-4">
               <button
                 onClick={handleAddToBag}
-                className="flex-1 h-14 bg-muted-foreground/80 text-background font-bold text-sm tracking-widest rounded hover:bg-muted-foreground transition-colors"
+                className="flex-[1.5] h-16 bg-white border border-[#1a1a1a] text-[#1a1a1a] font-bold text-xs tracking-[0.2em] rounded-sm hover:bg-[#1a1a1a] hover:text-white transition-all uppercase"
               >
-                ADD TO BAG
+                Add To Bag
               </button>
               <button
                 onClick={handleBuyNow}
-                className="flex-1 h-14 bg-[#c4877a] text-white font-bold text-sm tracking-widest rounded hover:bg-[#b07069] transition-colors"
+                className="flex-1 h-16 bg-[#8b231a] text-white font-bold text-xs tracking-[0.2em] rounded-sm hover:bg-[#a62b21] transition-all uppercase"
               >
-                BUY NOW
+                Buy Now
               </button>
             </div>
 
             {/* Delivery */}
-            <div className="pt-2">
-              <h3 className="font-bold text-xs tracking-widest text-gray-400 mb-2">DELIVERY</h3>
-              <div className="flex rounded border border-gray-800 overflow-hidden bg-[#0a0a0a]">
+            <div className="pt-6 border-t border-black/5">
+              <h3 className="font-bold text-[10px] tracking-widest text-gray-500 uppercase mb-3">Check Delivery</h3>
+              <div className="flex border border-gray-200 rounded-sm overflow-hidden bg-white shadow-sm ring-1 ring-black/5">
                 <input
                   type="text"
                   value={pincode}
                   onChange={(e) => setPincode(e.target.value.replace(/\D/g, "").slice(0, 6))}
                   placeholder="Enter pincode"
-                  className="flex-1 px-4 py-3 text-sm bg-transparent outline-none text-white placeholder:text-gray-700 font-medium"
+                  className="flex-1 px-4 py-4 text-sm bg-transparent outline-none text-[#1a1a1a] placeholder:text-gray-300 font-medium"
                   maxLength={6}
                 />
-                <button className="px-6 text-xs font-bold tracking-widest text-orange-500 hover:text-white transition-colors">
+                <button className="px-8 text-[10px] font-bold tracking-widest text-[#8b231a] hover:bg-gray-50 transition-colors">
                   CHECK
                 </button>
               </div>
             </div>
 
             {/* Features */}
-            <div className="grid grid-cols-2 gap-4 pt-2">
-              <div className="flex items-center gap-2">
-                <Truck size={18} className="text-muted-foreground" />
-                <span className="text-sm font-medium">Free Shipping</span>
+            <div className="grid grid-cols-2 gap-y-6 pt-4">
+              <div className="flex items-center gap-3">
+                <Truck size={18} className="text-[#8b231a]" strokeWidth={1} />
+                <span className="text-[10px] font-bold uppercase tracking-widest">Free Shipping</span>
               </div>
-              <div className="flex items-center gap-2">
-                <RotateCcw size={18} className="text-muted-foreground" />
-                <span className="text-sm font-medium">7 Days Easy Return</span>
+              <div className="flex items-center gap-3">
+                <RotateCcw size={18} className="text-[#8b231a]" strokeWidth={1} />
+                <span className="text-[10px] font-bold uppercase tracking-widest">7 Day Returns</span>
               </div>
-              <div className="flex items-center gap-2">
-                <Shield size={18} className="text-muted-foreground" />
-                <span className="text-sm font-medium">Assured Quality</span>
+              <div className="flex items-center gap-3">
+                <Shield size={18} className="text-[#8b231a]" strokeWidth={1} />
+                <span className="text-[10px] font-bold uppercase tracking-widest">Assured Quality</span>
               </div>
-              <div className="flex items-center gap-2">
-                <Banknote size={18} className="text-muted-foreground" />
-                <span className="text-sm font-medium">COD Available</span>
+              <div className="flex items-center gap-3">
+                <Banknote size={18} className="text-[#8b231a]" strokeWidth={1} />
+                <span className="text-[10px] font-bold uppercase tracking-widest">COD Available</span>
               </div>
             </div>
 
             {/* Accordion sections */}
-            <Accordion type="single" collapsible className="w-full pt-2">
-              <AccordionItem value="details">
-                <AccordionTrigger className="font-bold text-sm tracking-wide">
-                  PRODUCT DETAILS
+            <Accordion type="single" collapsible className="w-full pt-4 border-t border-black/5">
+              <AccordionItem value="details" className="border-none">
+                <AccordionTrigger className="font-bold text-[11px] tracking-widest uppercase py-4">
+                  Product Details
                 </AccordionTrigger>
                 <AccordionContent>
-                  <p className="text-sm leading-relaxed text-muted-foreground mb-4">
-                    {product.description}
-                  </p>
-                  <div className="grid grid-cols-2 gap-y-3 gap-x-6">
-                    <div>
-                      <p className="font-bold text-sm">Fabric</p>
-                      <p className="text-sm text-muted-foreground">{product.fabric}</p>
-                    </div>
-                    <div>
-                      <p className="font-bold text-sm">Fit</p>
-                      <p className="text-sm text-muted-foreground">{product.fit}</p>
-                    </div>
-                    <div>
-                      <p className="font-bold text-sm">Neckline</p>
-                      <p className="text-sm text-muted-foreground">{product.neckline}</p>
-                    </div>
-                    <div>
-                      <p className="font-bold text-sm">Sleeve</p>
-                      <p className="text-sm text-muted-foreground">{product.sleeve}</p>
+                  <div className="space-y-6 pt-2">
+                    <p className="text-sm leading-relaxed text-gray-500">
+                      {product.description}
+                    </p>
+                    <div className="grid grid-cols-2 gap-y-6 gap-x-12">
+                      <div className="space-y-1">
+                        <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Fabric</p>
+                        <p className="text-sm text-[#1a1a1a] font-medium italic">{product.fabric}</p>
+                      </div>
+                      <div className="space-y-1">
+                        <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Fit</p>
+                        <p className="text-sm text-[#1a1a1a] font-medium italic">{product.fit}</p>
+                      </div>
+                      <div className="space-y-1">
+                        <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Neckline</p>
+                        <p className="text-sm text-[#1a1a1a] font-medium italic">{product.neckline}</p>
+                      </div>
+                      <div className="space-y-1">
+                        <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Sleeve</p>
+                        <p className="text-sm text-[#1a1a1a] font-medium italic">{product.sleeve}</p>
+                      </div>
                     </div>
                   </div>
                 </AccordionContent>
               </AccordionItem>
-              <AccordionItem value="wash">
-                <AccordionTrigger className="font-bold text-sm tracking-wide">
-                  WASH AND CARE
+              <AccordionItem value="wash" className="border-none">
+                <AccordionTrigger className="font-bold text-[11px] tracking-widest uppercase py-4">
+                  Wash and Care
                 </AccordionTrigger>
                 <AccordionContent>
-                  <p className="text-sm text-muted-foreground">
-                    Hand wash or machine wash in cold water. Do not bleach. Dry in shade. Iron on medium heat.
-                  </p>
-                </AccordionContent>
-              </AccordionItem>
-              <AccordionItem value="delivery">
-                <AccordionTrigger className="font-bold text-sm tracking-wide">
-                  DELIVERY AND RETURNS
-                </AccordionTrigger>
-                <AccordionContent>
-                  <p className="text-sm text-muted-foreground">
-                    Free delivery on orders above ₹999. Easy 7-day returns and exchanges. Cash on delivery available on most pin codes.
+                  <p className="text-sm leading-relaxed text-gray-500 pt-2 italic">
+                    Gridox garments are made with premium fabrics. We recommend hand dry cleaning or a gentle cold wash to preserve the fabric's integrity. Dry in shade and iron on low-to-medium heat.
                   </p>
                 </AccordionContent>
               </AccordionItem>
             </Accordion>
 
             {/* Help */}
-            <div className="pt-4 border-t">
-              <h3 className="font-bold text-sm mb-2">HAVE A QUESTION? WE ARE HERE TO HELP!</h3>
-              <p className="text-sm text-muted-foreground">
-                We are available on <a href="tel:011-41169005" className="underline">011-41169005</a>, Monday - Saturday from 9:30am - 6:30pm.
-              </p>
-              <p className="text-sm text-muted-foreground mt-1">
-                Email us at <a href="mailto:support@gridox.com" className="underline">support@gridox.com</a>
-              </p>
+            <div className="pt-8 border-t border-black/5">
+              <h3 className="font-bold text-[10px] tracking-widest uppercase text-gray-400 mb-4">Questions?</h3>
+              <div className="space-y-2">
+                <p className="text-sm text-[#1a1a1a] font-medium">
+                  Support: <a href="tel:011-41169005" className="hover:text-[#8b231a] transition-colors font-bold tracking-wider underline underline-offset-4">011-41169005</a>
+                </p>
+                <p className="text-sm text-[#1a1a1a] font-medium">
+                  Email: <a href="mailto:support@gridox.com" className="hover:text-[#8b231a] transition-colors font-bold tracking-wider underline underline-offset-4">support@gridox.com</a>
+                </p>
+              </div>
             </div>
           </div>
         </div>
       </div>
 
       {/* Similar Products */}
-      <SimilarProducts 
-        products={category.products} 
-        currentProductId={product.id} 
-        categorySlug={category.slug} 
-      />
+      <div className="max-w-7xl mx-auto py-12">
+        <SimilarProducts 
+          products={category.products} 
+          currentProductId={product.id} 
+          categorySlug={category.slug} 
+        />
+      </div>
 
       <BottomNav />
       <WhatsAppButton />
