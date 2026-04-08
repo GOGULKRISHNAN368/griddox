@@ -1,4 +1,4 @@
-import { Search, User, ShoppingCart, Menu, X } from "lucide-react";
+import { Search, User, ShoppingCart, Menu, X, MapPin } from "lucide-react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { NAV_TARGETS } from "@/fixes/navConfig"; // fix: nav scroll links
@@ -7,6 +7,8 @@ const navLinks = [
   { name: "HOME" },
   { name: "NEW" },
   { name: "SHOP" },
+  { name: "TRACK ORDER" },
+  { name: "STORE LOCATOR" },
   { name: "ABOUT US" },
 ];
 
@@ -64,6 +66,13 @@ const Header = () => {
         <div className="flex items-center gap-4">
           <button aria-label="Search" className="text-foreground hover:text-accent transition-colors">
             <Search size={20} />
+          </button>
+          <button 
+            aria-label="Store Locator" 
+            onClick={() => navigate("/store-locator")} 
+            className="text-foreground hover:text-accent transition-colors"
+          >
+            <MapPin size={20} />
           </button>
           <button aria-label="Account" onClick={() => navigate("/account")} className="hidden md:block text-foreground hover:text-accent transition-colors"> {/* fix: account route */}
             <User size={20} />
