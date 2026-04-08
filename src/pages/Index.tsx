@@ -18,11 +18,6 @@ const Index = () => {
       <AnnouncementBar />
       <div id="new-arrivals"><NewIn /></div>
       <div id="shop"><FeaturedCategories /></div>
-      <div className="flex justify-center -mt-8 mb-12 md:hidden">
-        <button className="border border-foreground px-10 py-3 text-xs font-semibold uppercase tracking-[0.2em] bg-background hover:bg-foreground hover:text-background transition-colors">
-          View More
-        </button>
-      </div>
       <Reels />
       <CustomerReviews />
       <div id="about"><AboutUs /></div>

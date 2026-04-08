@@ -48,7 +48,7 @@ const HeroCarousel = () => {
             <img
               src={slide.image}
               alt={slide.title}
-              className={`w-full h-[40vh] sm:h-[50vh] md:h-[60vh] lg:h-[65vh] object-cover object-top ${
+              className={`w-full h-[65vh] sm:h-[55vh] md:h-[60vh] lg:h-[65vh] object-cover object-top ${
                 i === current ? "animate-hero-zoom-out" : "scale-110"
               }`}
               width={1920}
@@ -58,19 +58,19 @@ const HeroCarousel = () => {
             <div className="absolute inset-0 bg-foreground/20" />
             <div className="absolute inset-0 flex flex-col justify-center px-6 md:px-16 lg:px-24">
               {slide.offer && (
-                <p className="text-primary-foreground text-xs md:text-sm tracking-widest mb-2 font-body">
+                <p className="text-primary-foreground text-xs md:text-sm tracking-widest mb-2 font-body animate-fade-in shadow-sm">
                   {slide.offer}
                 </p>
               )}
-              <p className="text-primary-foreground/80 text-xs md:text-sm tracking-[0.2em] uppercase mb-2 font-body">
+              <p className="text-primary-foreground/80 text-[10px] md:text-sm tracking-[0.2em] uppercase mb-2 font-body animate-fade-in">
                 {slide.subtitle}
               </p>
-              <h1 className="font-heading italic text-3xl md:text-5xl lg:text-6xl text-primary-foreground mb-6 max-w-lg">
+              <h1 className="font-heading italic text-4xl md:text-5xl lg:text-6xl text-primary-foreground mb-8 max-w-[260px] md:max-w-lg leading-tight animate-fade-in">
                 {slide.title}
               </h1>
               <a
                 href="#"
-                className="inline-block w-fit border border-primary-foreground text-primary-foreground px-6 py-2.5 text-xs md:text-sm tracking-widest font-medium hover:bg-primary-foreground hover:text-foreground transition-all"
+                className="inline-block w-fit border border-primary-foreground text-primary-foreground px-8 py-3 text-[10px] md:text-sm tracking-[0.2em] font-medium hover:bg-primary-foreground hover:text-foreground transition-all uppercase animate-fade-in"
               >
                 {slide.cta}
               </a>
