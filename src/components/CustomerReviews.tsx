@@ -4,57 +4,57 @@ import { useRef } from "react";
 const reviews = [
   {
     id: 1,
-    name: "Nisha",
-    image: "/reviews/review1.png",
-    text: "Judge.me Shop Reviews",
+    name: "Sneha",
+    image: "/reviews/review7.png",
+    text: "Judge.me Shop\nReviews",
     rating: 5,
     tag: "Gridox!"
   },
   {
     id: 2,
-    name: "Anjali",
+    name: "Ritika",
     image: "/reviews/review2.png",
-    text: "Awesome material. Very soft to wear. And it looks super bright...",
+    text: "Judge.me Shop\nReviews",
     rating: 5,
     tag: "Gridox!"
   },
   {
     id: 3,
-    name: "Priyanka",
-    image: "/reviews/review3.png",
-    text: "Judge.me Shop Reviews",
+    name: "Nisha",
+    image: "/reviews/review1.png",
+    text: "Judge.me Shop\nReviews",
     rating: 5,
     tag: "Gridox!"
   },
   {
     id: 4,
-    name: "Deepthi Reddy",
-    image: "/reviews/review4.png",
-    text: "Perfect fit and very comfortable. Loved the color!",
-    rating: 5,
+    name: "Nisha",
+    image: "/reviews/review5.png",
+    text: "Judge.me Shop\nReviews",
+    rating: 4,
     tag: "Gridox!"
   },
   {
     id: 5,
-    name: "Vidhya",
-    image: "/reviews/review5.png",
-    text: "Judge.me Shop Reviews",
+    name: "Anjali",
+    image: "/reviews/review4.png",
+    text: "Judge.me Shop\nReviews",
     rating: 5,
     tag: "Gridox!"
   },
   {
     id: 6,
-    name: "Megha",
-    image: "/reviews/review6.png",
-    text: "Exceptional quality. The fabric feels premium.",
+    name: "Vidhya",
+    image: "/reviews/review3.png",
+    text: "Judge.me Shop\nReviews",
     rating: 5,
     tag: "Gridox!"
   },
   {
     id: 7,
-    name: "Sneha",
-    image: "/reviews/review7.png",
-    text: "Judge.me Shop Reviews",
+    name: "Megha",
+    image: "/reviews/review6.png",
+    text: "Judge.me Shop\nReviews",
     rating: 5,
     tag: "Gridox!"
   },
@@ -62,7 +62,7 @@ const reviews = [
     id: 8,
     name: "Kavya",
     image: "/reviews/review8.png",
-    text: "Beautiful design. Got so many compliments!",
+    text: "Judge.me Shop\nReviews",
     rating: 5,
     tag: "Gridox!"
   }
@@ -74,85 +74,94 @@ const CustomerReviews = () => {
   const scroll = (direction: 'left' | 'right') => {
     if (scrollRef.current) {
       const { scrollLeft, clientWidth } = scrollRef.current;
-      const scrollTo = direction === 'left' ? scrollLeft - clientWidth / 2 : scrollLeft + clientWidth / 2;
+      const scrollTo = direction === 'left' ? scrollLeft - clientWidth / 3 : scrollLeft + clientWidth / 3;
       scrollRef.current.scrollTo({ left: scrollTo, behavior: "smooth" });
     }
   };
 
   return (
-    <section className="py-16 md:py-24 bg-white overflow-hidden">
+    <section className="py-20 bg-white overflow-hidden">
       <div className="container mx-auto px-4">
-        <div className="text-center space-y-4 mb-12">
-          <h2 className="font-heading text-3xl md:text-4xl text-gray-900 font-bold tracking-tight">
+        <div className="text-center space-y-8 mb-16">
+          <h2 className="font-heading text-3xl md:text-4xl text-[#1a1a1a] font-normal tracking-tight">
             Loved by 4 Lakh+ Women
           </h2>
-          <div className="flex flex-col md:flex-row items-center justify-center gap-4">
-            <div className="flex items-center gap-1">
+          
+          <div className="flex items-center justify-center gap-2 md:gap-4 flex-wrap">
+            <div className="flex gap-0.5">
               {[...Array(5)].map((_, i) => (
-                <Star key={i} size={16} className="fill-black text-black" />
+                <Star key={i} size={14} className="fill-black text-black" />
               ))}
-              <span className="text-sm font-bold ml-2">4.89 <span className="text-gray-400 font-normal">★ (1,719)</span></span>
             </div>
-            <div className="flex items-center gap-1.5 text-emerald-600 font-bold text-xs uppercase tracking-widest">
-              <CheckCircle2 size={16} fill="currentColor" className="text-white" />
+            <div className="flex items-center gap-1.5 text-sm">
+              <span className="font-medium text-gray-900">4.89</span>
+              <Star size={12} className="fill-black text-black" />
+              <span className="text-gray-400">(1,719)</span>
+            </div>
+            <div className="flex items-center gap-2 px-3 py-1 bg-[#eefaf4] text-[#108548] text-[10px] font-bold uppercase tracking-wider rounded-sm">
+              <CheckCircle2 size={14} className="fill-[#108548] text-white" />
               Verified
             </div>
           </div>
         </div>
 
-        <div className="relative group">
+        <div className="relative group max-w-6xl mx-auto">
           {/* Controls */}
           <button 
             onClick={() => scroll('left')}
-            className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 z-20 w-12 h-12 rounded-full bg-white shadow-xl border border-gray-100 flex items-center justify-center text-gray-900 hover:bg-black hover:text-white transition-all opacity-0 group-hover:opacity-100 hidden md:flex"
+            className="absolute -left-12 top-[40%] z-20 text-gray-400 hover:text-black transition-colors hidden lg:block"
+            aria-label="Previous"
           >
-            <ChevronLeft size={24} />
+            <ChevronLeft size={48} strokeWidth={1} />
           </button>
           
           <button 
             onClick={() => scroll('right')}
-            className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 z-20 w-12 h-12 rounded-full bg-white shadow-xl border border-gray-100 flex items-center justify-center text-gray-900 hover:bg-black hover:text-white transition-all opacity-0 group-hover:opacity-100 hidden md:flex"
+            className="absolute -right-12 top-[40%] z-20 text-gray-400 hover:text-black transition-colors hidden lg:block"
+            aria-label="Next"
           >
-            <ChevronRight size={24} />
+            <ChevronRight size={48} strokeWidth={1} />
           </button>
 
           {/* Slider */}
           <div 
             ref={scrollRef}
-            className="flex gap-4 md:gap-6 overflow-x-auto snap-x snap-mandatory scrollbar-hide pb-8 px-4 -mx-4"
+            className="flex gap-4 md:gap-4 overflow-x-auto snap-x snap-mandatory scrollbar-hide pb-12"
             style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
           >
             {reviews.map((review) => (
               <div 
                 key={review.id} 
-                className="flex-shrink-0 w-[260px] md:w-[280px] snap-start bg-[#f9f9f9] rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow group/card border border-gray-100"
+                className="flex-shrink-0 w-[190px] md:w-[220px] snap-start bg-[#fcfcfc] overflow-hidden"
               >
-                <div className="aspect-[4/5] overflow-hidden bg-gray-200">
+                <div className="aspect-[1/1.2] overflow-hidden rounded-md mb-4 shadow-sm">
                   <img 
                     src={review.image} 
                     alt={review.name}
-                    className="w-full h-full object-cover transition-transform duration-700 group-hover/card:scale-110"
+                    className="w-full h-full object-cover"
                   />
                 </div>
-                <div className="p-6 flex flex-col items-center text-center space-y-4">
+                <div className="py-4 px-2 flex flex-col items-center text-center space-y-4">
                   <div className="space-y-1">
-                    <p className="text-[10px] text-gray-400 uppercase tracking-widest font-bold">Reviewer</p>
-                    <p className="text-sm font-bold text-gray-900 tracking-wider uppercase">{review.name}</p>
+                    <p className="text-[10px] text-gray-500 font-medium whitespace-pre-line leading-tight">
+                      {review.text}
+                    </p>
                   </div>
                   
                   <div className="flex gap-0.5">
-                    {[...Array(review.rating)].map((_, i) => (
-                      <Star key={i} size={12} className="fill-emerald-600 text-emerald-600" />
+                    {[...Array(5)].map((_, i) => (
+                      <Star 
+                        key={i} 
+                        size={18} 
+                        className={`${i < review.rating ? 'fill-[#108548] text-[#108548]' : 'text-[#108548]'}`} 
+                        strokeWidth={1.5}
+                      />
                     ))}
                   </div>
 
-                  <p className="text-xs text-gray-600 leading-relaxed font-medium line-clamp-3 italic min-h-[40px]">
-                    "{review.text}"
-                  </p>
+                  <p className="text-sm font-bold text-[#1a1a1a] tracking-wide">{review.name}</p>
 
-                  <div className="pt-2">
-                    <p className="text-[10px] font-black tracking-[0.3em] text-[#8b231a]">{review.tag}</p>
-                  </div>
+                  <p className="text-[10px] font-bold text-gray-300 uppercase tracking-[0.2em]">{review.tag}</p>
                 </div>
               </div>
             ))}
