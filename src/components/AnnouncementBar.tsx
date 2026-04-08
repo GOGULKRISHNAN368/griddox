@@ -1,5 +1,6 @@
 const announcements = [
-  "COD Available",
+  "Fast Delivery in Coimbatore & Tirupur",
+  "COD Available across Tamil Nadu",
   "New Arrivals updated every week",
   "Express shipping on all Orders",
   "Get flat 10% off on your app purchase Use code: APP10",

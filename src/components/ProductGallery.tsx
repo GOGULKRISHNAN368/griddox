@@ -143,7 +143,7 @@ const ProductGallery = ({ images, productName }: ProductGalleryProps) => {
               <img
                 key={index}
                 src={img}
-                alt={`${productName} - ${index === 0 ? "Front" : index === 1 ? "Side" : index === 2 ? "Back" : index === 3 ? "Walking" : "Detail"}`}
+                alt={`${productName} ${index === 0 ? "Front" : index === 1 ? "Side" : index === 2 ? "Back" : index === 3 ? "Walking" : "Detail"} - Designer Fashion Coimbatore`}
                 className={`absolute inset-0 w-full h-full object-cover object-top transition-opacity duration-500 ${
                   activeIndex === index ? "opacity-100" : "opacity-0"
                 }`}

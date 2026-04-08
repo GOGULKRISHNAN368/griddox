@@ -45,9 +45,9 @@ const Header = () => {
         </button>
 
         {/* Logo */}
-        <div className="font-heading text-2xl md:text-3xl font-bold tracking-tight text-foreground">
+        <h1 className="font-heading text-2xl md:text-3xl font-bold tracking-tight text-foreground m-0">
           Gridox<span className="text-accent">!</span>
-        </div>
+        </h1>
 
         {/* Desktop nav */}
         <nav className="hidden md:flex items-center gap-8">

@@ -1,5 +1,6 @@
 import { useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
+import OptimizedImage from "./OptimizedImage";
 import "./FeaturedCategories.css";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
@@ -20,13 +21,13 @@ interface Category {
 }
 
 const initialCategories: Category[] = [
-  { id: "1", name: "PEPLUM CO-ORDS", image: catCoOrds, description: "Discover our latest collection of Peplum Co-ords. Stylish and comfortable fits for every occasion.", slug: "peplum-co-ords" },
-  { id: "2", name: "COTTON KURTI SET", image: catKurtaSet, description: "Traditional yet modern cotton kurti sets for everyday elegance.", slug: "cotton-kurti-set" },
-  { id: "3", name: "PEPLUM TOPS", image: catKurtas, description: "Trendy peplum tops perfect for pairing with your favorite bottoms.", slug: "peplum-tops" },
-  { id: "4", name: "RAW SILK SET", image: catDresses, description: "Experience luxury with our premium raw silk sets, designed for special occasions.", slug: "raw-silk-set" },
-  { id: "5", name: "MATERNITY WEAR", image: catMaternity, description: "Comfortable and stylish maternity wear for expecting mothers.", slug: "maternity-wear" },
-  { id: "6", name: "LOUNGE WEAR", image: catChuridar, description: "Relax in style with our premium quality lounge wear collection.", slug: "lounge-wear" },
-  { id: "7", name: "BOTTOM WEAR", image: catAnkleLeggings, description: "Versatile bottom wear collection spanning from leggings to palazzo.", slug: "bottom-wear" },
+  { id: "1", name: "PEPLUM CO-ORDS", image: catCoOrds, description: "Shop premium Peplum Co-ords for women. Our designer-crafted coordinating sets blend modern silhouettes with traditional elegance, perfect for festive events and contemporary ethnic wear.", slug: "peplum-co-ords" },
+  { id: "2", name: "COTTON KURTI SET", image: catKurtaSet, description: "Discover breathable Cotton Kurti Sets online. High-quality cotton fabrics, intricate prints, and comfortable fits designed for daily casual wear and office elegance.", slug: "cotton-kurti-set" },
+  { id: "3", name: "PEPLUM TOPS", image: catKurtas, description: "Trendy Peplum Tops for a stylish fusion look. Pair these versatile designer tops with jeans or ethnic bottoms for a chic, modern appearance in premium fabrics.", slug: "peplum-tops" },
+  { id: "4", name: "RAW SILK SET", image: catDresses, description: "Luxurious Raw Silk Sets for weddings and special occasions. Experience the rich texture and royal feel of high-end silk garments tailored to perfection for the modern woman.", slug: "raw-silk-set" },
+  { id: "5", name: "MATERNITY WEAR", image: catMaternity, description: "Comfortable and stylish Maternity Wear for expecting mothers. Functional designs, soft fabrics, and flattering silhouettes that keep you fashionable through every trimester.", slug: "maternity-wear" },
+  { id: "6", name: "LOUNGE WEAR", image: catChuridar, description: "Premium Women's Lounge Wear for ultimate comfort. Stay chic at home with our collection of soft, breathable, and stylish sets designed for relaxation without compromising on style.", slug: "lounge-wear" },
+  { id: "7", name: "BOTTOM WEAR", image: catAnkleLeggings, description: "Versatile Bottom Wear including ankle-length leggings, palazzos, and ethnic trousers. Perfectly tailored basics to complete any ethnic or fusion outfit.", slug: "bottom-wear" },
 ];
 
 const FeaturedCategories = () => {
@@ -94,7 +95,7 @@ const FeaturedCategories = () => {
         {categories.map((cat) => (
           <div key={cat.id} className="item">
             <div className="main-img-container">
-               <img src={cat.image} alt={cat.name} className="main-img" />
+               <OptimizedImage src={cat.image} alt={cat.name} className="main-img" />
             </div>
             <div className="content">
               <div className="author">GRIDOX</div>
@@ -113,7 +114,7 @@ const FeaturedCategories = () => {
       <div className="thumbnail">
         {categories.map((cat, index) => (
             <div key={`thumb-${cat.id}`} className="item" onClick={() => handleThumbnailClick(index)}>
-                <img src={cat.image} alt={cat.name} />
+                <OptimizedImage src={cat.image} alt={cat.name} />
                 <div className="content">
                     <div className="title">{cat.name}</div>
                     <div className="description">Explore</div>

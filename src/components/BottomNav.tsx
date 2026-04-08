@@ -13,16 +13,16 @@ const items = [
 const BottomNav = () => {
   const navigate = useNavigate(); // fix: cart/account routes
   return (
-    <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-background border-t border-border z-50 px-2 pb-[env(safe-area-inset-bottom)]">
-      <div className="flex justify-around items-center py-2">
+    <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md border-t border-border z-[1001] px-2 pb-[env(safe-area-inset-bottom)] shadow-[0_-4px_12px_rgba(0,0,0,0.05)]">
+      <div className="flex justify-around items-center py-3">
         {items.map(({ icon: Icon, label, path }) => (
           <button
             key={label}
             onClick={() => path && navigate(path)}
-            className="flex flex-col items-center gap-0.5 text-foreground hover:text-accent transition-colors bg-transparent border-none cursor-pointer"
+            className="flex flex-col items-center gap-1.5 text-gray-500 hover:text-[#8b231a] active:scale-90 transition-all bg-transparent border-none cursor-pointer flex-1"
           >
-            <Icon size={18} />
-            <span className="text-[9px] font-medium tracking-wide">{label}</span>
+            <Icon size={20} strokeWidth={1.5} />
+            <span className="text-[9px] font-bold tracking-widest">{label}</span>
           </button>
         ))}
       </div>

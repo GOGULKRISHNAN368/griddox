@@ -16,12 +16,11 @@ const AboutUs = () => {
                 Our Story
               </div>
               <h2 className="font-heading text-3xl md:text-4xl text-white leading-tight tracking-tight">
-                About Gridox
+                About Gridox | Premium Designer Women's Fashion
               </h2>
               <p className="text-white/70 font-body text-sm md:text-base leading-relaxed max-w-xl mx-auto">
-                Gridox pieces are more than just clothing—they're a celebration of modern elegance.
-                With our own production unit, every piece is designed
-                and tailored to fit your life beautifully.
+                Gridox is a leading destination for designer women's clothing, specializing in premium ethnic wear and modern contemporary styles. 
+                With our own dedicated production unit, we bridge the gap between high-end couture and everyday elegance, ensuring every piece is tailored to perfection for the modern woman.
               </p>
             </div>
 
@@ -60,10 +59,10 @@ const AboutUs = () => {
               <div className={`w-full overflow-hidden transition-all duration-700 ease-in-out ${isExpanded ? "max-h-[800px] opacity-100 pb-6" : "max-h-0 opacity-0"}`}>
                 <div className="text-white/70 space-y-4 text-sm leading-relaxed max-w-2xl mx-auto text-left md:text-center px-4">
                   <p>
-                    Gridox is inspired by modern women who balance multiple roles effortlessly. That's why our collections are designed to be versatile, timeless, and easy to wear, without compromising on elegance.
+                    Gridox is inspired by modern women across Coimbatore, Tirupur, and all of Tamil Nadu who balance multiple roles effortlessly. That's why our collections are designed to be versatile, timeless, and easy to wear, especially suited for the local climate.
                   </p>
                   <p>
-                    Unlike mass-produced fashion, we focus on limited, carefully crafted pieces—ensuring uniqueness in every outfit you own. Our designs are not just trend-based; they are built to last beyond seasons.
+                    Unlike mass-produced fashion, we focus on limited, carefully crafted pieces—ensuring uniqueness in every outfit you own. Our designs are built to last beyond seasons, providing the perfect blend of tradition and comfort for the fashion-forward women of South India.
                   </p>
                   <div className="pt-4">
                     <p className="text-white text-base md:text-lg font-heading italic font-medium relative inline-block px-8">

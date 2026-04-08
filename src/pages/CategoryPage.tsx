@@ -1,5 +1,6 @@
 import { useParams, Link } from "react-router-dom";
 import { Heart, ChevronLeft } from "lucide-react";
+import { Helmet } from "react-helmet-async";
 import { useEffect } from "react";
 import categories from "@/data/categoryProducts";
 import Header from "@/components/Header";
@@ -25,6 +26,12 @@ const CategoryPage = () => {
 
   return (
     <div className="min-h-screen bg-white text-[#1a1a1a] pb-16 md:pb-0 font-body">
+      <Helmet>
+        <title>{`${category.title} | Women's Fashion | Gridox`}</title>
+        <meta name="description" content={`Discover the latest ${category.title} collection at Gridox. Shop high-quality, designer women's clothing starting from premium fabrics.`} />
+        <meta property="og:title" content={`${category.title} | Gridox`} />
+        <meta property="og:description" content={`Explore our curated ${category.title} collection. Tailored fits and premium designs.`} />
+      </Helmet>
 
       <Header />
 
@@ -55,7 +62,7 @@ const CategoryPage = () => {
               <div className="relative overflow-hidden rounded-md bg-white shadow-sm ring-1 ring-black/5">
                 <img
                   src={product.images[0]}
-                  alt={product.name}
+                  alt={`${product.name} - Best Designer Wear in Coimbatore & Tirupur`}
                   loading="lazy"
                   className="w-full aspect-[3/4] object-cover object-top transition-transform duration-700 group-hover:scale-110"
                 />

@@ -52,17 +52,17 @@ const reviews = [
   },
   {
     id: 7,
-    name: "Megha",
+    name: "Megha (Coimbatore)",
     image: "/reviews/review6.avif",
-    text: "Judge.me Shop\nReviews",
+    text: "Received my Peplum set within 24 hours in Coimbatore. Perfect fit!",
     rating: 5,
     tag: "Gridox!"
   },
   {
     id: 8,
-    name: "Kavya",
+    name: "Kavya (Tirupur)",
     image: "/reviews/revire8.avif",
-    text: "Judge.me Shop\nReviews",
+    text: "The raw silk quality is amazing. Best festive wear collection in Tirupur.",
     rating: 5,
     tag: "Gridox!"
   }

@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
+import OptimizedImage from "./OptimizedImage";
 import hero1 from "@/assets/hero-1.jpg";
 import hero2 from "@/assets/hero-2.jpg";
 import hero3 from "@/assets/hero-3.png";
@@ -45,15 +46,15 @@ const HeroCarousel = () => {
       >
         {slides.map((slide, i) => (
           <div key={i} className="relative w-full flex-shrink-0 overflow-hidden">
-            <img
+            <OptimizedImage
               src={slide.image}
               alt={slide.title}
+              priority={i === 0}
               className={`w-full h-[65vh] sm:h-[55vh] md:h-[60vh] lg:h-[65vh] object-cover object-top ${
                 i === current ? "animate-hero-zoom-out" : "scale-110"
               }`}
               width={1920}
               height={800}
-              {...(i === 0 ? {} : { loading: "lazy" as const })}
             />
             <div className="absolute inset-0 bg-foreground/20" />
             <div className="absolute inset-0 flex flex-col justify-center px-6 md:px-16 lg:px-24">

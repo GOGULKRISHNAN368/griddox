@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <!-- Key Hub Pages -->
+  <url>
+    <loc>https://gridox.in/</loc>
+    <lastmod>2024-04-08</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>1.0</priority>
+  </url>
+  <url>
+    <loc>https://gridox.in/store-locator</loc>
+    <lastmod>2024-04-08</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://gridox.in/style-guide/coimbatore</loc>
+    <lastmod>2024-04-08</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+
+  <!-- Categories -->
+  <url>
+    <loc>https://gridox.in/category/peplum-co-ords</loc>
+    <lastmod>2024-04-08</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://gridox.in/category/cotton-kurti-set</loc>
+    <lastmod>2024-04-08</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://gridox.in/category/peplum-tops</loc>
+    <lastmod>2024-04-08</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://gridox.in/category/raw-silk-set</loc>
+    <lastmod>2024-04-08</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://gridox.in/category/maternity-wear</loc>
+    <lastmod>2024-04-08</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://gridox.in/category/lounge-wear</loc>
+    <lastmod>2024-04-08</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://gridox.in/category/bottom-wear</loc>
+    <lastmod>2024-04-08</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+</urlset>

@@ -92,7 +92,7 @@ const Reels: React.FC = () => {
                 loop
                 playsInline
                 autoPlay
-                preload="auto"
+                preload="none"
               >
                 <source src={reel.videoUrl} type="video/mp4" />
               </video>

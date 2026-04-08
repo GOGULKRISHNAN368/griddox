@@ -1,5 +1,6 @@
 import { useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
+import OptimizedImage from "./OptimizedImage";
 import { Heart, ShoppingBag } from "lucide-react";
 import { HOME_PRODUCT_LINKS } from "@/fixes/homeProductLinks"; // fix: home product links
 import img1 from "@/assets/hero-1.jpg";
@@ -101,7 +102,7 @@ const NewIn = () => {
             >
               {/* Image Container */}
               <div className="relative aspect-[3/4] w-full rounded-xl overflow-hidden bg-white">
-                <img 
+                <OptimizedImage 
                   src={product.image} 
                   alt={product.name} 
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"

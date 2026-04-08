@@ -1,5 +1,6 @@
 import { useParams, Link } from "react-router-dom";
 import { Heart, ChevronLeft, Truck, RotateCcw, Shield, Banknote } from "lucide-react";
+import { Helmet } from "react-helmet-async";
 import { useState } from "react";
 import categories from "@/data/categoryProducts";
 import ProductGallery from "@/components/ProductGallery";
@@ -48,6 +49,14 @@ const ProductDetailPage = () => {
 
   return (
     <div className="min-h-screen bg-white text-[#1a1a1a] pb-16 md:pb-0 font-body">
+      <Helmet>
+        <title>{`${product.name} | ${category.title} | Gridox`}</title>
+        <meta name="description" content={product.description || `Buy ${product.name} from our ${category.title} collection at Gridox. Premium ${product.fabric} with exclusive designer pattern.`} />
+        <meta property="og:title" content={`${product.name} - ${category.title} at Gridox`} />
+        <meta property="og:description" content={`Shop the ${product.name} at Gridox. Premium quality women's clothing.`} />
+        <meta property="og:image" content={product.images[0]} />
+        <meta name="keywords" content={`${product.name}, ${category.title}, women's ${product.fabric} dress, Gridox clothing`} />
+      </Helmet>
 
       <Header />
 
