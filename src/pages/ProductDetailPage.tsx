@@ -4,8 +4,7 @@ import { useState } from "react";
 import categories from "@/data/categoryProducts";
 import ProductGallery from "@/components/ProductGallery";
 import Header from "@/components/Header";
-import AnnouncementBar from "@/components/AnnouncementBar";
-import OfferBanner from "@/components/OfferBanner";
+
 import BottomNav from "@/components/BottomNav";
 import WhatsAppButton from "@/components/WhatsAppButton";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
@@ -49,8 +48,7 @@ const ProductDetailPage = () => {
 
   return (
     <div className="min-h-screen bg-white text-[#1a1a1a] pb-16 md:pb-0 font-body">
-      <OfferBanner />
-      <AnnouncementBar />
+
       <Header />
 
       {/* Breadcrumb */}

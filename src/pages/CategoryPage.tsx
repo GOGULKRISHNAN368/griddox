@@ -3,8 +3,7 @@ import { Heart, ChevronLeft } from "lucide-react";
 import { useEffect } from "react";
 import categories from "@/data/categoryProducts";
 import Header from "@/components/Header";
-import AnnouncementBar from "@/components/AnnouncementBar";
-import OfferBanner from "@/components/OfferBanner";
+
 import BottomNav from "@/components/BottomNav";
 import WhatsAppButton from "@/components/WhatsAppButton";
 
@@ -26,8 +25,7 @@ const CategoryPage = () => {
 
   return (
     <div className="min-h-screen bg-white text-[#1a1a1a] pb-16 md:pb-0 font-body">
-      <OfferBanner />
-      <AnnouncementBar />
+
       <Header />
 
       {/* Breadcrumb */}

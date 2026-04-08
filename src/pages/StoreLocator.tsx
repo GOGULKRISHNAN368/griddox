@@ -1,5 +1,4 @@
 import Header from "@/components/Header";
-import AnnouncementBar from "@/components/AnnouncementBar";
 import BottomNav from "@/components/BottomNav";
 import WhatsAppButton from "@/components/WhatsAppButton";
 import { MapPin, Phone, Mail, Clock, Navigation, Star, Sparkles, Shirt } from "lucide-react";
@@ -13,8 +12,7 @@ const StoreLocator = () => {
   return (
     <div className="min-h-screen bg-white pb-20 md:pb-0 font-body">
       <Header />
-      <AnnouncementBar />
-      
+
       {/* Hero Section - Sleeker and more minimalist */}
       <section className="relative h-[35vh] md:h-[50vh] flex items-center justify-center overflow-hidden bg-[#1a1a1a]">
         <div className="absolute inset-0 bg-gradient-to-b from-charcoal/40 to-[#1a1a1a] z-10" />

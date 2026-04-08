@@ -1,5 +1,4 @@
-import OfferBanner from "@/components/OfferBanner";
-import AnnouncementBar from "@/components/AnnouncementBar";
+
 import Header from "@/components/Header";
 import HeroCarousel from "@/components/HeroCarousel";
 import NewIn from "@/components/NewIn";
@@ -15,7 +14,7 @@ const Index = () => {
     <div className="min-h-screen bg-background pb-16 md:pb-0">
       <Header />
       <HeroCarousel />
-      <AnnouncementBar />
+
       <div id="new-arrivals"><NewIn /></div>
       <div id="shop"><FeaturedCategories /></div>
       <Reels />
