@@ -45,6 +45,24 @@ const Reels: React.FC = () => {
     }
   };
 
+  const touchStartX = useRef<number | null>(null);
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    touchStartX.current = e.touches[0].clientX;
+  };
+
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    if (touchStartX.current === null) return;
+    const touchEndX = e.changedTouches[0].clientX;
+    const diff = touchStartX.current - touchEndX;
+
+    if (Math.abs(diff) > 50) {
+      if (diff > 0) nextReel();
+      else prevReel();
+    }
+    touchStartX.current = null;
+  };
+
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (activeReelIndex === null) return;
@@ -73,6 +91,7 @@ const Reels: React.FC = () => {
                 muted
                 loop
                 playsInline
+                preload="none"
                 onMouseOver={(e) => (e.currentTarget as HTMLVideoElement).play()}
                 onMouseOut={(e) => {
                   (e.currentTarget as HTMLVideoElement).pause();
@@ -110,7 +129,12 @@ const Reels: React.FC = () => {
       {/* Modal View */}
       {activeReelIndex !== null && (
         <div className="reel-modal-overlay" onClick={closeReel}>
-          <div className="reel-modal-container" onClick={(e) => e.stopPropagation()}>
+          <div 
+            className="reel-modal-container" 
+            onClick={(e) => e.stopPropagation()}
+            onTouchStart={handleTouchStart}
+            onTouchEnd={handleTouchEnd}
+          >
             <video 
               key={reelsData[activeReelIndex].videoUrl}
               className="reel-modal-video"
@@ -148,15 +172,15 @@ const Reels: React.FC = () => {
             )}
 
             <div className="reel-modal-side-actions">
-              <button className="reel-action-btn like-btn">
+              <button className="reel-action-btn">
                 <div className="icon-circle">
-                  <Heart size={20} fill="#ff4d4d" stroke="#ff4d4d" />
+                  <Heart size={22} fill={true ? "#ff0000" : "none"} color={true ? "#ff0000" : "#fff"} />
                 </div>
                 <span>1</span>
               </button>
-              <button className="reel-action-btn share-btn">
+              <button className="reel-action-btn">
                 <div className="icon-circle">
-                  <Share2 size={20} fill="white" />
+                  <Share2 size={22} />
                 </div>
                 <span>Share</span>
               </button>
