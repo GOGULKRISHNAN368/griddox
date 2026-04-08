@@ -87,16 +87,12 @@ const Reels: React.FC = () => {
               onClick={() => openReel(index)}
             >
               <video 
-                className="reel-video-preview"
+                className="reel-video-preview object-cover w-full h-full"
                 muted
                 loop
                 playsInline
-                preload="none"
-                onMouseOver={(e) => (e.currentTarget as HTMLVideoElement).play()}
-                onMouseOut={(e) => {
-                  (e.currentTarget as HTMLVideoElement).pause();
-                  (e.currentTarget as HTMLVideoElement).currentTime = 0;
-                }}
+                autoPlay
+                preload="auto"
               >
                 <source src={reel.videoUrl} type="video/mp4" />
               </video>

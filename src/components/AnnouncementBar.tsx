@@ -1,20 +1,21 @@
 const announcements = [
-  "Free shipping on all Orders",
   "COD Available",
-  "New Arrivals updated weekly",
-  "Get flat 10% off on your app purchase Use code: APP10",
-  "FREE shipping on all prepaid orders above Rs. 800 for topwear",
+  "New Arrivals updated every week",
   "Express shipping on all Orders",
+  "Get flat 10% off on your app purchase Use code: APP10",
 ];
 
 const AnnouncementBar = () => {
   return (
-    <div className="bg-announcement text-announcement-foreground overflow-hidden py-2 text-xs md:text-sm tracking-wide">
-      <div className="flex animate-marquee whitespace-nowrap">
-        {[...announcements, ...announcements].map((text, i) => (
-          <span key={i} className="mx-8 inline-block">
-            {text}
-          </span>
+    <div className="bg-[#1a1a1a] text-white overflow-hidden py-1.5 text-[10px] md:text-xs tracking-widest uppercase font-medium">
+      <div className="flex animate-[marquee_15s_linear_infinite] whitespace-nowrap items-center">
+        {[...announcements, ...announcements, ...announcements].map((text, i) => (
+          <div key={i} className="flex items-center">
+            <span className="mx-12 inline-block">
+              {text}
+            </span>
+            <span className="opacity-20">|</span>
+          </div>
         ))}
       </div>
     </div>

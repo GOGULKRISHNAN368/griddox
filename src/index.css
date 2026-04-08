@@ -107,7 +107,7 @@
   .font-body {
     font-family: var(--font-body);
   }
-}
+}    
 
 @keyframes marquee {
   0% { transform: translateX(0); }

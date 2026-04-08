@@ -88,14 +88,6 @@ const FeaturedCategories = () => {
     }, timeRunning);
   };
 
-  // Optional auto-play
-  // useEffect(() => {
-  //   const auto = setInterval(() => {
-  //     handleNext();
-  //   }, 7000);
-  //   return () => clearInterval(auto);
-  // }, [animatingClass]);
-
   return (
     <div className={`featured-carousel ${animatingClass}`}>
       <div className="list">
@@ -141,4 +133,3 @@ const FeaturedCategories = () => {
 };
 
 export default FeaturedCategories;
-

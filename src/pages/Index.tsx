@@ -12,10 +12,9 @@ import WhatsAppButton from "@/components/WhatsAppButton";
 const Index = () => {
   return (
     <div className="min-h-screen bg-background pb-16 md:pb-0">
-      <OfferBanner />
-      <AnnouncementBar />
       <Header />
       <HeroCarousel />
+      <AnnouncementBar />
       <div id="new-arrivals"><NewIn /></div>
       <div id="shop"><FeaturedCategories /></div>
       <div className="flex justify-center -mt-8 mb-12 md:hidden">
