@@ -4,191 +4,165 @@ import BottomNav from "@/components/BottomNav";
 import WhatsAppButton from "@/components/WhatsAppButton";
 import { MapPin, Phone, Mail, Clock, Navigation, Star, Sparkles, Shirt } from "lucide-react";
 
-// The generated hero image path: C:\Users\Gogul\.gemini\antigravity\brain\83377415-479c-49d7-8df8-82da9058aecf\store_locator_hero_1775658520224.png
-// Since I need an absolute path or relative to public, I'll assume I can use the local path if I copy it to public.
-// But for now, I'll use a placeholder or the actual path if I can find it in public.
-// Usually, generated images are in artifacts.
+// Colors: Mahogany (#8b231a), Ivory (#fcfaf7), Charcoal (#1a1a1a)
 
 const StoreLocator = () => {
   const address = "Sakthi Theatre Rd, Shrinagar, Pitchampalayam Pudur, Tiruppur, Chettipalayam, Tamil Nadu 641603";
   const mapEmbedUrl = `https://maps.google.com/maps?q=${encodeURIComponent(address)}&t=&z=17&ie=UTF8&iwloc=&output=embed`;
 
   return (
-    <div className="min-h-screen bg-white pb-20 md:pb-0 font-body">
+    <div className="min-h-screen bg-[#fcfaf7] pb-20 md:pb-0 font-body">
       <Header />
       <AnnouncementBar />
       
-      {/* Hero Section */}
-      <section className="relative h-[40vh] md:h-[60vh] flex items-center justify-center overflow-hidden">
-        <div className="absolute inset-0 bg-black/40 z-10" />
+      {/* Hero Section - Sleeker and more minimalist */}
+      <section className="relative h-[35vh] md:h-[50vh] flex items-center justify-center overflow-hidden bg-[#1a1a1a]">
+        <div className="absolute inset-0 bg-gradient-to-b from-charcoal/40 to-[#1a1a1a] z-10" />
         <img 
-          src="/store_locator_hero_1775658520224.png" // I'll assume the user will have this in public or I'll copy it
+          src="/store_locator_hero_1775658520224.png"
           alt="Gridox Store Interior"
-          className="absolute inset-0 w-full h-full object-cover scale-105 animate-hero-zoom-out"
+          className="absolute inset-0 w-full h-full object-cover opacity-60 grayscale-[0.3]"
           onError={(e) => {
-             // Fallback if image not found
              e.currentTarget.src = "https://images.unsplash.com/photo-1441986300917-64674bd600d8?auto=format&fit=crop&q=80&w=2000";
           }}
         />
-        <div className="relative z-20 text-center space-y-4 px-4">
-          <div className="inline-flex items-center gap-2 px-3 py-1 bg-white/20 backdrop-blur-md border border-white/30 text-white text-[10px] uppercase tracking-[0.3em] font-bold rounded-full mb-4">
-            <Star size={12} className="fill-white" />
+        <div className="relative z-20 text-center space-y-6 px-4">
+          <div className="inline-block px-4 py-1.5 border border-white/20 text-white text-[9px] uppercase tracking-[0.4em] font-semibold backdrop-blur-sm mb-2">
             Flagship Destination
           </div>
-          <h1 className="font-heading text-5xl md:text-7xl lg:text-8xl text-white font-bold tracking-tight">
-            Our <span className="italic">Store</span>
+          <h1 className="font-heading text-4xl md:text-6xl lg:text-7xl text-white font-light tracking-tight">
+            Our <span className="italic font-normal text-[#e5d5c5]">Flagship</span> Store
           </h1>
-          <p className="text-white/80 text-lg md:text-xl font-medium max-w-2xl mx-auto">
-            Where tradition meets modern elegance in the heart of Tiruppur.
-          </p>
+          <div className="w-16 h-px bg-[#8b231a] mx-auto" />
         </div>
       </section>
 
-      <main className="container mx-auto px-4 -mt-20 relative z-30 pb-20">
+      <main className="container mx-auto px-4 py-16 md:py-24">
         <div className="max-w-7xl mx-auto">
-          <div className="bg-white shadow-[0_32px_64px_-16px_rgba(0,0,0,0.1)] rounded-[2rem] overflow-hidden border border-gray-100">
-            <div className="flex flex-col lg:flex-row">
-              
-              {/* Left Column: Info */}
-              <div className="w-full lg:w-[45%] p-8 md:p-16 space-y-12 bg-[#fafafa]">
-                <div className="space-y-6">
-                  <h2 className="font-heading text-4xl font-bold text-gray-900 border-b border-gray-200 pb-6">
-                    Connect <span className="text-accent underline decoration-accent/20 underline-offset-8">With Us</span>
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-16 items-start">
+            
+            {/* Left Content: The "Neat" details */}
+            <div className="lg:col-span-5 space-y-16">
+              <div className="space-y-8">
+                <div className="space-y-4">
+                  <h2 className="font-heading text-3xl md:text-4xl text-[#1a1a1a] leading-tight">
+                    Visit us in the heart of <span className="text-[#8b231a] italic">Tiruppur</span>
                   </h2>
-                  <p className="text-gray-500 text-lg">
-                    Step into a world of curated fashion. Our team is ready to help you find your perfect fit.
+                  <p className="text-gray-500 text-lg leading-relaxed max-w-md">
+                    Experience our latest collections and personalized styling in our signature boutique setting.
                   </p>
                 </div>
 
+                {/* Info List */}
                 <div className="space-y-10">
                   {/* Address */}
-                  <div className="flex gap-5">
-                    <div className="flex-shrink-0 w-12 h-12 rounded-2xl bg-white shadow-sm flex items-center justify-center text-accent">
-                      <MapPin size={24} />
+                  <div className="group flex gap-6">
+                    <div className="flex-shrink-0 w-10 h-10 border border-[#8b231a]/10 flex items-center justify-center text-[#8b231a] group-hover:bg-[#8b231a] group-hover:text-white transition-all duration-300">
+                      <MapPin size={18} />
                     </div>
                     <div className="space-y-2">
-                      <p className="text-[10px] uppercase tracking-[0.2em] font-black text-gray-400">Main Address</p>
-                      <p className="text-gray-800 font-semibold leading-relaxed text-lg italic">
+                      <p className="text-[10px] uppercase tracking-[0.2em] font-bold text-gray-400">Address</p>
+                      <p className="text-[#1a1a1a] font-medium leading-relaxed italic">
                         {address}
                       </p>
                     </div>
                   </div>
 
-                  {/* Hours */}
-                  <div className="flex gap-5">
-                    <div className="flex-shrink-0 w-12 h-12 rounded-2xl bg-white shadow-sm flex items-center justify-center text-accent">
-                      <Clock size={24} />
-                    </div>
-                    <div className="space-y-2 w-full">
-                      <p className="text-[10px] uppercase tracking-[0.2em] font-black text-gray-400">Opening Hours</p>
+                  {/* Contact */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+                    <div className="group flex gap-6">
+                      <div className="flex-shrink-0 w-10 h-10 border border-[#8b231a]/10 flex items-center justify-center text-[#8b231a] group-hover:bg-[#8b231a] group-hover:text-white transition-all duration-300">
+                        <Phone size={18} />
+                      </div>
                       <div className="space-y-1">
-                        <div className="flex justify-between items-center py-1 border-b border-gray-100">
-                          <span className="text-gray-600 font-medium">Mon - Sat</span>
-                          <span className="text-gray-900 font-bold italic">10 AM - 9 PM</span>
-                        </div>
-                        <div className="flex justify-between items-center py-1">
-                          <span className="text-gray-600 font-medium">Sunday</span>
-                          <span className="text-accent font-bold italic">11 AM - 8 PM</span>
-                        </div>
+                        <p className="text-[10px] uppercase tracking-[0.2em] font-bold text-gray-400">Call</p>
+                        <p className="text-[#1a1a1a] font-semibold">+91 98765 43210</p>
+                      </div>
+                    </div>
+                    <div className="group flex gap-6">
+                      <div className="flex-shrink-0 w-10 h-10 border border-[#8b231a]/10 flex items-center justify-center text-[#8b231a] group-hover:bg-[#8b231a] group-hover:text-white transition-all duration-300">
+                        <Mail size={18} />
+                      </div>
+                      <div className="space-y-1">
+                        <p className="text-[10px] uppercase tracking-[0.2em] font-bold text-gray-400">Email</p>
+                        <p className="text-[#1a1a1a] font-semibold">hello@gridox.com</p>
                       </div>
                     </div>
                   </div>
 
-                  {/* Contact Info */}
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                    <div className="space-y-2">
-                      <div className="flex items-center gap-2 text-[10px] uppercase tracking-[0.2em] font-black text-gray-400">
-                        <Phone size={14} className="text-accent" />
-                        Call Us
-                      </div>
-                      <p className="text-gray-900 font-bold">+91 98765 43210</p>
+                  {/* Hours - Neat Table */}
+                  <div className="p-8 bg-white border border-[#8b231a]/5 shadow-sm space-y-6">
+                    <div className="flex items-center gap-3">
+                      <Clock size={16} className="text-[#8b231a]" />
+                      <p className="text-[10px] uppercase tracking-[0.3em] font-bold text-[#1a1a1a]">Boutique Hours</p>
                     </div>
-                    <div className="space-y-2">
-                      <div className="flex items-center gap-2 text-[10px] uppercase tracking-[0.2em] font-black text-gray-400">
-                        <Mail size={14} className="text-accent" />
-                        Email
+                    <div className="space-y-3">
+                      <div className="flex justify-between text-sm border-b border-gray-50 pb-2">
+                        <span className="text-gray-500">Mon - Sat</span>
+                        <span className="text-[#1a1a1a] font-medium uppercase tracking-tight">10:00 - 21:00</span>
                       </div>
-                      <p className="text-gray-900 font-bold">hello@gridox.com</p>
+                      <div className="flex justify-between text-sm">
+                        <span className="text-gray-500">Sunday</span>
+                        <span className="text-[#8b231a] font-bold uppercase tracking-tight">11:00 - 20:00</span>
+                      </div>
                     </div>
                   </div>
                 </div>
 
-                <div className="pt-6">
+                <div className="pt-4">
                   <a 
                     href={`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(address)}`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex items-center justify-center gap-4 bg-gray-900 text-white w-full py-5 text-sm font-bold uppercase tracking-[0.25em] hover:bg-accent transition-all group rounded-xl shadow-xl hover:shadow-accent/20"
+                    className="inline-flex items-center gap-4 bg-[#8b231a] text-white px-10 py-5 text-[11px] font-bold uppercase tracking-[0.3em] hover:bg-[#1a1a1a] transition-all group"
                   >
-                    <Navigation size={18} className="group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
                     Get Directions
+                    <Navigation size={14} className="group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
                   </a>
                 </div>
               </div>
+            </div>
 
-              {/* Right Column: Map */}
-              <div className="w-full lg:w-[55%] min-h-[400px] lg:min-h-[700px] relative bg-gray-100">
+            {/* Right: Map - Cinematic look */}
+            <div className="lg:col-span-7">
+              <div className="relative aspect-[4/5] md:aspect-square lg:aspect-auto lg:h-[750px] shadow-[0_40px_80px_-20px_rgba(139,35,26,0.15)] overflow-hidden">
                 <iframe
                   title="Store Location"
                   src={mapEmbedUrl}
                   width="100%"
                   height="100%"
-                  style={{ border: 0, filter: "grayscale(0.1) contrast(1.1)" }}
+                  style={{ border: 0, filter: "sepia(0.2) contrast(1.1) brightness(1.05)" }}
                   loading="lazy"
-                  referrerPolicy="no-referrer-when-downgrade"
-                  className="absolute inset-0"
+                  className="absolute inset-0 grayscale-[0.2]"
                 />
+                <div className="absolute inset-0 pointer-events-none ring-1 ring-inset ring-[#8b231a]/10" />
               </div>
-
             </div>
+
           </div>
         </div>
       </main>
 
-      {/* Experience Section */}
-      <section className="bg-[#121212] py-24 md:py-32 text-white overflow-hidden relative">
-        <div className="absolute top-0 right-0 w-96 h-96 bg-accent/10 blur-[120px] rounded-full -translate-y-1/2 translate-x-1/2" />
-        <div className="absolute bottom-0 left-0 w-96 h-96 bg-accent/5 blur-[120px] rounded-full translate-y-1/2 -translate-x-1/2" />
-        
-        <div className="container mx-auto px-4 relative z-10">
-          <div className="max-w-4xl mx-auto text-center space-y-16">
-            <div className="space-y-4">
-              <h2 className="font-heading text-4xl md:text-6xl font-bold">The Gridox <span className="italic text-accent">Experience</span></h2>
-              <div className="w-24 h-px bg-accent/50 mx-auto" />
-              <p className="text-gray-400 text-lg max-w-xl mx-auto">
-                Discover why our flagship store is more than just a place to shop.
-              </p>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
-              {[
-                { 
-                  title: "Personal Styling", 
-                  desc: "Get 1-on-1 fashion advice from our experts.",
-                  icon: Sparkles
-                },
-                { 
-                  title: "VIP Fitting", 
-                  desc: "Spacious, private rooms with perfect lightning.",
-                  icon: Shirt
-                },
-                { 
-                  title: "Click & Collect", 
-                  desc: "Shop online and pick up at your convenience.",
-                  icon: Navigation
-                }
-              ].map((item, i) => (
-                <div key={i} className="group space-y-6 text-center">
-                  <div className="w-20 h-20 rounded-[2rem] bg-white/5 border border-white/10 flex items-center justify-center mx-auto transition-all group-hover:bg-accent group-hover:border-accent">
-                    <item.icon size={32} className="text-accent group-hover:text-white transition-colors" />
-                  </div>
-                  <div className="space-y-3">
-                    <h3 className="text-xl font-bold tracking-tight">{item.title}</h3>
-                    <p className="text-gray-500 leading-relaxed text-sm">{item.desc}</p>
-                  </div>
+      {/* Features - Clean Minimalist */}
+      <section className="bg-white py-24 border-t border-[#8b231a]/5">
+        <div className="container mx-auto px-4">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-12 max-w-5xl mx-auto">
+            {[
+              { title: "Personal Styling", icon: Sparkles, desc: "Bespoke advice" },
+              { title: "Private Fitting", icon: Shirt, desc: "Spacious rooms" },
+              { title: "In-Store Pickup", icon: Star, desc: "Fast & easy" },
+              { title: "Tailoring", icon: Navigation, desc: "Perfect fit" }
+            ].map((item, i) => (
+              <div key={i} className="text-center space-y-4 group">
+                <div className="w-16 h-16 border border-[#8b231a]/10 rounded-full flex items-center justify-center mx-auto transition-colors group-hover:bg-[#8b231a]/5">
+                  <item.icon size={22} className="text-[#8b231a]" strokeWidth={1} />
                 </div>
-              ))}
-            </div>
+                <div className="space-y-1">
+                  <h3 className="text-[11px] font-bold uppercase tracking-[0.2em] text-[#1a1a1a]">{item.title}</h3>
+                  <p className="text-[10px] text-gray-400 font-medium italic">{item.desc}</p>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       </section>
