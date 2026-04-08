@@ -39,6 +39,7 @@ body {
     height: 100%;
     object-fit: cover;
     object-position: center top;
+    border: 2px solid #000;
 }
 
 .featured-carousel .list .item .content {
@@ -151,6 +152,7 @@ body {
     object-fit: cover;
     border-radius: 20px;
     box-shadow: 0 4px 10px #000a;
+    border: 2px solid #000;
 }
 
 .featured-carousel .thumbnail .item .content {
@@ -207,6 +209,7 @@ body {
 .featured-carousel .arrows button:hover {
     background-color: #fff;
     color: #000;
+    border: 1px solid #000;
 }
 
 /* Animations */

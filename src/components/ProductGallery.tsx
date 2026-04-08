@@ -97,10 +97,10 @@ const ProductGallery = ({ images, productName }: ProductGalleryProps) => {
             <button
               key={index}
               onClick={() => handleThumbnailClick(index)}
-              className={`relative w-[80px] aspect-[3/4] rounded-md overflow-hidden border-2 transition-all duration-200 flex-shrink-0 ${
+              className={`relative w-[80px] aspect-[3/4] rounded-md overflow-hidden border transition-all duration-200 flex-shrink-0 ${
                 activeIndex === index
-                  ? "border-foreground shadow-md"
-                  : "border-transparent opacity-60 hover:opacity-100"
+                  ? "border-white shadow-lg opacity-100"
+                  : "border-gray-900 opacity-40 hover:opacity-80"
               }`}
               aria-label={`View image ${index + 1}`}
             >
@@ -124,7 +124,7 @@ const ProductGallery = ({ images, productName }: ProductGalleryProps) => {
       <div className="relative flex-1 min-w-0">
         <div
           ref={mainImageRef}
-          className="relative w-full aspect-[3/4] rounded-lg overflow-hidden bg-muted cursor-crosshair"
+          className="relative w-full aspect-[3/4] rounded-lg overflow-hidden bg-[#111] border border-black cursor-crosshair shadow-2xl"
           onMouseMove={handleMouseMove}
           onMouseEnter={handleMouseEnter}
           onMouseLeave={handleMouseLeave}
@@ -202,10 +202,10 @@ const ProductGallery = ({ images, productName }: ProductGalleryProps) => {
             <button
               key={index}
               onClick={() => handleThumbnailClick(index)}
-              className={`relative w-[60px] aspect-[3/4] rounded-md overflow-hidden border-2 transition-all duration-200 flex-shrink-0 ${
+              className={`relative w-[60px] aspect-[3/4] rounded-md overflow-hidden border transition-all duration-200 flex-shrink-0 ${
                 activeIndex === index
-                  ? "border-foreground shadow-md"
-                  : "border-transparent opacity-60 hover:opacity-100"
+                  ? "border-white shadow-lg opacity-100"
+                  : "border-gray-900 opacity-40 hover:opacity-80"
               }`}
               aria-label={`View image ${index + 1}`}
             >

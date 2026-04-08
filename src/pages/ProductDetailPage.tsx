@@ -48,21 +48,21 @@ const ProductDetailPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background pb-16 md:pb-0">
+    <div className="min-h-screen bg-black text-white pb-16 md:pb-0">
       <OfferBanner />
       <AnnouncementBar />
       <Header />
 
       {/* Breadcrumb */}
       <div className="max-w-7xl mx-auto px-4 py-3">
-        <div className="flex items-center gap-2 text-xs text-muted-foreground uppercase tracking-wide">
-          <Link to="/" className="hover:text-foreground transition-colors">HOME</Link>
+        <div className="flex items-center gap-2 text-[10px] text-gray-500 uppercase tracking-widest">
+          <Link to="/" className="hover:text-white transition-colors">HOME</Link>
           <span>/</span>
-          <Link to={`/category/${category.slug}`} className="hover:text-foreground transition-colors">
+          <Link to={`/category/${category.slug}`} className="hover:text-white transition-colors">
             {category.title}
           </Link>
           <span>/</span>
-          <span className="text-foreground">{product.name}</span>
+          <span className="text-gray-300">{product.name}</span>
         </div>
       </div>
 
@@ -78,23 +78,23 @@ const ProductDetailPage = () => {
           <div className="space-y-5">
             {/* Title */}
             <div>
-              <h1 className="text-xl md:text-2xl font-bold tracking-wide uppercase">
+              <h1 className="text-xl md:text-2xl font-bold tracking-widest uppercase text-white">
                 {product.name}
               </h1>
             </div>
 
             {/* Price */}
             <div className="flex items-baseline gap-3">
-              <span className="text-2xl font-bold">₹{product.price.toLocaleString()}</span>
-              <span className="text-sm text-muted-foreground">MRP</span>
-              <span className="text-sm text-muted-foreground line-through">
+              <span className="text-2xl font-bold text-white">₹{product.price.toLocaleString()}</span>
+              <span className="text-sm text-gray-500 font-medium">MRP</span>
+              <span className="text-sm text-gray-500 line-through">
                 ₹{product.originalPrice.toLocaleString()}
               </span>
-              <span className="text-sm font-semibold text-red-500">
+              <span className="text-sm font-semibold text-orange-500">
                 {product.discount}% OFF
               </span>
             </div>
-            <p className="text-xs text-muted-foreground">Inclusive of all taxes</p>
+            <p className="text-[10px] text-gray-500 uppercase tracking-widest">Inclusive of all taxes</p>
 
             {/* Colors */}
             {product.colors.length > 0 && (
@@ -125,18 +125,18 @@ const ProductDetailPage = () => {
             {/* Size */}
             <div>
               <div className="flex items-center justify-between mb-2">
-                <h3 className="font-bold text-sm tracking-wide">SELECT SIZE</h3>
-                <button className="text-sm text-red-500 hover:underline">Size Guide</button>
+                <h3 className="font-bold text-xs tracking-widest text-gray-400">SELECT SIZE</h3>
+                <button className="text-xs text-orange-500 hover:underline tracking-widest">SIZE GUIDE</button>
               </div>
               <div className="flex flex-wrap gap-2">
                 {product.sizes.map((size) => (
                    <button
                     key={size}
                     onClick={() => setSelectedSize(size)}
-                    className={`w-12 h-12 rounded-full border-2 text-sm font-medium transition-all ${
+                    className={`w-12 h-12 rounded-full border text-xs font-bold tracking-tighter transition-all ${
                       selectedSize === size
-                         ? "border-foreground bg-foreground text-background"
-                        : "border-muted-foreground/30 hover:border-foreground"
+                         ? "border-white bg-white text-black"
+                        : "border-gray-800 text-gray-400 hover:border-gray-600"
                     }`}
                   >
                     {size === 0 ? "FS" : size}
@@ -163,17 +163,17 @@ const ProductDetailPage = () => {
 
             {/* Delivery */}
             <div className="pt-2">
-              <h3 className="font-bold text-sm tracking-wide mb-2">DELIVERY</h3>
-              <div className="flex rounded border border-muted overflow-hidden">
+              <h3 className="font-bold text-xs tracking-widest text-gray-400 mb-2">DELIVERY</h3>
+              <div className="flex rounded border border-gray-800 overflow-hidden bg-[#0a0a0a]">
                 <input
                   type="text"
                   value={pincode}
                   onChange={(e) => setPincode(e.target.value.replace(/\D/g, "").slice(0, 6))}
                   placeholder="Enter pincode"
-                  className="flex-1 px-4 py-3 text-sm bg-transparent outline-none"
+                  className="flex-1 px-4 py-3 text-sm bg-transparent outline-none text-white placeholder:text-gray-700 font-medium"
                   maxLength={6}
                 />
-                <button className="px-4 text-sm font-semibold text-red-500 hover:text-red-600 transition-colors">
+                <button className="px-6 text-xs font-bold tracking-widest text-orange-500 hover:text-white transition-colors">
                   CHECK
                 </button>
               </div>

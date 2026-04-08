@@ -25,27 +25,27 @@ const CategoryPage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background pb-16 md:pb-0">
+    <div className="min-h-screen bg-black text-white pb-16 md:pb-0">
       <OfferBanner />
       <AnnouncementBar />
       <Header />
 
       {/* Breadcrumb */}
       <div className="max-w-7xl mx-auto px-4 py-4">
-        <div className="flex items-center gap-2 text-sm text-muted-foreground">
-          <Link to="/" className="hover:text-foreground transition-colors flex items-center gap-1">
+        <div className="flex items-center gap-2 text-sm text-gray-400">
+          <Link to="/" className="hover:text-white transition-colors flex items-center gap-1">
             <ChevronLeft size={14} />
             HOME
           </Link>
           <span>/</span>
-          <span className="text-foreground font-medium">{category.title}</span>
+          <span className="text-white font-medium">{category.title}</span>
         </div>
       </div>
 
       {/* Title */}
       <div className="max-w-7xl mx-auto px-4 pb-6">
-        <h1 className="text-2xl md:text-3xl font-bold tracking-wide">{category.title}</h1>
-        <p className="text-muted-foreground mt-1">{category.products.length} Products</p>
+        <h1 className="text-2xl md:text-3xl font-bold tracking-wide text-white">{category.title}</h1>
+        <p className="text-gray-400 mt-1">{category.products.length} Products</p>
       </div>
 
       {/* Product Grid */}
@@ -54,7 +54,7 @@ const CategoryPage = () => {
           {category.products.map((product) => (
             <Link to={`/category/${category.slug}/product/${product.id}`} key={product.id} className="group cursor-pointer">
               {/* Image Container */}
-              <div className="relative overflow-hidden rounded-sm bg-muted">
+              <div className="relative overflow-hidden rounded-sm bg-[#111] border border-black shadow-lg">
                 <img
                   src={product.images[0]}
                   alt={product.name}
@@ -84,15 +84,15 @@ const CategoryPage = () => {
 
               {/* Product Info */}
               <div className="mt-3 space-y-1">
-                <h3 className="text-sm md:text-base font-medium leading-snug line-clamp-2">
+                <h3 className="text-sm md:text-base font-medium leading-snug line-clamp-2 text-gray-200">
                   {product.name}
                 </h3>
                 <div className="flex items-center gap-2 flex-wrap">
-                  <span className="text-sm md:text-base font-bold">₹{product.price.toLocaleString()}</span>
-                  <span className="text-xs md:text-sm text-muted-foreground line-through">
+                  <span className="text-sm md:text-base font-bold text-white">₹{product.price.toLocaleString()}</span>
+                  <span className="text-xs md:text-sm text-gray-500 line-through">
                     ₹{product.originalPrice.toLocaleString()}
                   </span>
-                  <span className="text-xs md:text-sm font-semibold text-orange-600">
+                  <span className="text-xs md:text-sm font-semibold text-orange-500">
                     ({product.discount}% OFF)
                   </span>
                 </div>
