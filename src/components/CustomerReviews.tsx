@@ -5,7 +5,7 @@ const reviews = [
   {
     id: 1,
     name: "Sneha",
-    image: "/reviews/review7.png",
+    image: "/reviews/review7.avif",
     text: "Judge.me Shop\nReviews",
     rating: 5,
     tag: "Gridox!"
@@ -13,7 +13,7 @@ const reviews = [
   {
     id: 2,
     name: "Ritika",
-    image: "/reviews/review2.png",
+    image: "/reviews/revire2.avif",
     text: "Judge.me Shop\nReviews",
     rating: 5,
     tag: "Gridox!"
@@ -21,7 +21,7 @@ const reviews = [
   {
     id: 3,
     name: "Nisha",
-    image: "/reviews/review1.png",
+    image: "/reviews/review1.avif",
     text: "Judge.me Shop\nReviews",
     rating: 5,
     tag: "Gridox!"
@@ -29,7 +29,7 @@ const reviews = [
   {
     id: 4,
     name: "Nisha",
-    image: "/reviews/review5.png",
+    image: "/reviews/review5.avif",
     text: "Judge.me Shop\nReviews",
     rating: 4,
     tag: "Gridox!"
@@ -37,7 +37,7 @@ const reviews = [
   {
     id: 5,
     name: "Anjali",
-    image: "/reviews/review4.png",
+    image: "/reviews/review4.avif",
     text: "Judge.me Shop\nReviews",
     rating: 5,
     tag: "Gridox!"
@@ -45,7 +45,7 @@ const reviews = [
   {
     id: 6,
     name: "Vidhya",
-    image: "/reviews/review3.png",
+    image: "/reviews/review3.avif",
     text: "Judge.me Shop\nReviews",
     rating: 5,
     tag: "Gridox!"
@@ -53,7 +53,7 @@ const reviews = [
   {
     id: 7,
     name: "Megha",
-    image: "/reviews/review6.png",
+    image: "/reviews/review6.avif",
     text: "Judge.me Shop\nReviews",
     rating: 5,
     tag: "Gridox!"
@@ -61,7 +61,7 @@ const reviews = [
   {
     id: 8,
     name: "Kavya",
-    image: "/reviews/review8.png",
+    image: "/reviews/revire8.avif",
     text: "Judge.me Shop\nReviews",
     rating: 5,
     tag: "Gridox!"
