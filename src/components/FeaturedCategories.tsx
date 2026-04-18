@@ -36,7 +36,7 @@ const FeaturedCategories = () => {
   const [animatingClass, setAnimatingClass] = useState<"next" | "prev" | "">("");
   
   // Timing variables
-  const timeRunning = 1500; // time corresponding to css animation duration + buffer
+  const timeRunning = 700; // time corresponding to css animation duration + buffer
   
   const runTimeOut = useRef<NodeJS.Timeout | null>(null);
 

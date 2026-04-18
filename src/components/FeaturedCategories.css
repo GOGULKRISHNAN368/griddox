@@ -229,7 +229,7 @@ body {
     transform: translateY(50px);
     filter: blur(20px);
     opacity: 0;
-    animation: showContent .5s 1s linear 1 forwards;
+    animation: showContent .5s 0.2s linear 1 forwards;
 }
 
 @keyframes showContent {
@@ -240,10 +240,10 @@ body {
     }
 }
 
-.featured-carousel .list .item:nth-child(1) .content .title { animation-delay: 1.2s !important; }
-.featured-carousel .list .item:nth-child(1) .content .topic { animation-delay: 1.4s !important; }
-.featured-carousel .list .item:nth-child(1) .content .des { animation-delay: 1.6s !important; }
-.featured-carousel .list .item:nth-child(1) .content .buttons { animation-delay: 1.8s !important; }
+.featured-carousel .list .item:nth-child(1) .content .title { animation-delay: 0.3s !important; }
+.featured-carousel .list .item:nth-child(1) .content .topic { animation-delay: 0.4s !important; }
+.featured-carousel .list .item:nth-child(1) .content .des { animation-delay: 0.5s !important; }
+.featured-carousel .list .item:nth-child(1) .content .buttons { animation-delay: 0.6s !important; }
 
 /* Next Click Animations */
 .featured-carousel.next .list .item:nth-child(1) .main-img-container {
@@ -315,7 +315,7 @@ body {
 .featured-carousel.prev .list .item:nth-child(2) .content .topic,
 .featured-carousel.prev .list .item:nth-child(2) .content .des,
 .featured-carousel.prev .list .item:nth-child(2) .content .buttons {
-    animation: contentOut 1.5s linear 1 forwards !important;
+    animation: contentOut 0.5s linear 1 forwards !important;
 }
 @keyframes contentOut {
     to {
