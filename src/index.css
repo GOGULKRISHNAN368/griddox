@@ -7,49 +7,41 @@
 
 @layer base {
   :root {
-    /* ── LUXURY WARM PALETTE ──────────────────────────────────────────────────
-       Background:   Soft cream      #F5EDE7  hsl(20 47% 93%)
-       Card/block:   Deeper beige    #EADCD2  hsl(20 33% 87%)
-       Primary CTA:  Deep muted red  #8B2C2C  hsl(0 52% 36%)
-       Text primary: Dark brown      #4A2E2A  hsl(5 28% 23%)
-       Text muted:   Warm gray-brown #7A5C55  hsl(8 17% 41%)
-       Icon bg:      Warm tan        #E6C9B5  hsl(22 42% 80%)
-       Border:       Soft beige      #D8B7A6  hsl(18 33% 75%)
-    ── ──────────────────────────────────────────────────────────────────────── */
+    /* ── CLEAN WHITE PALETTE ────────────────────────────────────────────────── */
     --background: 0 0% 100%;
-    --foreground: 5 28% 23%;
+    --foreground: 0 0% 3.9%;
 
-    --card: 20 33% 87%;
-    --card-foreground: 5 28% 23%;
+    --card: 0 0% 100%;
+    --card-foreground: 0 0% 3.9%;
 
-    --popover: 20 47% 93%;
-    --popover-foreground: 5 28% 23%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 0 0% 3.9%;
 
-    --primary: 0 52% 36%;
-    --primary-foreground: 20 47% 96%;
+    --primary: 0 0% 9%;
+    --primary-foreground: 0 0% 98%;
 
-    --secondary: 20 33% 87%;
-    --secondary-foreground: 5 28% 23%;
+    --secondary: 0 0% 96.1%;
+    --secondary-foreground: 0 0% 9%;
 
-    --muted: 22 42% 80%;
-    --muted-foreground: 8 17% 41%;
+    --muted: 0 0% 96.1%;
+    --muted-foreground: 0 0% 45.1%;
 
-    --accent: 0 52% 36%;
-    --accent-foreground: 20 47% 96%;
+    --accent: 0 0% 96.1%;
+    --accent-foreground: 0 0% 9%;
 
-    --destructive: 0 60% 45%;
-    --destructive-foreground: 20 47% 96%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 98%;
 
-    --border: 18 33% 75%;
-    --input: 18 33% 75%;
-    --ring: 0 52% 36%;
+    --border: 0 0% 89.8%;
+    --input: 0 0% 89.8%;
+    --ring: 0 0% 3.9%;
 
     --radius: 0.5rem;
 
     --nav-bg: 0 0% 100%;
-    --nav-foreground: 5 28% 23%;
-    --announcement-bg: 0 52% 30%;
-    --announcement-foreground: 20 47% 96%;
+    --nav-foreground: 0 0% 3.9%;
+    --announcement-bg: 0 0% 9%;
+    --announcement-foreground: 0 0% 98%;
     --hero-overlay: 0 0% 0%;
 
     --sidebar-background: 0 0% 98%;

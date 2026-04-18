@@ -35,6 +35,9 @@ const SimilarProducts = ({ products, currentProductId, categorySlug }: SimilarPr
                   src={product.images[0]}
                   alt={product.name}
                   className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                  onClick={(e) => {
+                    window.dispatchEvent(new CustomEvent('openPromoModal', { detail: { src: product.images[0] } }));
+                  }}
                 />
                 {product.badge && (
                   <span className="absolute top-2 left-2 bg-white text-[10px] font-bold px-2 py-1 rounded shadow-sm">

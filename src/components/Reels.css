@@ -142,24 +142,24 @@
 .reel-modal-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.85);
+  background: rgba(0, 0, 0, 0.95);
   backdrop-filter: blur(8px);
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 1000;
-  padding: 2rem;
+  z-index: 2000; /* Higher than BottomNav (1001) for immersive experience */
+  padding: 0;
 }
 
 .reel-modal-container {
   position: relative;
-  height: 85vh;
+  height: min(90vh, 1000px);
   aspect-ratio: 9 / 16;
   background: #000;
   border-radius: 12px;
   overflow: hidden;
   box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-  border: 1px solid #000;
+  border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .reel-modal-video {
@@ -315,22 +315,29 @@
 
 .reel-add-to-cart {
   width: 100%;
-  background: #232323;
+  background: linear-gradient(135deg, #232323 0%, #000000 100%);
   color: #fff;
   border: none;
-  padding: 0.85rem;
-  border-radius: 4px;
-  font-size: 0.8rem;
-  font-weight: 600;
+  padding: 1rem;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.15em;
   cursor: pointer;
   margin-top: 0.5rem;
-  transition: all 0.2s ease;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
 
 .reel-add-to-cart:hover {
-  background: #000;
+  background: linear-gradient(135deg, #000000 0%, #232323 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
+}
+
+.reel-add-to-cart:active {
+  transform: translateY(0);
 }
 
 .reel-modal-arrow {
@@ -429,10 +436,11 @@
   /* Modal Mobile */
   .reel-modal-overlay {
     padding: 0;
+    z-index: 3000; /* Ensure it covers everything on mobile */
   }
 
   .reel-modal-container {
-    height: 100vh;
+    height: 100dvh;
     width: 100vw;
     max-width: 100%;
     border-radius: 0;
@@ -440,29 +448,36 @@
   }
 
   .reel-modal-arrow {
-    display: flex;
-    width: 36px;
-    height: 36px;
-    background: rgba(0, 0, 0, 0.2);
-    border: none;
-  }
-
-  .reel-modal-arrow-left {
-    left: 0.5rem;
-  }
-
-  .reel-modal-arrow-right {
-    right: 0.5rem;
+    display: none; /* Hide arrows on mobile modal, use swipe */
   }
 
   .reel-modal-side-actions {
-    right: 1rem;
-    bottom: 12rem;
+    right: 1.25rem;
+    bottom: 15rem; /* Pushed up to clear the larger product card */
   }
 
   .reel-modal-product-overlay {
-    bottom: 2rem;
-    left: 1rem;
-    right: 1rem;
+    bottom: 4.5rem; /* Significantly pushed up to clear navigation areas */
+    left: 1.25rem;
+    right: 1.25rem;
+    padding: 1.25rem;
+    border-radius: 16px;
+    background: rgba(255, 255, 255, 0.98);
+    backdrop-filter: blur(10px);
+  }
+
+  .reel-modal-thumb {
+    width: 64px;
+    height: 64px;
+  }
+
+  .reel-modal-name {
+    font-size: 1rem;
+    -webkit-line-clamp: 2;
+  }
+
+  .reel-add-to-cart {
+    padding: 1.25rem;
+    font-size: 0.95rem;
   }
 }

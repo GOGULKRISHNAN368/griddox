@@ -159,6 +159,9 @@ const ProductGallery = ({ images, productName }: ProductGalleryProps) => {
                 loading={index === 0 ? "eager" : "lazy"}
                 width={640}
                 height={896}
+                onClick={() => {
+                  window.dispatchEvent(new CustomEvent('openPromoModal', { detail: { src: img } }));
+                }}
               />
             ))}
           </div>

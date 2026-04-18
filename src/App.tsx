@@ -5,6 +5,7 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { HelmetProvider } from "react-helmet-async";
+import { PromoModal } from "@/components/PromoModal"; // Import the modal
 
 // Lazy load pages for code splitting
 const Index = lazy(() => import("./pages/Index.tsx"));
@@ -31,6 +32,7 @@ const App = () => (
       <TooltipProvider>
         <Toaster />
         <Sonner />
+        <PromoModal />
         <BrowserRouter>
           <Suspense fallback={<PageLoader />}>
             <Routes>

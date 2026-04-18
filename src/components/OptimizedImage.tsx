@@ -5,6 +5,7 @@ interface OptimizedImageProps extends React.ImgHTMLAttributes<HTMLImageElement> 
   alt: string;
   className?: string;
   priority?: boolean;
+  isProductImage?: boolean;
 }
 
 /**
@@ -20,8 +21,18 @@ const OptimizedImage: React.FC<OptimizedImageProps> = ({
   alt, 
   className, 
   priority = false, 
+  isProductImage = false,
+  onClick,
   ...props 
 }) => {
+  const handleClick = (e: React.MouseEvent<HTMLImageElement>) => {
+    if (isProductImage) {
+      // Show promotional modal, without stopping propagation if they're clicking a link
+      window.dispatchEvent(new CustomEvent('openPromoModal', { detail: { src } }));
+    }
+    if (onClick) onClick(e);
+  };
+
   return (
     <img
       src={src}
@@ -30,6 +41,7 @@ const OptimizedImage: React.FC<OptimizedImageProps> = ({
       loading={priority ? "eager" : "lazy"}
       decoding="async"
       fetchPriority={priority ? "high" : "auto"}
+      onClick={handleClick}
       {...props}
     />
   );
