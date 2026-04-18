@@ -181,13 +181,12 @@ body {
 /* Arrows */
 .featured-carousel .arrows {
     position: absolute;
-    top: 80%;
-    right: 52%;
+    top: auto;
+    bottom: 50px;
+    left: 10%;
     z-index: 100;
-    width: 300px;
-    max-width: 30%;
     display: flex;
-    gap: 10px;
+    gap: 15px;
     align-items: center;
 }
 
