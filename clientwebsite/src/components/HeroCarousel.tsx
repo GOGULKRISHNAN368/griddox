@@ -63,7 +63,7 @@ const HeroCarousel = () => {
   if (slides.length === 0) return null;
 
   return (
-    <div 
+    <div
       className="relative w-full overflow-hidden select-none cursor-grab active:cursor-grabbing bg-white"
       onTouchStart={(e) => setTouchStart(e.targetTouches[0].clientX)}
       onTouchMove={(e) => setTouchEnd(e.targetTouches[0].clientX)}
@@ -92,17 +92,15 @@ const HeroCarousel = () => {
         style={{ transform: `translateX(-${current * 100}%)` }}
       >
         {slides.map((slide, i) => (
-          <div 
-            key={i} 
+          <div
+            key={i}
             className="relative w-full flex-shrink-0 overflow-hidden flex items-center justify-center p-0"
           >
             <OptimizedImage
               src={slide.imageUrl}
               alt={slide.title || "Banner"}
               priority={i === 0}
-              className={`w-full h-auto object-contain ${
-                i === current ? "animate-hero-zoom-out" : "scale-100"
-              }`}
+              className="w-full h-auto object-contain"
             />
           </div>
         ))}
@@ -114,9 +112,8 @@ const HeroCarousel = () => {
           <button
             key={i}
             onClick={() => setCurrent(i)}
-            className={`h-1.5 rounded-full transition-all ${
-              i === current ? "w-8 bg-black" : "w-3 bg-black/20 hover:bg-black/40"
-            }`}
+            className={`h-1.5 rounded-full transition-all ${i === current ? "w-8 bg-black" : "w-3 bg-black/20 hover:bg-black/40"
+              }`}
             aria-label={`Slide ${i + 1}`}
           />
         ))}

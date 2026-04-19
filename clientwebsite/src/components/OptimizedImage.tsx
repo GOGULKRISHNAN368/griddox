@@ -16,14 +16,14 @@ interface OptimizedImageProps extends React.ImgHTMLAttributes<HTMLImageElement> 
  * 2. High fetching priority for Hero images
  * 3. Modern decoding for faster main thread execution
  */
-const OptimizedImage: React.FC<OptimizedImageProps> = ({ 
-  src, 
-  alt, 
-  className, 
-  priority = false, 
+const OptimizedImage: React.FC<OptimizedImageProps> = ({
+  src,
+  alt,
+  className,
+  priority = false,
   isProductImage = false,
   onClick,
-  ...props 
+  ...props
 }) => {
   const handleClick = (e: React.MouseEvent<HTMLImageElement>) => {
     if (isProductImage) {
@@ -42,6 +42,7 @@ const OptimizedImage: React.FC<OptimizedImageProps> = ({
       decoding="async"
       fetchPriority={priority ? "high" : "auto"}
       onClick={handleClick}
+      style={{ imageRendering: '-webkit-optimize-contrast' }}
       {...props}
     />
   );

@@ -108,15 +108,65 @@ function App() {
     }
   };
 
+  const standardizeNewArrival = (file: File): Promise<string> => {
+    return new Promise((resolve) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = (e) => {
+        const img = new Image();
+        img.src = e.target?.result as string;
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          const TARGET_W = 1200;
+          const TARGET_H = 1600;
+          canvas.width = TARGET_W;
+          canvas.height = TARGET_H;
+          const ctx = canvas.getContext('2d');
+          
+          if (ctx) {
+            ctx.imageSmoothingEnabled = true;
+            ctx.imageSmoothingQuality = 'high';
+            
+            // Fill with white background
+            ctx.fillStyle = 'white';
+            ctx.fillRect(0, 0, TARGET_W, TARGET_H);
+
+            // Calculate "Cover" scaling
+            const imgRatio = img.width / img.height;
+            const targetRatio = TARGET_W / TARGET_H;
+            let drawW, drawH, offsetLeft, offsetTop;
+
+            if (imgRatio > targetRatio) {
+              drawH = TARGET_H;
+              drawW = img.width * (TARGET_H / img.height);
+              offsetLeft = (TARGET_W - drawW) / 2;
+              offsetTop = 0;
+            } else {
+              drawW = TARGET_W;
+              drawH = img.height * (TARGET_W / img.width);
+              offsetLeft = 0;
+              offsetTop = (TARGET_H - drawH) / 2;
+            }
+
+            ctx.drawImage(img, offsetLeft, offsetTop, drawW, drawH);
+            resolve(canvas.toDataURL('image/jpeg', 0.95)); // Very high quality
+          } else {
+            resolve(e.target?.result as string);
+          }
+        };
+      };
+    });
+  };
+
   const handleProductImageSelect = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
     setIsLoading(true);
-    setStatus('Optimizing product image...');
+    setStatus('Processing to Perfect Quality (1200x1600)...');
     try {
-      const base64 = await optimizeImage(file);
+      const base64 = await standardizeNewArrival(file);
       setProductForm(prev => ({ ...prev, image: base64 }));
-      setStatus('Image ready.');
+      setStatus('Perfect 1200x1600 image ready.');
     } catch (error) {
        setStatus('Error processing image.');
     } finally {
