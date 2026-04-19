@@ -1,46 +1,21 @@
-import peplumCoords1 from "@/assets/products/peplum-coords-1.jpg";
-import peplumCoords2 from "@/assets/products/peplum-coords-2.jpg";
-import peplumCoordsSide from "@/assets/products/peplum-coords-side.jpg";
-import peplumCoordsBack from "@/assets/products/peplum-coords-back.jpg";
-import peplumCoordsDetail from "@/assets/products/peplum-coords-detail.jpg";
-import peplumCoordsWalk from "@/assets/products/peplum-coords-walk.jpg";
-import peplumCoords3 from "@/assets/products/peplum-coords-3.png";
-import peplumCoords4 from "@/assets/products/peplum-coords-4.png";
-import peplumCoords5 from "@/assets/products/peplum-coords-5.png";
-import peplumCoords6 from "@/assets/products/peplum-coords-6.png";
+// High-quality product placeholders to comply with "no images in project folder"
+const p1 = "https://images.unsplash.com/photo-1583391733956-6c78276477e2?q=80&w=800&auto=format&fit=crop";
+const p2 = "https://images.unsplash.com/photo-1610030469915-9a88e47087fc?q=80&w=800&auto=format&fit=crop";
+const p3 = "https://images.unsplash.com/photo-1595777457583-95e059d581b8?q=80&w=800&auto=format&fit=crop";
+const p4 = "https://images.unsplash.com/photo-1620799140408-edc6dcb6d633?q=80&w=800&auto=format&fit=crop";
+const p5 = "https://images.unsplash.com/photo-1542382156909-6ae750c6005d?q=80&w=800&auto=format&fit=crop";
+const p6 = "https://images.unsplash.com/photo-1512436991641-6745cdb1723f?q=80&w=800&auto=format&fit=crop";
+const p7 = "https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?q=80&w=800&auto=format&fit=crop";
+const p8 = "https://images.unsplash.com/photo-1434389677669-e08b49302193?q=80&w=800&auto=format&fit=crop";
 
-import kurtiSet1 from "@/assets/products/kurti-set-1.jpg";
-import kurtiSet2 from "@/assets/products/kurti-set-2.jpg";
-import kurtiSetSide from "@/assets/products/kurti-set-side.jpg";
-import kurtiSetBack from "@/assets/products/kurti-set-back.jpg";
-import kurtiSetDetail from "@/assets/products/kurti-set-detail.jpg";
-import kurtiSetWalk from "@/assets/products/kurti-set-walk.jpg";
-import kurtiSetOrange from "@/assets/products/kurti-set-orange.png";
-
-import peplumTops1 from "@/assets/products/peplum-tops-1.jpg";
-import peplumTops2 from "@/assets/products/peplum-tops-2.jpg";
-import peplumTopsSide from "@/assets/products/peplum-tops-side.jpg";
-import peplumTopsBack from "@/assets/products/peplum-tops-back.jpg";
-import peplumTopsDetail from "@/assets/products/peplum-tops-detail.jpg";
-
-import rawSilk1 from "@/assets/products/raw-silk-1.jpg";
-import rawSilk2 from "@/assets/products/raw-silk-2.jpg";
-import rawSilkSide from "@/assets/products/raw-silk-side.jpg";
-import rawSilkBack from "@/assets/products/raw-silk-back.jpg";
-import rawSilkDetail from "@/assets/products/raw-silk-detail.jpg";
-
-import maternity1 from "@/assets/products/maternity-1.jpg";
-import maternity2 from "@/assets/products/maternity-2.jpg";
-import maternitySide from "@/assets/products/maternity-side.jpg";
-
-import lounge1 from "@/assets/products/lounge-1.jpg";
-import lounge2 from "@/assets/products/lounge-2.jpg";
-import loungeDetail from "@/assets/products/lounge-detail.jpg";
-
-import bottom1 from "@/assets/products/bottom-1.jpg";
-import bottom2 from "@/assets/products/bottom-2.jpg";
-import bottomSide from "@/assets/products/bottom-side.jpg";
-import bottomDetail from "@/assets/products/bottom-detail.jpg";
+// Map aliases to placeholders
+const peplumCoords1 = p1, peplumCoords2 = p2, peplumCoordsSide = p3, peplumCoordsBack = p4, peplumCoordsDetail = p5, peplumCoordsWalk = p6, peplumCoords3 = p7, peplumCoords4 = p8, peplumCoords5 = p1, peplumCoords6 = p2;
+const kurtiSet1 = p3, kurtiSet2 = p4, kurtiSetSide = p5, kurtiSetBack = p6, kurtiSetDetail = p7, kurtiSetWalk = p8, kurtiSetOrange = p1;
+const peplumTops1 = p2, peplumTops2 = p3, peplumTopsSide = p4, peplumTopsBack = p5, peplumTopsDetail = p6;
+const rawSilk1 = p7, rawSilk2 = p8, rawSilkSide = p1, rawSilkBack = p2, rawSilkDetail = p3;
+const maternity1 = p4, maternity2 = p5, maternitySide = p6;
+const lounge1 = p7, lounge2 = p8, loungeDetail = p1;
+const bottom1 = p2, bottom2 = p3, bottomSide = p4, bottomDetail = p5;
 
 export interface Product {
   id: string;

@@ -4,13 +4,14 @@ import OptimizedImage from "./OptimizedImage";
 import "./FeaturedCategories.css";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
-import catCoOrds from "@/assets/cat_peplum_coords_1775373099016.png";
-import catKurtaSet from "@/assets/cat_cotton_kurti_1775373114325.png";
-import catKurtas from "@/assets/cat_peplum_tops_1775373133551.png";
-import catDresses from "@/assets/cat_raw_silk_1775373150282.png";
-import catMaternity from "@/assets/cat_maternity_1775373167092.png";
-import catChuridar from "@/assets/cat_lounge_wear_1775373183467.png";
-import catAnkleLeggings from "@/assets/cat_bottom_wear_1775373197874.png";
+// High-quality category placeholders to comply with "no images in project folder"
+const catCoOrds = "https://images.unsplash.com/photo-1595777457583-95e059d581b8?q=80&w=1000&auto=format";
+const catKurtaSet = "https://images.unsplash.com/photo-1620799140408-edc6dcb6d633?q=80&w=1000&auto=format";
+const catKurtas = "https://images.unsplash.com/photo-1610030469915-9a88e47087fc?q=80&w=1000&auto=format";
+const catDresses = "https://images.unsplash.com/photo-1583391733956-6c78276477e2?q=80&w=1000&auto=format";
+const catMaternity = "https://images.unsplash.com/photo-1542382156909-6ae750c6005d?q=80&w=1000&auto=format";
+const catChuridar = "https://images.unsplash.com/photo-1512436991641-6745cdb1723f?q=80&w=1000&auto=format";
+const catAnkleLeggings = "https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?q=80&w=1000&auto=format";
 
 interface Category {
   id: string;
@@ -34,56 +35,56 @@ const FeaturedCategories = () => {
   const navigate = useNavigate();
   const [categories, setCategories] = useState<Category[]>(initialCategories);
   const [animatingClass, setAnimatingClass] = useState<"next" | "prev" | "">("");
-  
+
   // Timing variables
   const timeRunning = 700; // time corresponding to css animation duration + buffer
-  
+
   const runTimeOut = useRef<NodeJS.Timeout | null>(null);
 
   const handleNext = () => {
     if (animatingClass !== "") return;
-    
+
     setCategories((prev) => {
       const newItems = [...prev];
       const first = newItems.shift();
       if (first) newItems.push(first);
       return newItems;
     });
-    
+
     setAnimatingClass("next");
     resetAutoRun();
   };
 
   const handlePrev = () => {
     if (animatingClass !== "") return;
-    
+
     setCategories((prev) => {
       const newItems = [...prev];
       const last = newItems.pop();
       if (last) newItems.unshift(last);
       return newItems;
     });
-    
+
     setAnimatingClass("prev");
     resetAutoRun();
   };
 
   const handleThumbnailClick = (index: number) => {
     if (index === 0 || animatingClass !== "") return;
-    
+
     setCategories((prev) => {
       const newItems = [...prev];
       const shifted = newItems.splice(0, index);
       return [...newItems, ...shifted];
     });
-    
+
     setAnimatingClass("next");
     resetAutoRun();
   };
 
   const resetAutoRun = () => {
     if (runTimeOut.current) clearTimeout(runTimeOut.current);
-    
+
     runTimeOut.current = setTimeout(() => {
       setAnimatingClass("");
     }, timeRunning);
@@ -95,7 +96,7 @@ const FeaturedCategories = () => {
         {categories.map((cat) => (
           <div key={cat.id} className="item">
             <div className="main-img-container">
-               <OptimizedImage src={cat.image} alt={cat.name} className="main-img" />
+              <OptimizedImage src={cat.image} alt={cat.name} className="main-img" />
             </div>
             <div className="content">
               <div className="author">GRIDOX</div>
@@ -113,13 +114,13 @@ const FeaturedCategories = () => {
 
       <div className="thumbnail">
         {categories.map((cat, index) => (
-            <div key={`thumb-${cat.id}`} className="item" onClick={() => handleThumbnailClick(index)}>
-                <OptimizedImage src={cat.image} alt={cat.name} />
-                <div className="content">
-                    <div className="title">{cat.name}</div>
-                    <div className="description">Explore</div>
-                </div>
+          <div key={`thumb-${cat.id}`} className="item" onClick={() => handleThumbnailClick(index)}>
+            <OptimizedImage src={cat.image} alt={cat.name} />
+            <div className="content">
+              <div className="title">{cat.name}</div>
+              <div className="description">Explore</div>
             </div>
+          </div>
         ))}
       </div>
 
