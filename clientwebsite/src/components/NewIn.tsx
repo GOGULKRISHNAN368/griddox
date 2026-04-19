@@ -1,56 +1,32 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import OptimizedImage from "./OptimizedImage";
 import { Heart, ShoppingBag } from "lucide-react";
 import { HOME_PRODUCT_LINKS } from "@/fixes/homeProductLinks"; // fix: home product links
-import img1 from "@/assets/hero-1.jpg";
-import img2 from "@/assets/cat-kurta-set-v2.jpg";
-import img3 from "@/assets/cat-dresses-v2.jpg";
-import img4 from "@/assets/cat-kurtas-v2.jpg";
-
-const products = [
-  {
-    id: 1,
-    name: "Minimal blush",
-    price: 2299,
-    originalPrice: 2799,
-    discount: "18%",
-    isNew: true,
-    image: img1,
-  },
-  {
-    id: 2,
-    name: "Breeze bloom kurta set",
-    price: 2149,
-    originalPrice: 2499,
-    discount: "14%",
-    isNew: true,
-    image: img2,
-  },
-  {
-    id: 3,
-    name: "Festive silk top",
-    price: 1499,
-    originalPrice: 1999,
-    discount: "25%",
-    isNew: false,
-    image: img3,
-  },
-  {
-    id: 4,
-    name: "Modern ethnic dress",
-    price: 3299,
-    originalPrice: 3999,
-    discount: "17%",
-    isNew: false,
-    image: img4,
-  },
-];
-
 const NewIn = () => {
   const navigate = useNavigate(); // fix: home product links
+  const [activeProducts, setActiveProducts] = useState<any[]>([]);
   const [activeIndex, setActiveIndex] = useState(0);
   const scrollRef = useRef<HTMLDivElement>(null);
+
+  // Fetch from unified backend
+  useEffect(() => {
+    const fetchNewArrivals = async () => {
+      try {
+        const apiBase = window.location.hostname === 'localhost' ? 'http://localhost:3001' : `http://${window.location.hostname}:3001`;
+        const response = await fetch(`${apiBase}/api/products?category=new-arrivals`);
+        if (response.ok) {
+          const data = await response.json();
+          if (data && data.length > 0) {
+            setActiveProducts(data);
+          }
+        }
+      } catch (error) {
+        console.log("Using static products for New Arrivals");
+      }
+    };
+    fetchNewArrivals();
+  }, []);
 
   const handleScroll = () => {
     if (scrollRef.current) {
@@ -59,7 +35,7 @@ const NewIn = () => {
       if (!cardElement) return;
       const cardWidth = cardElement.clientWidth;
       const index = Math.round(scrollPosition / cardWidth);
-      if (index >= 0 && index < products.length) {
+      if (index >= 0 && index < activeProducts.length) {
         setActiveIndex(index);
       }
     }
@@ -94,11 +70,20 @@ const NewIn = () => {
           onScroll={handleScroll}
           className="flex overflow-x-auto snap-x snap-mandatory gap-3 px-4 pb-4 md:grid md:grid-cols-4 md:gap-6 md:px-6 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
         >
-          {products.map((product) => (
+          {activeProducts.map((product: any) => (
             <div 
-              key={product.id} 
+              key={product._id || product.id} 
               className="w-[45vw] sm:w-[35vw] md:w-full snap-start shrink-0 flex flex-col group cursor-pointer"
-              onClick={() => { const l = HOME_PRODUCT_LINKS[product.id]; if (l) navigate(`/category/${l.categorySlug}/product/${l.productId}`); }} // fix: home product links
+              onClick={() => { 
+                const linkId = product.id;
+                const l = linkId ? HOME_PRODUCT_LINKS[linkId] : null; 
+                if (l) {
+                  navigate(`/category/${l.categorySlug}/product/${l.productId}`); 
+                } else {
+                  // Fallback for dynamic products
+                  navigate(`/category/new-arrivals`);
+                }
+              }} // fix: home product links
             >
               {/* Image Container */}
               <div className="relative aspect-[3/4] w-full rounded-xl overflow-hidden bg-white">
@@ -116,7 +101,7 @@ const NewIn = () => {
                       -{product.discount}
                     </span>
                   )}
-                  {product.isNew && (
+                  {(product.isNew || product.category === 'new-arrivals') && (
                     <span className="bg-[#D8B7A6] text-foreground text-[11px] px-2.5 py-0.5 rounded-full font-medium shadow-sm">
                       New
                     </span>
@@ -150,7 +135,7 @@ const NewIn = () => {
 
         {/* Pagination Dots (Mobile Only) */}
         <div className="flex justify-center gap-2 mt-4 md:hidden">
-          {products.map((_, idx) => (
+          {activeProducts.map((_, idx) => (
             <button
               key={idx}
               onClick={() => scrollTo(idx)}
