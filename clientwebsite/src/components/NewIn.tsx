@@ -14,7 +14,7 @@ const NewIn = () => {
     const fetchNewArrivals = async () => {
       try {
         const apiBase = window.location.hostname === 'localhost' ? 'http://localhost:3001' : `http://${window.location.hostname}:3001`;
-        const response = await fetch(`${apiBase}/api/products?category=new-arrivals`);
+        const response = await fetch(`${apiBase}/api/products?isNewArrival=true`);
         if (response.ok) {
           const data = await response.json();
           if (data && data.length > 0) {
@@ -75,15 +75,10 @@ const NewIn = () => {
               key={product._id || product.id} 
               className="w-[38vw] sm:w-[32vw] md:w-full snap-start shrink-0 flex flex-col group cursor-pointer"
               onClick={() => { 
-                const linkId = product.id;
-                const l = linkId ? HOME_PRODUCT_LINKS[linkId] : null; 
-                if (l) {
-                  navigate(`/category/${l.categorySlug}/product/${l.productId}`); 
-                } else {
-                  // Fallback for dynamic products
-                  navigate(`/category/new-arrivals`);
-                }
-              }} // fix: home product links
+                const categorySlug = product.category || 'new-arrivals';
+                const productId = product._id;
+                navigate(`/category/${categorySlug}/product/${productId}`);
+              }}
             >
               {/* Image Container */}
               <div className="relative aspect-[3/4] w-full rounded-xl overflow-hidden bg-white">

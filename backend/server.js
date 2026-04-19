@@ -36,9 +36,14 @@ const ProductSchema = new mongoose.Schema({
   originalPrice: Number,
   discount: String,
   isNew: { type: Boolean, default: false },
-  image: String, // Store Base64 or URL
-  category: { type: String, default: 'new-arrivals' },
-  createdAt: { type: Date, default: Date.now }
+  isNewArrival: { type: Boolean, default: false },
+  isBestSeller: { type: Boolean, default: false },
+  image: String, // Main image (Base64)
+  gallery: [String], // Array of 5 look images (Base64)
+  sizes: [String], // Array of available sizes (e.g. S, M, L, XL)
+  details: String, // Rich text or long description
+  category: { type: String, default: 'new-arrivals', index: true }, // Added index for faster filtering
+  createdAt: { type: Date, default: Date.now, index: true } // Added index for faster sorting
 });
 
 const Product = mongoose.model('Product', ProductSchema);
@@ -103,15 +108,34 @@ app.get('/api/banners', async (req, res) => {
   }
 });
 
-// Product Routes
 app.get('/api/products', async (req, res) => {
   try {
-    const { category } = req.query;
-    const query = category ? { category } : {};
-    const products = await Product.find(query).sort({ createdAt: -1 });
+    const { category, isNewArrival, isBestSeller } = req.query;
+    let query = {};
+    if (category) query.category = category;
+    if (isNewArrival === 'true') query.isNewArrival = true;
+    if (isBestSeller === 'true') query.isBestSeller = true;
+    
+    // PROJECT fields to exclude heavy images (gallery) and long details when fetching a list
+    const products = await Product.find(query)
+      .select('-gallery -details -__v') 
+      .sort({ createdAt: -1 })
+      .lean(); // Faster query execution
+
     res.status(200).send(products);
   } catch (error) {
     res.status(500).send({ message: 'Error fetching products', error: error.message });
+  }
+});
+
+app.get('/api/products/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const product = await Product.findById(id).lean();
+    if (!product) return res.status(404).send({ message: 'Product not found' });
+    res.status(200).send(product);
+  } catch (error) {
+    res.status(500).send({ message: 'Error fetching product', error: error.message });
   }
 });
 

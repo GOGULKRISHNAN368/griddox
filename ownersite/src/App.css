@@ -429,3 +429,39 @@
   from { opacity: 0; transform: scale(0.98); }
   to { opacity: 1; transform: scale(1); }
 }
+
+/* Add Dress Specific UI */
+.mini-btn {
+  background: #f0f0f0;
+  border: 1px solid #ddd;
+  padding: 8px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: 0.2s;
+}
+
+.mini-btn:hover {
+  background: #e0e0e0;
+}
+
+.gallery-thumb img {
+  image-rendering: -webkit-optimize-contrast;
+}
+
+.size-selector input[type="checkbox"] {
+  accent-color: #8b231a;
+  width: 16px;
+  height: 16px;
+}
+
+.cat-badge {
+  text-transform: uppercase;
+  font-weight: bold;
+}
+
+@media (max-width: 900px) {
+  .product-form.card .form-grid {
+    grid-template-columns: 1fr !important;
+  }
+}

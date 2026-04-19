@@ -1,46 +1,87 @@
 import { useParams, Link } from "react-router-dom";
 import { Heart, ChevronLeft, Truck, RotateCcw, Shield, Banknote } from "lucide-react";
 import { Helmet } from "react-helmet-async";
-import { useState } from "react";
-import categories from "@/data/categoryProducts";
+import { useState, useEffect } from "react";
 import ProductGallery from "@/components/ProductGallery";
 import Header from "@/components/Header";
-
 import BottomNav from "@/components/BottomNav";
 import WhatsAppButton from "@/components/WhatsAppButton";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import SimilarProducts from "@/components/SimilarProducts";
 import { toast } from "sonner";
 
+interface Product {
+  _id: string;
+  name: string;
+  price: number;
+  originalPrice?: number;
+  discount?: string;
+  image: string;
+  gallery: string[];
+  sizes: string[];
+  details: string;
+  category: string;
+}
+
 const ProductDetailPage = () => {
-  const { slug, productId } = useParams<{ slug: string; productId: string }>();
-  const [selectedSize, setSelectedSize] = useState<number | null>(null);
-  const [selectedColorIdx, setSelectedColorIdx] = useState(0);
+  const { productId } = useParams<{ slug: string; productId: string }>();
+  const [product, setProduct] = useState<Product | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [selectedSize, setSelectedSize] = useState<string | null>(null);
   const [pincode, setPincode] = useState("");
 
-  const category = categories.find((c) => c.slug === slug);
-  const product = category?.products.find((p) => p.id === productId);
+  useEffect(() => {
+    window.scrollTo(0, 0);
+    const fetchProduct = async () => {
+      try {
+        const apiBase = window.location.hostname === 'localhost' ? 'http://localhost:3001' : `http://${window.location.hostname}:3001`;
+        const response = await fetch(`${apiBase}/api/products/${productId}`);
+        const found = await response.json();
+        setProduct(found);
+      } catch (error) {
+        console.error('Error fetching product:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchProduct();
+  }, [productId]);
 
-  if (!category || !product) {
+  if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <p className="text-xl">Product not found</p>
+      <div className="min-h-screen flex items-center justify-center bg-white">
+        <div className="flex flex-col items-center gap-4">
+          <div className="w-12 h-12 border-4 border-[#8b231a] border-t-transparent rounded-full animate-spin"></div>
+          <p className="text-gray-400 italic font-body tracking-widest text-sm uppercase">Curating Detail...</p>
+        </div>
       </div>
     );
   }
 
+  if (!product) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center bg-white p-4 text-center">
+        <h2 className="font-heading text-2xl italic mb-4">Design Not Found</h2>
+        <p className="text-gray-500 mb-8">This piece might have moved or is no longer available.</p>
+        <Link to="/" className="px-8 py-3 bg-[#8b231a] text-white font-bold tracking-widest text-xs uppercase">Back to Home</Link>
+      </div>
+    );
+  }
+
+  const allImages = [product.image, ...(product.gallery || [])].filter(Boolean);
+  const categoryName = product.category.replace(/-/g, ' ').toUpperCase();
+
   const handleAddToBag = () => {
-    if (!selectedSize) {
+    if (!selectedSize && product.sizes?.length > 0) {
       toast.error("Please select a size");
       return;
     }
     toast.success("Added to bag!", {
-      description: `${product.name} - Size ${selectedSize === 0 ? "Free Size" : selectedSize}`,
+      description: `${product.name} - ${selectedSize || "Standard"}`,
     });
   };
 
   const handleBuyNow = () => {
-    if (!selectedSize) {
+    if (!selectedSize && product.sizes?.length > 0) {
       toast.error("Please select a size");
       return;
     }
@@ -50,12 +91,8 @@ const ProductDetailPage = () => {
   return (
     <div className="min-h-screen bg-white text-[#1a1a1a] pb-16 md:pb-0 font-body">
       <Helmet>
-        <title>{`${product.name} | ${category.title} | Gridox`}</title>
-        <meta name="description" content={product.description || `Buy ${product.name} from our ${category.title} collection at Gridox. Premium ${product.fabric} with exclusive designer pattern.`} />
-        <meta property="og:title" content={`${product.name} - ${category.title} at Gridox`} />
-        <meta property="og:description" content={`Shop the ${product.name} at Gridox. Premium quality women's clothing.`} />
-        <meta property="og:image" content={product.images[0]} />
-        <meta name="keywords" content={`${product.name}, ${category.title}, women's ${product.fabric} dress, Gridox clothing`} />
+        <title>{`${product.name} | ${categoryName} | Gridox`}</title>
+        <meta name="description" content={product.details || `Premium designer wear from Gridox.`} />
       </Helmet>
 
       <Header />
@@ -65,25 +102,21 @@ const ProductDetailPage = () => {
         <div className="flex items-center gap-2 text-[10px] text-gray-400 uppercase tracking-widest font-bold">
           <Link to="/" className="hover:text-black transition-colors">HOME</Link>
           <span>/</span>
-          <Link to={`/category/${category.slug}`} className="hover:text-black transition-colors">
-            {category.title}
+          <Link to={`/category/${product.category}`} className="hover:text-black transition-colors">
+            {categoryName}
           </Link>
           <span>/</span>
           <span className="text-[#8b231a]">{product.name}</span>
         </div>
       </div>
 
-      {/* Product Layout */}
       <div className="max-w-7xl mx-auto px-4 pb-12">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-14 items-start">
-          {/* Left: Image Gallery */}
           <div className="w-full">
-            <ProductGallery images={product.images} productName={product.name} />
+            <ProductGallery images={allImages} productName={product.name} />
           </div>
 
-          {/* Right: Product Info */}
           <div className="space-y-8">
-            {/* Title */}
             <div className="space-y-2">
               <h1 className="font-heading text-2xl md:text-4xl font-normal leading-tight italic text-[#1a1a1a]">
                 {product.name}
@@ -91,84 +124,56 @@ const ProductDetailPage = () => {
               <p className="text-[10px] text-gray-400 uppercase tracking-[0.3em] font-bold">Premium Ensemble</p>
             </div>
 
-            {/* Price */}
             <div className="flex items-center gap-4">
               <span className="text-3xl font-bold text-[#1a1a1a]">₹{product.price.toLocaleString()}</span>
-              <div className="flex flex-col">
-                <span className="text-xs text-gray-400 line-through">
-                  ₹{product.originalPrice.toLocaleString()}
-                </span>
-                <span className="text-xs font-bold text-[#8b231a] tracking-wider uppercase">
-                  {product.discount}% OFF
-                </span>
-              </div>
+              {product.originalPrice && (
+                <div className="flex flex-col">
+                  <span className="text-xs text-gray-400 line-through">
+                    ₹{product.originalPrice.toLocaleString()}
+                  </span>
+                  {product.discount && (
+                    <span className="text-xs font-bold text-[#8b231a] tracking-wider uppercase">
+                      {product.discount}
+                    </span>
+                  )}
+                </div>
+              )}
             </div>
 
-            {/* Colors */}
-            {product.colors.length > 0 && (
-              <div className="space-y-3">
-                <h3 className="font-bold text-[10px] tracking-widest text-gray-500 uppercase">Select Color</h3>
-                <div className="flex gap-4">
-                  {product.colors.map((color, idx) => (
+            {/* Sizes */}
+            {product.sizes && product.sizes.length > 0 && (
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <h3 className="font-bold text-[10px] tracking-widest text-gray-500 uppercase">Select Size</h3>
+                  <button className="text-[10px] text-[#8b231a] font-bold tracking-widest hover:underline uppercase">Size Guide</button>
+                </div>
+                <div className="flex flex-wrap gap-3">
+                  {product.sizes.map((size) => (
                     <button
-                      key={color.name}
-                      onClick={() => setSelectedColorIdx(idx)}
-                      className="group flex flex-col items-center gap-2"
+                      key={size}
+                      onClick={() => setSelectedSize(size)}
+                      className={`w-12 h-12 rounded-full border text-xs font-bold transition-all ${
+                        selectedSize === size
+                          ? "border-[#1a1a1a] bg-[#1a1a1a] text-white"
+                          : "border-gray-200 text-[#1a1a1a] hover:border-[#1a1a1a]"
+                      }`}
                     >
-                      <div
-                        className={`w-10 h-10 rounded-full border-2 transition-all ring-offset-2 ${
-                          selectedColorIdx === idx
-                            ? "border-[#1a1a1a] ring-2 ring-[#1a1a1a]/20 scale-110"
-                            : "border-transparent group-hover:border-gray-200"
-                        }`}
-                        style={{ backgroundColor: color.hex }}
-                      />
+                      {size}
                     </button>
                   ))}
                 </div>
               </div>
             )}
 
-            {/* Size */}
-            <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <h3 className="font-bold text-[10px] tracking-widest text-gray-500 uppercase">Select Size</h3>
-                <button className="text-[10px] text-[#8b231a] font-bold tracking-widest hover:underline uppercase">Size Guide</button>
-              </div>
-              <div className="flex flex-wrap gap-3">
-                {product.sizes.map((size) => (
-                   <button
-                    key={size}
-                    onClick={() => setSelectedSize(size)}
-                    className={`w-12 h-12 rounded-full border text-xs font-bold transition-all ${
-                      selectedSize === size
-                         ? "border-[#1a1a1a] bg-[#1a1a1a] text-white"
-                        : "border-gray-200 text-[#1a1a1a] hover:border-[#1a1a1a]"
-                    }`}
-                  >
-                    {size === 0 ? "FS" : size}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* CTA Buttons */}
             <div className="flex flex-col md:flex-row gap-4 pt-4">
-              <button
-                onClick={handleAddToBag}
-                className="flex-[1.5] h-16 bg-white border border-[#1a1a1a] text-[#1a1a1a] font-bold text-xs tracking-[0.2em] rounded-sm hover:bg-[#1a1a1a] hover:text-white transition-all uppercase"
-              >
+              <button onClick={handleAddToBag} className="flex-[1.5] h-16 bg-white border border-[#1a1a1a] text-[#1a1a1a] font-bold text-xs tracking-[0.2em] rounded-sm hover:bg-[#1a1a1a] hover:text-white transition-all uppercase">
                 Add To Bag
               </button>
-              <button
-                onClick={handleBuyNow}
-                className="flex-1 h-16 bg-[#8b231a] text-white font-bold text-xs tracking-[0.2em] rounded-sm hover:bg-[#a62b21] transition-all uppercase"
-              >
+              <button onClick={handleBuyNow} className="flex-1 h-16 bg-[#8b231a] text-white font-bold text-xs tracking-[0.2em] rounded-sm hover:bg-[#a62b21] transition-all uppercase">
                 Buy Now
               </button>
             </div>
 
-            {/* Delivery */}
             <div className="pt-6 border-t border-black/5">
               <h3 className="font-bold text-[10px] tracking-widest text-gray-500 uppercase mb-3">Check Delivery</h3>
               <div className="flex border border-gray-200 rounded-sm overflow-hidden bg-white shadow-sm ring-1 ring-black/5">
@@ -186,7 +191,6 @@ const ProductDetailPage = () => {
               </div>
             </div>
 
-            {/* Features */}
             <div className="grid grid-cols-2 gap-y-6 pt-4">
               <div className="flex items-center gap-3">
                 <Truck size={18} className="text-[#8b231a]" strokeWidth={1} />
@@ -206,7 +210,6 @@ const ProductDetailPage = () => {
               </div>
             </div>
 
-            {/* Accordion sections */}
             <Accordion type="single" collapsible className="w-full pt-4 border-t border-black/5">
               <AccordionItem value="details" className="border-none">
                 <AccordionTrigger className="font-bold text-[11px] tracking-widest uppercase py-4">
@@ -214,27 +217,9 @@ const ProductDetailPage = () => {
                 </AccordionTrigger>
                 <AccordionContent>
                   <div className="space-y-6 pt-2">
-                    <p className="text-sm leading-relaxed text-gray-500">
-                      {product.description}
+                    <p className="text-sm leading-relaxed text-gray-500 whitespace-pre-wrap">
+                      {product.details || "Premium quality designer garment tailored for elegance and style."}
                     </p>
-                    <div className="grid grid-cols-2 gap-y-6 gap-x-12">
-                      <div className="space-y-1">
-                        <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Fabric</p>
-                        <p className="text-sm text-[#1a1a1a] font-medium italic">{product.fabric}</p>
-                      </div>
-                      <div className="space-y-1">
-                        <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Fit</p>
-                        <p className="text-sm text-[#1a1a1a] font-medium italic">{product.fit}</p>
-                      </div>
-                      <div className="space-y-1">
-                        <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Neckline</p>
-                        <p className="text-sm text-[#1a1a1a] font-medium italic">{product.neckline}</p>
-                      </div>
-                      <div className="space-y-1">
-                        <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Sleeve</p>
-                        <p className="text-sm text-[#1a1a1a] font-medium italic">{product.sleeve}</p>
-                      </div>
-                    </div>
                   </div>
                 </AccordionContent>
               </AccordionItem>
@@ -249,30 +234,8 @@ const ProductDetailPage = () => {
                 </AccordionContent>
               </AccordionItem>
             </Accordion>
-
-            {/* Help */}
-            <div className="pt-8 border-t border-black/5">
-              <h3 className="font-bold text-[10px] tracking-widest uppercase text-gray-400 mb-4">Questions?</h3>
-              <div className="space-y-2">
-                <p className="text-sm text-[#1a1a1a] font-medium">
-                  Support: <a href="tel:011-41169005" className="hover:text-[#8b231a] transition-colors font-bold tracking-wider underline underline-offset-4">011-41169005</a>
-                </p>
-                <p className="text-sm text-[#1a1a1a] font-medium">
-                  Email: <a href="mailto:support@gridox.com" className="hover:text-[#8b231a] transition-colors font-bold tracking-wider underline underline-offset-4">support@gridox.com</a>
-                </p>
-              </div>
-            </div>
           </div>
         </div>
-      </div>
-
-      {/* Similar Products */}
-      <div className="max-w-7xl mx-auto py-12">
-        <SimilarProducts 
-          products={category.products} 
-          currentProductId={product.id} 
-          categorySlug={category.slug} 
-        />
       </div>
 
       <BottomNav />

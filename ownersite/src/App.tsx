@@ -16,6 +16,9 @@ interface Product {
   originalPrice: number;
   discount: string;
   image: string;
+  gallery: string[];
+  sizes: string[];
+  details: string;
   category: string;
   createdAt: string;
 }
@@ -32,7 +35,7 @@ interface Category {
 }
 
 function App() {
-  const [activeTab, setActiveTab] = useState<'banners' | 'new-arrivals' | 'categories'>('banners');
+  const [activeTab, setActiveTab] = useState<'banners' | 'categories' | 'dresses'>('banners');
   const [status, setStatus] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [banners, setBanners] = useState<Banner[]>([]);
@@ -45,7 +48,13 @@ function App() {
     price: '',
     originalPrice: '',
     discount: '',
-    image: ''
+    image: '',
+    gallery: [] as string[],
+    sizes: [] as string[],
+    details: '',
+    category: '',
+    isNewArrival: false,
+    isBestSeller: false
   });
 
   // Category Form State
@@ -59,14 +68,18 @@ function App() {
   const API_BASE = window.location.hostname === 'localhost' ? 'http://localhost:3001' : `http://${window.location.hostname}:3001`;
   const bannerInputRef = useRef<HTMLInputElement>(null);
   const productInputRef = useRef<HTMLInputElement>(null);
+  const galleryInputRef = useRef<HTMLInputElement>(null);
   const categoryFullInputRef = useRef<HTMLInputElement>(null);
   const categoryThumbInputRef = useRef<HTMLInputElement>(null);
 
   // Fetch data on load and tab change
   useEffect(() => {
     if (activeTab === 'banners') fetchBanners();
-    else if (activeTab === 'new-arrivals') fetchProducts();
     else if (activeTab === 'categories') fetchCategories();
+    else if (activeTab === 'dresses') {
+      fetchProducts();
+      fetchCategories();
+    }
   }, [activeTab]);
 
   const fetchBanners = async () => {
@@ -81,9 +94,10 @@ function App() {
     }
   };
 
-  const fetchProducts = async () => {
+  const fetchProducts = async (category?: string) => {
     try {
-      const response = await fetch(`${API_BASE}/api/products?category=new-arrivals`);
+      const url = category ? `${API_BASE}/api/products?category=${category}` : `${API_BASE}/api/products`;
+      const response = await fetch(url);
       if (response.ok) {
         const data = await response.json();
         setProducts(data);
@@ -105,11 +119,27 @@ function App() {
     }
   };
 
-  const optimizeImage = (file: File): Promise<string> => {
+  const optimizeImage = (file: File, maxWidth = 1200, quality = 0.8): Promise<string> => {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
       reader.readAsDataURL(file);
-      reader.onload = () => resolve(reader.result as string);
+      reader.onload = (e) => {
+        const img = new Image();
+        img.src = e.target?.result as string;
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          const scale = Math.min(1, maxWidth / img.width);
+          canvas.width = img.width * scale;
+          canvas.height = img.height * scale;
+          const ctx = canvas.getContext('2d');
+          if (ctx) {
+            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+            resolve(canvas.toDataURL('image/jpeg', quality));
+          } else {
+            resolve(e.target?.result as string);
+          }
+        };
+      };
       reader.onerror = error => reject(error);
     });
   };
@@ -182,7 +212,7 @@ function App() {
             }
 
             ctx.drawImage(img, offsetLeft, offsetTop, drawW, drawH);
-            resolve(canvas.toDataURL('image/jpeg', 0.95));
+            resolve(canvas.toDataURL('image/jpeg', 0.8)); // Reduced from 0.95 for speed
           } else {
             resolve(e.target?.result as string);
           }
@@ -255,6 +285,32 @@ function App() {
     }
   };
 
+  const handleGalleryImagesSelect = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const files = event.target.files;
+    if (!files || files.length === 0) return;
+    
+    setIsLoading(true);
+    setStatus(`Processing ${files.length} gallery images...`);
+    
+    try {
+      const processedImages: string[] = [];
+      // Process only up to 5 images
+      const filesArray = Array.from(files).slice(0, 5);
+      
+      for (const file of filesArray) {
+        const base64 = await standardizeNewArrival(file);
+        processedImages.push(base64);
+      }
+      
+      setProductForm(prev => ({ ...prev, gallery: processedImages }));
+      setStatus(`${processedImages.length} gallery images ready.`);
+    } catch (error) {
+      setStatus('Error processing gallery images.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const handleAddProduct = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!productForm.image || !productForm.name || !productForm.price) {
@@ -263,26 +319,32 @@ function App() {
     }
 
     setIsLoading(true);
-    setStatus('Adding product to Atlas...');
+    setStatus('Adding to Atlas...');
 
     try {
+      const dataToSend = {
+        ...productForm,
+        price: Number(productForm.price),
+        originalPrice: Number(productForm.originalPrice) || undefined,
+        category: productForm.category
+      };
+
       const response = await fetch(`${API_BASE}/api/add-product`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          ...productForm,
-          price: Number(productForm.price),
-          originalPrice: Number(productForm.originalPrice) || undefined,
-          category: 'new-arrivals'
-        }),
+        body: JSON.stringify(dataToSend),
       });
 
       if (response.ok) {
-        setStatus('Product added successfully!');
-        setProductForm({ name: '', price: '', originalPrice: '', discount: '', image: '' });
+        setStatus('Saved successfully!');
+        setProductForm({ 
+          name: '', price: '', originalPrice: '', discount: '', image: '', 
+          gallery: [], sizes: [], details: '', category: '',
+          isNewArrival: false, isBestSeller: false
+        });
         fetchProducts();
       } else {
-        setStatus('Failed to add product.');
+        setStatus('Failed to save.');
       }
     } catch (error) {
       setStatus('Error connecting to server.');
@@ -405,7 +467,7 @@ function App() {
           <ul>
             <li onClick={() => setActiveTab('banners')} className={activeTab === 'banners' ? 'active' : ''}>Banners</li>
             <li onClick={() => setActiveTab('categories')} className={activeTab === 'categories' ? 'active' : ''}>Categories</li>
-            <li onClick={() => setActiveTab('new-arrivals')} className={activeTab === 'new-arrivals' ? 'active' : ''}>New Arrivals</li>
+            <li onClick={() => setActiveTab('dresses')} className={activeTab === 'dresses' ? 'active' : ''}>Add Dress</li>
             <li>Settings</li>
           </ul>
         </nav>
@@ -497,32 +559,116 @@ function App() {
         ) : (
           <>
             <div className="page-title">
-              <h1>New Arrivals Management</h1>
-              <p>Add and manage products in the "New Arrivals" section.</p>
+              <h1>Dress Management</h1>
+              <p>Add new dresses to specific categories with detailed looks and sizes.</p>
             </div>
             
-            <form className="product-form card" onSubmit={handleAddProduct}>
-              <div className="form-grid">
-                <div className="image-upload-box" onClick={() => productInputRef.current?.click()}>
-                  {productForm.image ? (
-                    <img src={productForm.image} alt="Preview" className="preview-img" />
-                  ) : (
-                    <div className="placeholder">
-                      <span>+</span>
-                      <p>Select Dress Image</p>
-                    </div>
-                  )}
-                  <input type="file" ref={productInputRef} onChange={handleProductImageSelect} accept="image/*" style={{ display: 'none' }} />
+            <form className="product-form card" onSubmit={handleAddProduct} style={{ maxWidth: '900px', margin: '0 auto 40px' }}>
+              <div className="form-grid" style={{ gridTemplateColumns: '1fr 1fr', gap: '30px' }}>
+                <div className="image-sections">
+                  <h3 style={{ marginBottom: '15px', fontSize: '1.1rem' }}>1. Product Images</h3>
+                  <div className="image-upload-box main" onClick={() => productInputRef.current?.click()} style={{ height: '300px', marginBottom: '15px' }}>
+                    {productForm.image ? (
+                      <img src={productForm.image} alt="Main" className="preview-img" />
+                    ) : (
+                      <div className="placeholder">
+                        <span>+</span>
+                        <p>Main Dress Image (Portrait)</p>
+                      </div>
+                    )}
+                    <input type="file" ref={productInputRef} onChange={handleProductImageSelect} accept="image/*" style={{ display: 'none' }} />
+                  </div>
+                  
+                  <p style={{ fontSize: '0.9rem', marginBottom: '8px', fontWeight: 'bold' }}>Gallery (5 Different Looks)</p>
+                  <div className="gallery-upload-row" style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                    {[0, 1, 2, 3, 4].map(i => (
+                      <div key={i} className="gallery-thumb" style={{ width: '60px', height: '80px', border: '1px dashed #ccc', borderRadius: '4px', overflow: 'hidden', position: 'relative' }}>
+                        {productForm.gallery[i] ? (
+                          <img src={productForm.gallery[i]} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                        ) : (
+                          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', color: '#999' }}>+</div>
+                        )}
+                      </div>
+                    ))}
+                    <button type="button" onClick={() => galleryInputRef.current?.click()} className="mini-btn" style={{ height: '80px', padding: '0 10px', fontSize: '0.8rem' }}>Upload Looks</button>
+                    <input type="file" ref={galleryInputRef} onChange={handleGalleryImagesSelect} accept="image/*" multiple style={{ display: 'none' }} />
+                  </div>
                 </div>
+
                 <div className="form-fields">
+                  <h3 style={{ marginBottom: '15px', fontSize: '1.1rem' }}>2. Product Information</h3>
+                  
+                  <select 
+                    value={productForm.category} 
+                    onChange={e => setProductForm({...productForm, category: e.target.value})}
+                    required
+                    style={{ padding: '12px', borderRadius: '8px', border: '1px solid #ddd', marginBottom: '15px', width: '100%' }}
+                  >
+                    <option value="">Select Category</option>
+                    {categories.map(cat => (
+                      <option key={cat._id} value={cat.slug}>{cat.name}</option>
+                    ))}
+                  </select>
+
                   <input type="text" placeholder="Dress Name" value={productForm.name} onChange={e => setProductForm({...productForm, name: e.target.value})} required />
+                  
                   <div className="price-row">
                     <input type="number" placeholder="Price" value={productForm.price} onChange={e => setProductForm({...productForm, price: e.target.value})} required />
                     <input type="number" placeholder="Old Price" value={productForm.originalPrice} onChange={e => setProductForm({...productForm, originalPrice: e.target.value})} />
                   </div>
-                  <input type="text" placeholder="Discount (e.g. 20%)" value={productForm.discount} onChange={e => setProductForm({...productForm, discount: e.target.value})} />
-                  <button type="submit" disabled={isLoading} className="submit-btn">
-                    {isLoading ? 'Saving...' : 'Add Product to Section'}
+                  
+                  <input type="text" placeholder="Discount (e.g. 10% OFF)" value={productForm.discount} onChange={e => setProductForm({...productForm, discount: e.target.value})} />
+                  
+                  <div className="size-selector" style={{ marginBottom: '15px' }}>
+                    <p style={{ fontSize: '0.9rem', marginBottom: '8px', fontWeight: 'bold' }}>Available Sizes</p>
+                    <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+                      {['XS', 'S', 'M', 'L', 'XL', 'XXL', '3XL'].map(size => (
+                        <label key={size} style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '0.85rem', cursor: 'pointer' }}>
+                          <input 
+                            type="checkbox" 
+                            checked={productForm.sizes.includes(size)}
+                            onChange={(e) => {
+                              const newSizes = e.target.checked 
+                                ? [...productForm.sizes, size]
+                                : productForm.sizes.filter(s => s !== size);
+                              setProductForm({...productForm, sizes: newSizes});
+                            }}
+                          />
+                          {size}
+                        </label>
+                      ))}
+                    </div>
+                  </div>
+
+                  <textarea 
+                    placeholder="Product Details (Fabric, Care, etc.)" 
+                    value={productForm.details} 
+                    onChange={e => setProductForm({...productForm, details: e.target.value})} 
+                    rows={4}
+                    style={{ padding: '12px', borderRadius: '8px', border: '1px solid #ddd', marginBottom: '15px', width: '100%', fontFamily: 'inherit' }}
+                  />
+
+                  <div className="special-flags" style={{ display: 'flex', gap: '20px', marginBottom: '20px', padding: '15px', background: '#f9f9f9', borderRadius: '8px' }}>
+                    <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', fontWeight: '600' }}>
+                      <input 
+                        type="checkbox" 
+                        checked={productForm.isNewArrival} 
+                        onChange={e => setProductForm({...productForm, isNewArrival: e.target.checked})}
+                      />
+                      Mark as New Arrival 🌟
+                    </label>
+                    <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', fontWeight: '600' }}>
+                      <input 
+                        type="checkbox" 
+                        checked={productForm.isBestSeller} 
+                        onChange={e => setProductForm({...productForm, isBestSeller: e.target.checked})}
+                      />
+                      Mark as Best Seller 🔥
+                    </label>
+                  </div>
+
+                  <button type="submit" disabled={isLoading || !productForm.image || !productForm.category} className="submit-btn" style={{ backgroundColor: '#8b231a' }}>
+                    {isLoading ? 'Saving...' : 'Add Dress to Collection'}
                   </button>
                 </div>
               </div>
@@ -532,6 +678,9 @@ function App() {
               {products.map(product => (
                 <div key={product._id} className="product-admin-card fade-in">
                   <div className="prod-img" style={{backgroundImage: `url("${product.image}")`}}>
+                    <span className="cat-badge" style={{ position: 'absolute', top: '10px', left: '10px', background: 'rgba(0,0,0,0.6)', color: 'white', padding: '2px 8px', borderRadius: '4px', fontSize: '0.7rem' }}>
+                      {product.category}
+                    </span>
                     {product.discount && <span className="discount-badge">-{product.discount}</span>}
                   </div>
                   <div className="prod-info">
