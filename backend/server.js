@@ -43,6 +43,18 @@ const ProductSchema = new mongoose.Schema({
 
 const Product = mongoose.model('Product', ProductSchema);
 
+const CategorySchema = new mongoose.Schema({
+  name: { type: String, required: true },
+  image: String, // Keeping for backward compatibility
+  fullImage: String,
+  thumbnailImage: String,
+  description: String,
+  slug: String,
+  createdAt: { type: Date, default: Date.now }
+});
+
+const Category = mongoose.model('Category', CategorySchema);
+
 // API Routes
 app.post('/api/add-banner', async (req, res) => {
   try {
@@ -121,6 +133,53 @@ app.delete('/api/products/:id', async (req, res) => {
     res.status(200).send({ message: 'Product removed successfully' });
   } catch (error) {
     res.status(500).send({ message: 'Error removing product', error: error.message });
+  }
+});
+
+// Category Routes
+app.get('/api/categories', async (req, res) => {
+  try {
+    const categories = await Category.find().sort({ createdAt: 1 });
+    res.status(200).send(categories);
+  } catch (error) {
+    res.status(500).send({ message: 'Error fetching categories', error: error.message });
+  }
+});
+
+app.post('/api/add-category', async (req, res) => {
+  try {
+    const { name, thumbnailImage, description } = req.body;
+    console.log(`[BACKEND] Adding category: "${name}"`);
+    console.log(`[BACKEND] Image received: ${thumbnailImage ? 'YES' : 'NO'} (Size: ${thumbnailImage?.length || 0} chars)`);
+    
+    if (!name || !thumbnailImage) {
+      return res.status(400).send({ message: 'Missing required fields: name or category image' });
+    }
+
+    const slug = name.toLowerCase().replace(/ /g, '-').replace(/[^\w-]+/g, '');
+    const newCategory = new Category({ 
+      name, 
+      thumbnailImage, 
+      description, 
+      slug 
+    });
+    
+    const saved = await newCategory.save();
+    console.log(`[BACKEND] Category "${name}" saved successfully to Atlas.`);
+    res.status(201).send({ message: 'Category added successfully', data: saved });
+  } catch (error) {
+    console.error('[BACKEND ERROR] Error adding category:', error);
+    res.status(500).send({ message: 'Server error adding category', error: error.message });
+  }
+});
+
+app.delete('/api/categories/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    await Category.findByIdAndDelete(id);
+    res.status(200).send({ message: 'Category removed successfully' });
+  } catch (error) {
+    res.status(500).send({ message: 'Error removing category', error: error.message });
   }
 });
 

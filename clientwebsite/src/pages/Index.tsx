@@ -2,10 +2,11 @@ import { lazy, Suspense } from "react";
 import { Helmet } from "react-helmet-async";
 import Header from "@/components/Header";
 import HeroCarousel from "@/components/HeroCarousel";
+import CategoryGrid from "@/components/CategoryGrid";
 
 // Lazy load below-the-fold components
 const NewIn = lazy(() => import("@/components/NewIn"));
-const FeaturedCategories = lazy(() => import("@/components/FeaturedCategories"));
+
 const Reels = lazy(() => import("@/components/Reels"));
 const CustomerReviews = lazy(() => import("@/components/CustomerReviews"));
 const AboutUs = lazy(() => import("@/components/AboutUs"));
@@ -31,7 +32,8 @@ const Index = () => {
 
       <Suspense fallback={<SectionSkeleton />}>
         <div id="new-arrivals"><NewIn /></div>
-        <div id="shop"><FeaturedCategories /></div>
+        <CategoryGrid />
+
         <Reels />
         <CustomerReviews />
         <div id="about"><AboutUs /></div>

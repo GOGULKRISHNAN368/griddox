@@ -20,12 +20,24 @@ interface Product {
   createdAt: string;
 }
 
+interface Category {
+  _id: string;
+  name: string;
+  image?: string;
+  fullImage?: string;
+  thumbnailImage?: string;
+  description: string;
+  slug: string;
+  createdAt: string;
+}
+
 function App() {
-  const [activeTab, setActiveTab] = useState<'banners' | 'new-arrivals'>('banners');
+  const [activeTab, setActiveTab] = useState<'banners' | 'new-arrivals' | 'categories'>('banners');
   const [status, setStatus] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [banners, setBanners] = useState<Banner[]>([]);
   const [products, setProducts] = useState<Product[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
   
   // Product Form State
   const [productForm, setProductForm] = useState({
@@ -36,14 +48,25 @@ function App() {
     image: ''
   });
 
+  // Category Form State
+  const [categoryForm, setCategoryForm] = useState({
+    name: '',
+    description: '',
+    fullImage: '',
+    thumbnailImage: ''
+  });
+
   const API_BASE = window.location.hostname === 'localhost' ? 'http://localhost:3001' : `http://${window.location.hostname}:3001`;
   const bannerInputRef = useRef<HTMLInputElement>(null);
   const productInputRef = useRef<HTMLInputElement>(null);
+  const categoryFullInputRef = useRef<HTMLInputElement>(null);
+  const categoryThumbInputRef = useRef<HTMLInputElement>(null);
 
   // Fetch data on load and tab change
   useEffect(() => {
     if (activeTab === 'banners') fetchBanners();
-    else fetchProducts();
+    else if (activeTab === 'new-arrivals') fetchProducts();
+    else if (activeTab === 'categories') fetchCategories();
   }, [activeTab]);
 
   const fetchBanners = async () => {
@@ -67,6 +90,18 @@ function App() {
       }
     } catch (error) {
       console.error('Error fetching products:', error);
+    }
+  };
+
+  const fetchCategories = async () => {
+    try {
+      const response = await fetch(`${API_BASE}/api/categories`);
+      if (response.ok) {
+        const data = await response.json();
+        setCategories(data);
+      }
+    } catch (error) {
+      console.error('Error fetching categories:', error);
     }
   };
 
@@ -127,11 +162,9 @@ function App() {
             ctx.imageSmoothingEnabled = true;
             ctx.imageSmoothingQuality = 'high';
             
-            // Fill with white background
             ctx.fillStyle = 'white';
             ctx.fillRect(0, 0, TARGET_W, TARGET_H);
 
-            // Calculate "Cover" scaling
             const imgRatio = img.width / img.height;
             const targetRatio = TARGET_W / TARGET_H;
             let drawW, drawH, offsetLeft, offsetTop;
@@ -149,7 +182,55 @@ function App() {
             }
 
             ctx.drawImage(img, offsetLeft, offsetTop, drawW, drawH);
-            resolve(canvas.toDataURL('image/jpeg', 0.95)); // Very high quality
+            resolve(canvas.toDataURL('image/jpeg', 0.95));
+          } else {
+            resolve(e.target?.result as string);
+          }
+        };
+      };
+    });
+  };
+
+  const standardizeFullImage = (file: File): Promise<string> => {
+    return new Promise((resolve) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = (e) => {
+        const img = new Image();
+        img.src = e.target?.result as string;
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          const TARGET_W = 1920;
+          const TARGET_H = 1080;
+          canvas.width = TARGET_W;
+          canvas.height = TARGET_H;
+          const ctx = canvas.getContext('2d');
+          
+          if (ctx) {
+            ctx.imageSmoothingEnabled = true;
+            ctx.imageSmoothingQuality = 'high';
+            
+            ctx.fillStyle = 'black'; // Better for backgrounds
+            ctx.fillRect(0, 0, TARGET_W, TARGET_H);
+
+            const imgRatio = img.width / img.height;
+            const targetRatio = TARGET_W / TARGET_H;
+            let drawW, drawH, offsetLeft, offsetTop;
+
+            if (imgRatio > targetRatio) {
+              drawH = TARGET_H;
+              drawW = img.width * (TARGET_H / img.height);
+              offsetLeft = (TARGET_W - drawW) / 2;
+              offsetTop = 0;
+            } else {
+              drawW = TARGET_W;
+              drawH = img.height * (TARGET_W / img.width);
+              offsetLeft = 0;
+              offsetTop = (TARGET_H - drawH) / 2;
+            }
+
+            ctx.drawImage(img, offsetLeft, offsetTop, drawW, drawH);
+            resolve(canvas.toDataURL('image/jpeg', 0.92));
           } else {
             resolve(e.target?.result as string);
           }
@@ -236,6 +317,86 @@ function App() {
     }
   };
 
+  const handleCategoryFullImageSelect = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    setIsLoading(true);
+    setStatus('Processing high-quality background (1920x1080)...');
+    try {
+      const base64 = await standardizeFullImage(file);
+      setCategoryForm(prev => ({ ...prev, fullImage: base64 }));
+      setStatus('Background image ready.');
+    } catch (error) {
+      setStatus('Error processing full image.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleCategoryThumbImageSelect = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    setIsLoading(true);
+    setStatus('Optimizing thumbnail...');
+    try {
+      const base64 = await optimizeImage(file);
+      setCategoryForm(prev => ({ ...prev, thumbnailImage: base64 }));
+      setStatus('Thumbnail ready.');
+    } catch (error) {
+      setStatus('Error processing thumbnail.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleAddCategory = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!categoryForm.thumbnailImage || !categoryForm.name || !categoryForm.description) {
+      setStatus('Please fill all fields and select a Category Image.');
+      return;
+    }
+
+    setIsLoading(true);
+    setStatus('Adding category to Atlas...');
+
+    try {
+      const response = await fetch(`${API_BASE}/api/add-category`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: categoryForm.name,
+          description: categoryForm.description,
+          thumbnailImage: categoryForm.thumbnailImage
+        }),
+      });
+
+      if (response.ok) {
+        setStatus('Category added successfully!');
+        setCategoryForm({ name: '', description: '', fullImage: '', thumbnailImage: '' });
+        fetchCategories();
+      } else {
+        setStatus('Failed to add category.');
+      }
+    } catch (error) {
+      setStatus('Error connecting to server.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleDeleteCategory = async (id: string) => {
+    if (!confirm('Remove this category?')) return;
+    try {
+      const response = await fetch(`${API_BASE}/api/categories/${id}`, { method: 'DELETE' });
+      if (response.ok) {
+        setStatus('Category removed.');
+        fetchCategories();
+      }
+    } catch (error) {
+      setStatus('Error removing category.');
+    }
+  };
+
   return (
     <div className="admin-container">
       <header className="admin-header">
@@ -243,6 +404,7 @@ function App() {
         <nav>
           <ul>
             <li onClick={() => setActiveTab('banners')} className={activeTab === 'banners' ? 'active' : ''}>Banners</li>
+            <li onClick={() => setActiveTab('categories')} className={activeTab === 'categories' ? 'active' : ''}>Categories</li>
             <li onClick={() => setActiveTab('new-arrivals')} className={activeTab === 'new-arrivals' ? 'active' : ''}>New Arrivals</li>
             <li>Settings</li>
           </ul>
@@ -272,6 +434,62 @@ function App() {
                         <button className="delete-btn" onClick={() => handleDeleteBanner(banner._id)}>Remove</button>
                      </div>
                    </div>
+                </div>
+              ))}
+            </div>
+          </>
+        ) : activeTab === 'categories' ? (
+          <>
+            <div className="page-title">
+              <h1>Category Management</h1>
+              <p>Add and manage main categories displayed on the shop section.</p>
+            </div>
+            
+            <form className="product-form card" onSubmit={handleAddCategory} style={{ maxWidth: '600px', margin: '0 auto 40px' }}>
+              <div style={{ textAlign: 'center', marginBottom: '20px' }}>
+                <p style={{ fontSize: '1.1rem', fontWeight: 'bold', marginBottom: '4px', color: '#8b231a' }}>Recommended: 1200px x 1600px</p>
+                <p style={{ fontSize: '0.85rem', color: '#666', marginBottom: '15px' }}>(Standard 3:4 Portrait Ratio)</p>
+                
+                <div className="image-upload-box" onClick={() => categoryThumbInputRef.current?.click()} style={{ height: '350px', width: '260px', margin: '0 auto 20px', border: '2px dashed #8b231a' }}>
+                  {categoryForm.thumbnailImage ? (
+                    <img src={categoryForm.thumbnailImage} alt="Preview" className="preview-img" />
+                  ) : (
+                    <div className="placeholder">
+                      <span>+</span>
+                      <p>Select Category Image</p>
+                    </div>
+                  )}
+                  <input type="file" ref={categoryThumbInputRef} onChange={handleCategoryThumbImageSelect} accept="image/*" style={{ display: 'none' }} />
+                </div>
+              </div>
+
+              <div className="form-fields">
+                <input type="text" placeholder="Category Name (e.g. PEPLUM CO-ORDS)" value={categoryForm.name} onChange={e => setCategoryForm({...categoryForm, name: e.target.value})} required />
+                <textarea 
+                  placeholder="Short Description for SEO and Display" 
+                  value={categoryForm.description} 
+                  onChange={e => setCategoryForm({...categoryForm, description: e.target.value})} 
+                  required 
+                  rows={4}
+                  style={{ padding: '12px', borderRadius: '8px', border: '1px solid #ddd', marginBottom: '15px', width: '100%', fontFamily: 'inherit' }}
+                />
+                <button type="submit" disabled={isLoading || !categoryForm.thumbnailImage || !categoryForm.name} className="submit-btn" style={{ backgroundColor: '#8b231a' }}>
+                  {isLoading ? 'Saving...' : 'Add Category to Site'}
+                </button>
+              </div>
+            </form>
+
+            <div className="product-list-grid">
+              {categories.map(cat => (
+                <div key={cat._id} className="product-admin-card fade-in">
+                  <div className="prod-img" style={{backgroundImage: `url("${cat.thumbnailImage || cat.image}")`}}></div>
+                  <div className="prod-info">
+                    <h5>{cat.name}</h5>
+                    <p style={{ fontSize: '0.8rem', color: '#666', marginBottom: '10px', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+                      {cat.description}
+                    </p>
+                    <button className="remove-link" onClick={() => handleDeleteCategory(cat._id)}>Remove Category</button>
+                  </div>
                 </div>
               ))}
             </div>
