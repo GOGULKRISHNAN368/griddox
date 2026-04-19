@@ -30,6 +30,19 @@ const BannerSchema = new mongoose.Schema({
 
 const Banner = mongoose.model('Banner', BannerSchema);
 
+const ProductSchema = new mongoose.Schema({
+  name: { type: String, required: true },
+  price: { type: Number, required: true },
+  originalPrice: Number,
+  discount: String,
+  isNew: { type: Boolean, default: false },
+  image: String, // Store Base64 or URL
+  category: { type: String, default: 'new-arrivals' },
+  createdAt: { type: Date, default: Date.now }
+});
+
+const Product = mongoose.model('Product', ProductSchema);
+
 // API Routes
 app.post('/api/add-banner', async (req, res) => {
   try {
@@ -75,6 +88,39 @@ app.get('/api/banners', async (req, res) => {
     res.status(200).send(banners);
   } catch (error) {
     res.status(500).send({ message: 'Error fetching banners', error: error.message });
+  }
+});
+
+// Product Routes
+app.get('/api/products', async (req, res) => {
+  try {
+    const { category } = req.query;
+    const query = category ? { category } : {};
+    const products = await Product.find(query).sort({ createdAt: -1 });
+    res.status(200).send(products);
+  } catch (error) {
+    res.status(500).send({ message: 'Error fetching products', error: error.message });
+  }
+});
+
+app.post('/api/add-product', async (req, res) => {
+  try {
+    const productData = req.body;
+    const newProduct = new Product(productData);
+    const saved = await newProduct.save();
+    res.status(201).send({ message: 'Product added successfully', data: saved });
+  } catch (error) {
+    res.status(500).send({ message: 'Error adding product', error: error.message });
+  }
+});
+
+app.delete('/api/products/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    await Product.findByIdAndDelete(id);
+    res.status(200).send({ message: 'Product removed successfully' });
+  } catch (error) {
+    res.status(500).send({ message: 'Error removing product', error: error.message });
   }
 });
 
