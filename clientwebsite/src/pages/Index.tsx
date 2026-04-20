@@ -3,11 +3,14 @@ import { Helmet } from "react-helmet-async";
 import Header from "@/components/Header";
 import HeroCarousel from "@/components/HeroCarousel";
 import CategoryGrid from "@/components/CategoryGrid";
+import AnnouncementBar from "@/components/AnnouncementBar";
+import BestSellers from "@/components/BestSellers";
 
 // Lazy load below-the-fold components
 const NewIn = lazy(() => import("@/components/NewIn"));
 
 const Reels = lazy(() => import("@/components/Reels"));
+const InstagramFeed = lazy(() => import("@/components/InstagramFeed"));
 const CustomerReviews = lazy(() => import("@/components/CustomerReviews"));
 const AboutUs = lazy(() => import("@/components/AboutUs"));
 const BottomNav = lazy(() => import("@/components/BottomNav"));
@@ -27,14 +30,28 @@ const Index = () => {
         <meta name="keywords" content="women fashion Coimbatore, designer clothing Tirupur, premium ethnic wear Coimbatore, peplum co-ords Tirupur, cotton kurti sets Coimbatore, fashion store Tamil Nadu, Gridox Coimbatore" />
         <link rel="canonical" href={window.location.origin} />
       </Helmet>
+      
       <Header />
+      
+      {/* Announcement Bar - Desktop Top (Above Carousel) */}
+      <div className="hidden md:block">
+        <AnnouncementBar />
+      </div>
+
       <HeroCarousel />
+
+      {/* Announcement Bar - Mobile Bottom (Below Carousel) */}
+      <div className="md:hidden">
+        <AnnouncementBar />
+      </div>
 
       <Suspense fallback={<SectionSkeleton />}>
         <div id="new-arrivals"><NewIn /></div>
         <CategoryGrid />
+        <BestSellers />
 
         <Reels />
+        <InstagramFeed />
         <CustomerReviews />
         <div id="about"><AboutUs /></div>
         <BottomNav />

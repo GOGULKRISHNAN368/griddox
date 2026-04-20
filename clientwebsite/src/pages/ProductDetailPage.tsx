@@ -6,6 +6,7 @@ import ProductGallery from "@/components/ProductGallery";
 import Header from "@/components/Header";
 import BottomNav from "@/components/BottomNav";
 import WhatsAppButton from "@/components/WhatsAppButton";
+
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { toast } from "sonner";
 
@@ -165,11 +166,18 @@ const ProductDetailPage = () => {
               </div>
             )}
 
-            <div className="flex flex-col md:flex-row gap-4 pt-4">
-              <button onClick={handleAddToBag} className="flex-[1.5] h-16 bg-white border border-[#1a1a1a] text-[#1a1a1a] font-bold text-xs tracking-[0.2em] rounded-sm hover:bg-[#1a1a1a] hover:text-white transition-all uppercase">
+            {/* Refined Action Buttons */}
+            <div className="flex gap-3 pt-6 sticky bottom-16 md:bottom-auto left-0 right-0 bg-white/80 backdrop-blur-md p-2 -mx-2 md:p-0 md:static md:bg-transparent md:backdrop-blur-none z-[50]">
+              <button 
+                onClick={handleAddToBag} 
+                className="flex-1 h-14 bg-white border border-[#1a1a1a] text-[#1a1a1a] font-bold text-[10px] tracking-[0.2em] rounded-md hover:bg-[#1a1a1a] hover:text-white transition-all uppercase shadow-sm"
+              >
                 Add To Bag
               </button>
-              <button onClick={handleBuyNow} className="flex-1 h-16 bg-[#8b231a] text-white font-bold text-xs tracking-[0.2em] rounded-sm hover:bg-[#a62b21] transition-all uppercase">
+              <button 
+                onClick={handleBuyNow} 
+                className="flex-1 h-14 bg-[#8b231a] text-white font-bold text-[10px] tracking-[0.2em] rounded-md hover:bg-[#a62b21] transition-all uppercase shadow-md active:scale-95 transform"
+              >
                 Buy Now
               </button>
             </div>

@@ -13,7 +13,6 @@ const CategoryPage = lazy(() => import("./pages/CategoryPage.tsx"));
 const ProductDetailPage = lazy(() => import("./pages/ProductDetailPage.tsx"));
 const NotFound = lazy(() => import("./pages/NotFound.tsx"));
 const CartPage = lazy(() => import("./pages/CartPage.tsx"));
-const AccountPage = lazy(() => import("./pages/AccountPage.tsx"));
 const StoreLocator = lazy(() => import("./pages/StoreLocator.tsx"));
 const CoimbatoreStyleGuide = lazy(() => import("./pages/CoimbatoreStyleGuide.tsx"));
 
@@ -40,7 +39,7 @@ const App = () => (
               <Route path="/category/:slug" element={<CategoryPage />} />
               <Route path="/category/:slug/product/:productId" element={<ProductDetailPage />} />
               <Route path="/cart" element={<CartPage />} />
-              <Route path="/account" element={<AccountPage />} />
+
               <Route path="/store-locator" element={<StoreLocator />} />
               <Route path="/style-guide/coimbatore" element={<CoimbatoreStyleGuide />} />
               <Route path="*" element={<NotFound />} />

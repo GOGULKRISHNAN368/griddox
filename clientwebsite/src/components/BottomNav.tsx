@@ -1,4 +1,4 @@
-import { Home, Menu, Search, LayoutGrid, ShoppingCart, User } from "lucide-react";
+import { Home, Menu, Search, LayoutGrid, ShoppingCart } from "lucide-react";
 import { useNavigate } from "react-router-dom"; // fix: cart/account routes
 
 const items = [
@@ -7,7 +7,6 @@ const items = [
   { icon: Search,       label: "SEARCH",  path: null },
   { icon: LayoutGrid,   label: "SHOP",    path: null },
   { icon: ShoppingCart, label: "CART",    path: "/cart" },    // fix: cart route
-  { icon: User,         label: "ACCOUNT", path: "/account" }, // fix: account route
 ];
 
 const BottomNav = () => {

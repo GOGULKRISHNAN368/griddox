@@ -4,7 +4,7 @@ import { Helmet } from "react-helmet-async";
 import { useEffect, useState } from "react";
 import Header from "@/components/Header";
 import BottomNav from "@/components/BottomNav";
-import WhatsAppButton from "@/components/WhatsAppButton";
+
 
 interface Product {
   _id: string;
@@ -118,7 +118,6 @@ const CategoryPage = () => {
       </div>
 
       <BottomNav />
-      <WhatsAppButton />
     </div>
   );
 };
