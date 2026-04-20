@@ -1,14 +1,37 @@
 const express = require('express');
-const mongoose = require('mongoose');
 const cors = require('cors');
-require('dotenv').config({ path: '../.env' }); 
+const mongoose = require('mongoose');
+const cloudinary = require('cloudinary').v2;
+require('dotenv').config({ path: '../.env' });
 
 const app = express();
 app.use(cors());
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ limit: '50mb', extended: true }));
 
-const PORT = 3001;
+const PORT = process.env.PORT || 3001;
+
+// Cloudinary Configuration
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET
+});
+
+// Helper to upload Base64 to Cloudinary
+const uploadToCloudinary = async (base64Data, folder = 'gridox', resourceType = 'auto') => {
+  if (!base64Data || !base64Data.startsWith('data:')) return base64Data;
+  try {
+    const result = await cloudinary.uploader.upload(base64Data, {
+      folder: folder,
+      resource_type: resourceType
+    });
+    return result.secure_url;
+  } catch (error) {
+    console.error('Cloudinary Upload Error:', error);
+    throw error;
+  }
+};
 
 // MongoDB Connection
 let MONGODB_URI = process.env.MONGODB_URI;
@@ -35,7 +58,6 @@ const ProductSchema = new mongoose.Schema({
   price: { type: Number, required: true },
   originalPrice: Number,
   discount: String,
-  isNew: { type: Boolean, default: false },
   isNewArrival: { type: Boolean, default: false },
   isBestSeller: { type: Boolean, default: false },
   image: String, // Main image (Base64)
@@ -60,16 +82,25 @@ const CategorySchema = new mongoose.Schema({
 
 const Category = mongoose.model('Category', CategorySchema);
 
+const ReelSchema = new mongoose.Schema({
+  videoUrl: { type: String, required: true }, // Base64 or URL
+  videoType: { type: String, default: 'video/mp4' },
+  productId: { type: mongoose.Schema.Types.ObjectId, ref: 'Product', required: true },
+  category: String, // Category slug
+  createdAt: { type: Date, default: Date.now }
+});
+
+const Reel = mongoose.model('Reel', ReelSchema);
+
 // API Routes
 app.post('/api/add-banner', async (req, res) => {
   try {
     const { title, imageUrl, link } = req.body;
-    console.log(`Received request to add banner: ${title}`);
+    const cloudUrl = await uploadToCloudinary(imageUrl, 'gridox_banners');
     
-    const newBanner = new Banner({ title, imageUrl, link });
+    const newBanner = new Banner({ title, imageUrl: cloudUrl, link });
     const savedBanner = await newBanner.save();
     
-    console.log(`Successfully saved banner to collection 'banners'. ID: ${savedBanner._id}`);
     res.status(201).send({ message: 'Banner added successfully', data: savedBanner });
   } catch (error) {
     console.error('Error adding banner:', error);
@@ -96,6 +127,18 @@ app.delete('/api/banners/:id', async (req, res) => {
     }
   } catch (error) {
     res.status(500).send({ message: 'Error removing banner', error: error.message });
+  }
+});
+
+app.put('/api/banners/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { title, imageUrl, link } = req.body;
+    const cloudUrl = await uploadToCloudinary(imageUrl, 'gridox_banners');
+    const updated = await Banner.findByIdAndUpdate(id, { title, imageUrl: cloudUrl, link }, { new: true });
+    res.status(200).send({ message: 'Banner updated successfully', data: updated });
+  } catch (error) {
+    res.status(500).send({ message: 'Error updating banner', error: error.message });
   }
 });
 
@@ -142,6 +185,13 @@ app.get('/api/products/:id', async (req, res) => {
 app.post('/api/add-product', async (req, res) => {
   try {
     const productData = req.body;
+    
+    // Upload images to Cloudinary
+    if (productData.image) productData.image = await uploadToCloudinary(productData.image, 'gridox_products');
+    if (productData.gallery && Array.isArray(productData.gallery)) {
+        productData.gallery = await Promise.all(productData.gallery.map(img => uploadToCloudinary(img, 'gridox_products')));
+    }
+
     const newProduct = new Product(productData);
     const saved = await newProduct.save();
     res.status(201).send({ message: 'Product added successfully', data: saved });
@@ -160,6 +210,23 @@ app.delete('/api/products/:id', async (req, res) => {
   }
 });
 
+app.put('/api/products/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const productData = req.body;
+    
+    if (productData.image) productData.image = await uploadToCloudinary(productData.image, 'gridox_products');
+    if (productData.gallery && Array.isArray(productData.gallery)) {
+        productData.gallery = await Promise.all(productData.gallery.map(img => uploadToCloudinary(img, 'gridox_products')));
+    }
+
+    const updated = await Product.findByIdAndUpdate(id, productData, { new: true });
+    res.status(200).send({ message: 'Product updated successfully', data: updated });
+  } catch (error) {
+    res.status(500).send({ message: 'Error updating product', error: error.message });
+  }
+});
+
 // Category Routes
 app.get('/api/categories', async (req, res) => {
   try {
@@ -173,27 +240,20 @@ app.get('/api/categories', async (req, res) => {
 app.post('/api/add-category', async (req, res) => {
   try {
     const { name, thumbnailImage, description } = req.body;
-    console.log(`[BACKEND] Adding category: "${name}"`);
-    console.log(`[BACKEND] Image received: ${thumbnailImage ? 'YES' : 'NO'} (Size: ${thumbnailImage?.length || 0} chars)`);
+    const cloudUrl = await uploadToCloudinary(thumbnailImage, 'gridox_categories');
     
-    if (!name || !thumbnailImage) {
-      return res.status(400).send({ message: 'Missing required fields: name or category image' });
-    }
-
     const slug = name.toLowerCase().replace(/ /g, '-').replace(/[^\w-]+/g, '');
     const newCategory = new Category({ 
       name, 
-      thumbnailImage, 
+      thumbnailImage: cloudUrl,
+      image: cloudUrl, // sync for legacy
       description, 
       slug 
     });
-    
     const saved = await newCategory.save();
-    console.log(`[BACKEND] Category "${name}" saved successfully to Atlas.`);
     res.status(201).send({ message: 'Category added successfully', data: saved });
   } catch (error) {
-    console.error('[BACKEND ERROR] Error adding category:', error);
-    res.status(500).send({ message: 'Server error adding category', error: error.message });
+    res.status(500).send({ message: 'Error adding category', error: error.message });
   }
 });
 
@@ -204,6 +264,94 @@ app.delete('/api/categories/:id', async (req, res) => {
     res.status(200).send({ message: 'Category removed successfully' });
   } catch (error) {
     res.status(500).send({ message: 'Error removing category', error: error.message });
+  }
+});
+
+app.put('/api/categories/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { name, thumbnailImage, description } = req.body;
+    
+    const updateData = { name, description };
+    if (thumbnailImage && thumbnailImage.startsWith('data:')) {
+        updateData.thumbnailImage = await uploadToCloudinary(thumbnailImage, 'gridox_categories');
+        updateData.image = updateData.thumbnailImage;
+    }
+    if (name) updateData.slug = name.toLowerCase().replace(/ /g, '-').replace(/[^\w-]+/g, '');
+
+    const updated = await Category.findByIdAndUpdate(id, updateData, { new: true });
+    res.status(200).send({ message: 'Category updated successfully', data: updated });
+  } catch (error) {
+    res.status(500).send({ message: 'Error updating category', error: error.message });
+  }
+});
+
+// Reel Routes
+app.get('/api/reels', async (req, res) => {
+  try {
+    // Return all reels, but we'll selectively clean the videoUrl in the results
+    const reels = await Reel.find().populate('productId').sort({ createdAt: -1 });
+    
+    const optimizedReels = reels.map(r => {
+        const reelObj = r.toObject();
+        // If it's heavy Base64, remove it from list to keep response small
+        if (reelObj.videoUrl && reelObj.videoUrl.startsWith('data:')) {
+            reelObj.videoUrl = ''; // Frontend will fetch it lazily
+            reelObj.isBase64 = true;
+        } else {
+            reelObj.isBase64 = false;
+        }
+        return reelObj;
+    });
+
+    res.status(200).send(optimizedReels);
+  } catch (error) {
+    res.status(500).send({ message: 'Error fetching reels', error: error.message });
+  }
+});
+
+// New endpoint to fetch only the video content for a specific reel
+app.get('/api/reels/video/:id', async (req, res) => {
+  try {
+    const reel = await Reel.findById(req.params.id);
+    if (!reel) return res.status(404).send('Not found');
+    
+    // If it's a URL, redirect or return the URL
+    if (!reel.videoUrl.startsWith('data:')) {
+        return res.status(200).send({ url: reel.videoUrl, isBase64: false });
+    }
+
+    // If it's Base64, return it
+    res.status(200).send({ url: reel.videoUrl, isBase64: true });
+  } catch (error) {
+    res.status(500).send(error.message);
+  }
+});
+
+app.post('/api/add-reel', async (req, res) => {
+  try {
+    const { videoUrl, videoType, productId, category } = req.body;
+    if (!videoUrl || !productId) {
+      return res.status(400).send({ message: 'Missing video or product association' });
+    }
+    
+    const cloudUrl = await uploadToCloudinary(videoUrl, 'gridox_reels', 'video');
+    
+    const newReel = new Reel({ videoUrl: cloudUrl, videoType, productId, category });
+    const saved = await newReel.save();
+    res.status(201).send({ message: 'Reel added successfully', data: saved });
+  } catch (error) {
+    res.status(500).send({ message: 'Error adding reel', error: error.message });
+  }
+});
+
+app.delete('/api/reels/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    await Reel.findByIdAndDelete(id);
+    res.status(200).send({ message: 'Reel removed successfully' });
+  } catch (error) {
+    res.status(500).send({ message: 'Error removing reel', error: error.message });
   }
 });
 

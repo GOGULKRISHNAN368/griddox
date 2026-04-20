@@ -1,19 +1,51 @@
 import React, { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { ChevronRight, ChevronLeft, X, Volume2, VolumeX, Heart, Share2, Play, ChevronUp, ChevronDown } from "lucide-react";
-import { reelsData, Reel } from "@/data/reelsData";
+// import { reelsData, Reel } from "@/data/reelsData"; // Replaced by API
 import "./Reels.css";
 
+interface Reel {
+  _id: string;
+  videoUrl: string;
+  productId: {
+    _id: string;
+    name: string;
+    category: string;
+  };
+  category: string;
+  isBase64?: boolean;
+}
+
 const Reels: React.FC = () => {
+  const [reelsData, setReelsData] = useState<Reel[]>([]);
   const [activeReelIndex, setActiveReelIndex] = useState<number | null>(null);
   const [currentFocusIndex, setCurrentFocusIndex] = useState(0);
   const [isMuted, setIsMuted] = useState(false);
   const sliderRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
 
-  const handleAddToCart = (productId: string) => {
-    // For these specific products, they belong to peplum-co-ords category
-    navigate(`/category/peplum-co-ords/product/${productId}`);
+  const API_BASE = window.location.hostname === 'localhost' ? 'http://localhost:3001' : `http://${window.location.hostname}:3001`;
+
+  useEffect(() => {
+    fetchReels();
+  }, []);
+
+  const fetchReels = async () => {
+    try {
+      const response = await fetch(`${API_BASE}/api/reels`);
+      if (response.ok) {
+        const data = await response.json();
+        setReelsData(data);
+      }
+    } catch (error) {
+      console.error("Error fetching reels:", error);
+    }
+  };
+
+  const handleAddToCart = (product: any) => {
+    if (!product) return;
+    // Dynamic navigation based on category and ID
+    navigate(`/category/${product.category}/product/${product._id}`);
     closeReel();
   };
 
@@ -144,38 +176,17 @@ const Reels: React.FC = () => {
           onScroll={handleScroll}
         >
           {reelsData.map((reel, index) => (
-            <div 
-              key={reel.id} 
-              className="reel-card group"
-              onClick={() => openReel(index)}
-            >
-              <video 
-                className="reel-video-preview object-cover w-full h-full"
-                muted
-                loop
-                playsInline
-                autoPlay
-                preload="none"
-              >
-                <source src={reel.videoUrl} type="video/mp4" />
-              </video>
-              
-              <div className="reel-play-icon">
-                <Play fill="white" size={48} />
-              </div>
-              
-              <div className={`reel-overlay flex flex-col justify-end items-center reel-focuser ${currentFocusIndex === index ? 'active-focus' : ''}`}>
-                <button 
-                  className="shop-now-btn"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleAddToCart(reel.product.id);
-                  }}
-                >
-                  Shop Now
-                </button>
-              </div>
-            </div>
+            <ReelItem 
+              key={reel._id} 
+              reel={reel} 
+              index={index}
+              isActive={activeReelIndex === index}
+              isFocused={currentFocusIndex === index}
+              currentFocusIndex={currentFocusIndex}
+              openReel={() => openReel(index)}
+              handleAddToCart={() => handleAddToCart(reel.productId)}
+              API_BASE={API_BASE}
+            />
           ))}
         </div>
         
@@ -190,78 +201,211 @@ const Reels: React.FC = () => {
 
       {/* Modal View */}
       {activeReelIndex !== null && (
-        <div className="reel-modal-overlay" onClick={closeReel}>
-          <div 
-            className="reel-modal-container" 
-            onClick={(e) => e.stopPropagation()}
-            onTouchStart={handleTouchStart}
-            onTouchEnd={handleTouchEnd}
-          >
+        <ReelModal 
+          reel={reelsData[activeReelIndex]}
+          isMuted={isMuted}
+          setIsMuted={setIsMuted}
+          closeReel={closeReel}
+          nextReel={nextReel}
+          prevReel={prevReel}
+          handleAddToCart={() => handleAddToCart(reelsData[activeReelIndex].productId)}
+          isFirst={activeReelIndex === 0}
+          isLast={activeReelIndex === reelsData.length - 1}
+          handleTouchStart={handleTouchStart}
+          handleTouchEnd={handleTouchEnd}
+          API_BASE={API_BASE}
+        />
+      )}
+    </section>
+  );
+};
+
+// Sub-component for individual Reel Card to handle lazy loading
+const ReelItem: React.FC<{
+  reel: Reel;
+  index: number;
+  isActive: boolean;
+  isFocused: boolean;
+  currentFocusIndex: number;
+  openReel: () => void;
+  handleAddToCart: () => void;
+  API_BASE: string;
+}> = ({ reel, index, isActive, isFocused, currentFocusIndex, openReel, handleAddToCart, API_BASE }) => {
+  const [videoSrc, setVideoSrc] = useState<string | null>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
+
+  useEffect(() => {
+    // Now that we are on Cloudinary, we can load all small counts of reels immediately
+    // for a better "full" visual experience.
+    loadVideo();
+  }, [reel._id]);
+
+  const loadVideo = async () => {
+    if (videoSrc) return;
+    
+    // If the reel already has a URL (non-base64), use it immediately!
+    if (reel.videoUrl) {
+        setVideoSrc(reel.videoUrl);
+        return;
+    }
+
+    try {
+        const res = await fetch(`${API_BASE}/api/reels/video/${reel._id}`);
+        if (res.ok) {
+            const data = await res.json();
+            setVideoSrc(data.url);
+        }
+    } catch (e) {
+        console.error("Video load failed", e);
+    }
+  };
+
+  return (
+    <div className="reel-card group" onClick={openReel}>
+      {videoSrc ? (
+        <video 
+          ref={videoRef}
+          className="reel-video-preview object-cover w-full h-full"
+          muted
+          loop
+          playsInline
+          autoPlay
+          preload="auto"
+          src={videoSrc}
+        />
+      ) : (
+        <div className="reel-video-preview bg-gradient-to-br from-slate-100 to-slate-200 flex items-center justify-center">
+            <div className="flex flex-col items-center gap-3">
+                <div className="w-12 h-12 rounded-full border-2 border-slate-300 border-t-slate-500 animate-spin"></div>
+                <span className="text-[10px] text-slate-400 font-medium uppercase tracking-widest">Loading</span>
+            </div>
+        </div>
+      )}
+      
+      <div className="reel-play-icon">
+        <Play fill="white" size={48} />
+      </div>
+      
+      <div className={`reel-overlay flex flex-col justify-end items-center reel-focuser ${isFocused ? 'active-focus' : ''}`}>
+        <button 
+          className="shop-now-btn"
+          onClick={(e) => {
+            e.stopPropagation();
+            handleAddToCart();
+          }}
+        >
+          Shop Now
+        </button>
+      </div>
+    </div>
+  );
+};
+
+// Sub-component for Modal to handle its own video loading
+const ReelModal: React.FC<{
+  reel: Reel;
+  isMuted: boolean;
+  setIsMuted: (m: boolean) => void;
+  closeReel: () => void;
+  nextReel: () => void;
+  prevReel: () => void;
+  handleAddToCart: () => void;
+  isFirst: boolean;
+  isLast: boolean;
+  handleTouchStart: (e: any) => void;
+  handleTouchEnd: (e: any) => void;
+  API_BASE: string;
+}> = ({ reel, isMuted, setIsMuted, closeReel, nextReel, prevReel, handleAddToCart, isFirst, isLast, handleTouchStart, handleTouchEnd, API_BASE }) => {
+  const [videoSrc, setVideoSrc] = useState<string | null>(null);
+
+  useEffect(() => {
+    // If the reel already has a URL (non-base64), use it immediately!
+    if (reel.videoUrl) {
+        setVideoSrc(reel.videoUrl);
+        return;
+    }
+
+    const loadModalVideo = async () => {
+        try {
+            const res = await fetch(`${API_BASE}/api/reels/video/${reel._id}`);
+            if (res.ok) {
+                const data = await res.json();
+                setVideoSrc(data.url);
+            }
+        } catch (e) {
+            console.error("Modal video load failed", e);
+        }
+    };
+    loadModalVideo();
+  }, [reel._id, reel.videoUrl]);
+
+  return (
+    <div className="reel-modal-overlay" onClick={closeReel}>
+      <div 
+        className="reel-modal-container" 
+        onClick={(e) => e.stopPropagation()}
+        onTouchStart={handleTouchStart}
+        onTouchEnd={handleTouchEnd}
+      >
+        {videoSrc ? (
             <video 
-              key={reelsData[activeReelIndex].videoUrl}
               className="reel-modal-video"
               autoPlay
               loop
               muted={isMuted}
               playsInline
-            >
-              <source src={reelsData[activeReelIndex].videoUrl} type="video/mp4" />
-            </video>
+              src={videoSrc}
+            />
+        ) : (
+            <div className="reel-modal-video bg-black flex items-center justify-center">
+                <div className="spinner"></div>
+            </div>
+        )}
 
-            {/* Top Left Close Button */}
-            <button className="fixed top-8 left-8 text-white z-[2001] hover:scale-110 transition-transform" onClick={closeReel}>
-              <X size={32} strokeWidth={2.5} />
+        <button className="fixed top-8 left-8 text-white z-[2001] hover:scale-110 transition-transform" onClick={closeReel}>
+          <X size={32} strokeWidth={2.5} />
+        </button>
+
+        <div className="fixed right-8 top-1/2 -translate-y-1/2 flex flex-col gap-4 z-[2001]">
+          <button 
+            className={`p-3 rounded-full bg-white/10 backdrop-blur-md text-white hover:bg-white/20 transition-all ${isFirst ? 'opacity-30 cursor-not-allowed' : ''}`}
+            onClick={prevReel}
+            disabled={isFirst}
+          >
+            <ChevronUp size={28} />
+          </button>
+          <button 
+            className={`p-3 rounded-full bg-white/10 backdrop-blur-md text-white hover:bg-white/20 transition-all ${isLast ? 'opacity-30 cursor-not-allowed' : ''}`}
+            onClick={nextReel}
+            disabled={isLast}
+          >
+            <ChevronDown size={28} />
+          </button>
+        </div>
+
+        <div className="reel-modal-header flex justify-between items-start p-6 absolute top-0 left-0 right-0 z-[2000] pointer-events-none">
+          <div className="pointer-events-auto">
+            <h3 className="text-white font-medium text-sm tracking-wide drop-shadow-md">
+              {reel.productId?.name}
+            </h3>
+          </div>
+          <div className="flex items-center gap-4 pointer-events-auto pr-2">
+            <button className="text-white hover:scale-110 transition-transform" onClick={() => setIsMuted(!isMuted)}>
+              {isMuted ? <VolumeX size={22} /> : <Volume2 size={22} />}
             </button>
-
-            {/* Right Side Vertical Navigation Arrows */}
-            <div className="fixed right-8 top-1/2 -translate-y-1/2 flex flex-col gap-4 z-[2001]">
-              <button 
-                className={`p-3 rounded-full bg-white/10 backdrop-blur-md text-white hover:bg-white/20 transition-all ${activeReelIndex === 0 ? 'opacity-30 cursor-not-allowed' : ''}`}
-                onClick={prevReel}
-                disabled={activeReelIndex === 0}
-              >
-                <ChevronUp size={28} />
-              </button>
-              <button 
-                className={`p-3 rounded-full bg-white/10 backdrop-blur-md text-white hover:bg-white/20 transition-all ${activeReelIndex === reelsData.length - 1 ? 'opacity-30 cursor-not-allowed' : ''}`}
-                onClick={nextReel}
-                disabled={activeReelIndex === reelsData.length - 1}
-              >
-                <ChevronDown size={28} />
-              </button>
-            </div>
-
-            <div className="reel-modal-header flex justify-between items-start p-6 absolute top-0 left-0 right-0 z-[2000] pointer-events-none">
-              <div className="pointer-events-auto">
-                <h3 className="text-white font-medium text-sm tracking-wide drop-shadow-md">
-                  {reelsData[activeReelIndex].product.name}
-                </h3>
-              </div>
-              <div className="flex items-center gap-4 pointer-events-auto pr-2">
-                <button 
-                  className="text-white hover:scale-110 transition-transform" 
-                  onClick={() => setIsMuted(!isMuted)}
-                >
-                  {isMuted ? <VolumeX size={22} /> : <Volume2 size={22} />}
-                </button>
-                <button className="text-white hover:scale-110 transition-transform">
-                  <Share2 size={22} />
-                </button>
-              </div>
-            </div>
-
-            <div className="reel-modal-product-overlay flex justify-center">
-              <button 
-                className="reel-shop-now-modal"
-                onClick={() => handleAddToCart(reelsData[activeReelIndex].product.id)}
-              >
-                Shop Now
-              </button>
-            </div>
+            <button className="text-white hover:scale-110 transition-transform">
+              <Share2 size={22} />
+            </button>
           </div>
         </div>
-      )}
-    </section>
+
+        <div className="reel-modal-product-overlay flex justify-center">
+          <button className="reel-shop-now-modal" onClick={handleAddToCart}>
+            Shop Now
+          </button>
+        </div>
+      </div>
+    </div>
   );
 };
 

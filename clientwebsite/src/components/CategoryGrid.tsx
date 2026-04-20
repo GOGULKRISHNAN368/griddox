@@ -72,9 +72,16 @@ const CategoryGrid: React.FC = () => {
             </Link>
           ))
         ) : (
-          <div style={{ gridColumn: '1 / -1', padding: '40px', textAlign: 'center', color: '#888' }}>
-            <p>Loading your designer categories...</p>
-          </div>
+          /* High-end Skeleton Loaders */
+          Array.from({ length: limit }).map((_, idx) => (
+            <div key={`skeleton-${idx}`} className="category-card">
+              <div className="category-image-wrapper skeleton" style={{ aspectRatio: '1 / 1' }}>
+                <div className="category-overlay" style={{ background: 'transparent' }}>
+                  <div className="skeleton" style={{ width: '60%', height: '20px', margin: '0 auto', opacity: 0.5 }}></div>
+                </div>
+              </div>
+            </div>
+          ))
         )}
       </div>
       

@@ -1,0 +1,204 @@
+.curated-looks-section {
+  padding: 80px 0;
+  background-color: #F8F9FA; /* Smooth light gray like Pantaloons */
+  overflow: hidden;
+  position: relative;
+}
+
+.curated-title {
+  font-family: 'Outfit', sans-serif;
+  font-size: 2rem;
+  font-weight: 700;
+  color: #1a1a1a;
+  letter-spacing: -0.01em;
+  margin-bottom: 2rem;
+  text-transform: capitalize;
+}
+
+.curated-slider-container {
+  position: relative;
+  width: 100%;
+  max-width: 1600px;
+  margin: 0 auto;
+  padding: 0 40px;
+}
+
+.curated-swiper {
+  width: 100%;
+  padding-top: 40px;
+  padding-bottom: 60px;
+  overflow: visible !important; /* Crucial for overlap */
+}
+
+.curated-slide {
+  width: 320px;
+  height: 480px; 
+  transition: all 0.6s cubic-bezier(0.165, 0.84, 0.44, 1);
+  z-index: 1;
+  opacity: 0.2 !important; /* Level 3: Very faded and tucked behind */
+}
+
+.swiper-slide-prev,
+.swiper-slide-next {
+  opacity: 0.6 !important; /* Level 2 Cards */
+  z-index: 5 !important;
+}
+
+.swiper-slide-active {
+  z-index: 20 !important;
+  opacity: 1 !important;
+  transform: scale(1.1) !important; /* Balanced scale for desktop */
+}
+
+.look-card {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  border-radius: 12px; /* Pantaloons uses slightly sharper corners than I had */
+  overflow: hidden;
+  background-color: #fff;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+  border: 8px solid #fff; /* Very thick white border like common frames */
+  cursor: pointer;
+}
+
+.look-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.look-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(0,0,0,0.6) 0%, transparent 60%);
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: 30px;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.swiper-slide-active .look-overlay {
+  opacity: 1;
+}
+
+.look-name {
+  color: #fff;
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.look-price {
+  color: rgba(255,255,255,0.9);
+  font-size: 1rem;
+}
+
+.look-shop-btn {
+  position: absolute;
+  bottom: 16px;
+  right: 16px;
+  background-color: #fff;
+  color: #1a1a1a;
+  padding: 8px 16px;
+  border-radius: 8px; /* Square with slight roundness like Pantaloons */
+  font-size: 0.75rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  border: 1px solid #e0e0e0;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  z-index: 10;
+  transition: all 0.2s ease;
+}
+
+.look-shop-btn span {
+    font-size: 11px;
+}
+
+.look-shop-btn:hover {
+  background-color: #1a1a1a;
+  color: #fff;
+  transform: translateY(-2px);
+}
+
+/* Navigation Arrows - Match Screenshot precisely */
+.curated-nav-btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 44px;
+  height: 44px;
+  background-color: #fff;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #999; /* Light gray arrow */
+  box-shadow: 0 2px 10px rgba(0,0,0,0.12);
+  border: none;
+  cursor: pointer;
+  z-index: 30;
+  transition: all 0.2s ease;
+}
+
+.curated-prev {
+  left: 20px;
+}
+
+.curated-next {
+  right: 20px;
+}
+
+.curated-nav-btn:hover {
+  background-color: #1a1a1a;
+  color: #fff;
+  transform: translateY(-50%) scale(1.1);
+}
+
+.curated-nav-btn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 768px) {
+  .curated-looks-section {
+    padding: 40px 0;
+  }
+  
+  .curated-title {
+    font-size: 1.5rem;
+    margin-bottom: 1.5rem;
+    padding: 0 20px;
+  }
+  
+  .curated-slide {
+    width: 240px !important;
+    height: 360px !important;
+  }
+  
+  .look-card {
+    border: 5px solid #fff; /* Slightly thinner on mobile */
+  }
+
+  .curated-nav-btn {
+    display: none; /* Swipe on mobile */
+  }
+
+  .look-shop-btn {
+    padding: 6px 12px;
+    bottom: 12px;
+    right: 12px;
+  }
+}
+
+.skeleton-looks {
+    background: linear-gradient(90deg, #f0f0f0 25%, #f8f8f8 50%, #f0f0f0 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite linear;
+}

@@ -5,6 +5,7 @@ import HeroCarousel from "@/components/HeroCarousel";
 import CategoryGrid from "@/components/CategoryGrid";
 import AnnouncementBar from "@/components/AnnouncementBar";
 import BestSellers from "@/components/BestSellers";
+import CuratedLooks from "@/components/CuratedLooks";
 
 // Lazy load below-the-fold components
 const NewIn = lazy(() => import("@/components/NewIn"));
@@ -48,6 +49,7 @@ const Index = () => {
       <Suspense fallback={<SectionSkeleton />}>
         <div id="new-arrivals"><NewIn /></div>
         <CategoryGrid />
+        <CuratedLooks />
         <BestSellers />
 
         <Reels />

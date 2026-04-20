@@ -20,6 +20,8 @@ interface Product {
   sizes: string[];
   details: string;
   category: string;
+  isNewArrival?: boolean;
+  isBestSeller?: boolean;
   createdAt: string;
 }
 
@@ -35,12 +37,14 @@ interface Category {
 }
 
 function App() {
-  const [activeTab, setActiveTab] = useState<'banners' | 'categories' | 'dresses'>('banners');
-  const [status, setStatus] = useState<string | null>(null);
+  const [activeTab, setActiveTab] = useState<'banners' | 'categories' | 'dresses' | 'reels'>('banners');
+  const [status, setStatus] = useState<{ message: string, type: 'success' | 'error' } | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [banners, setBanners] = useState<Banner[]>([]);
   const [products, setProducts] = useState<Product[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
+  const [reels, setReels] = useState<any[]>([]);
+  const [editingId, setEditingId] = useState<string | null>(null);
   
   // Product Form State
   const [productForm, setProductForm] = useState({
@@ -65,12 +69,25 @@ function App() {
     thumbnailImage: ''
   });
 
+  // Reel Form State
+  const [reelForm, setReelForm] = useState({
+    videoUrl: '',
+    productId: '',
+    category: ''
+  });
+
   const API_BASE = window.location.hostname === 'localhost' ? 'http://localhost:3001' : `http://${window.location.hostname}:3001`;
-  const bannerInputRef = useRef<HTMLInputElement>(null);
   const productInputRef = useRef<HTMLInputElement>(null);
   const galleryInputRef = useRef<HTMLInputElement>(null);
-  const categoryFullInputRef = useRef<HTMLInputElement>(null);
   const categoryThumbInputRef = useRef<HTMLInputElement>(null);
+
+  // Status Auto-hide
+  useEffect(() => {
+    if (status) {
+      const timer = setTimeout(() => setStatus(null), 4000);
+      return () => clearTimeout(timer);
+    }
+  }, [status]);
 
   // Fetch data on load and tab change
   useEffect(() => {
@@ -79,8 +96,16 @@ function App() {
     else if (activeTab === 'dresses') {
       fetchProducts();
       fetchCategories();
+    } else if (activeTab === 'reels') {
+      fetchReels();
+      fetchProducts();
+      fetchCategories();
     }
   }, [activeTab]);
+
+  const showStatus = (message: string, type: 'success' | 'error' = 'success') => {
+    setStatus({ message, type });
+  };
 
   const fetchBanners = async () => {
     try {
@@ -119,6 +144,18 @@ function App() {
     }
   };
 
+  const fetchReels = async () => {
+    try {
+      const response = await fetch(`${API_BASE}/api/reels`);
+      if (response.ok) {
+        const data = await response.json();
+        setReels(data);
+      }
+    } catch (error) {
+      console.error('Error fetching reels:', error);
+    }
+  };
+
   const optimizeImage = (file: File, maxWidth = 1200, quality = 0.8): Promise<string> => {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
@@ -144,32 +181,34 @@ function App() {
     });
   };
 
-  const handleBannerUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleBannerUpload = async (event: React.ChangeEvent<HTMLInputElement>, id?: string) => {
     const file = event.target.files?.[0];
     if (!file) return;
 
     setIsLoading(true);
-    setStatus('Optimizing and uploading banner...');
+    showStatus(id ? 'Updating banner...' : 'Uploading new banner...', 'success');
 
     try {
       const base64 = await optimizeImage(file);
-      const response = await fetch(`${API_BASE}/api/add-banner`, {
-        method: 'POST',
+      const url = id ? `${API_BASE}/api/banners/${id}` : `${API_BASE}/api/add-banner`;
+      const method = id ? 'PUT' : 'POST';
+
+      const response = await fetch(url, {
+        method: method,
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ title: `Banner - ${file.name}`, imageUrl: base64, link: '#' }),
       });
 
       if (response.ok) {
-        setStatus('Banner successfully saved!');
+        showStatus(id ? 'Banner updated successfully!' : 'New banner added!');
         fetchBanners();
       } else {
-        setStatus('Failed to upload banner.');
+        showStatus('Failed to process banner.', 'error');
       }
     } catch (error) {
-      setStatus('Error connecting to server.');
+      showStatus('Connection error.', 'error');
     } finally {
       setIsLoading(false);
-      if (bannerInputRef.current) bannerInputRef.current.value = '';
     }
   };
 
@@ -191,10 +230,8 @@ function App() {
           if (ctx) {
             ctx.imageSmoothingEnabled = true;
             ctx.imageSmoothingQuality = 'high';
-            
             ctx.fillStyle = 'white';
             ctx.fillRect(0, 0, TARGET_W, TARGET_H);
-
             const imgRatio = img.width / img.height;
             const targetRatio = TARGET_W / TARGET_H;
             let drawW, drawH, offsetLeft, offsetTop;
@@ -212,55 +249,7 @@ function App() {
             }
 
             ctx.drawImage(img, offsetLeft, offsetTop, drawW, drawH);
-            resolve(canvas.toDataURL('image/jpeg', 0.8)); // Reduced from 0.95 for speed
-          } else {
-            resolve(e.target?.result as string);
-          }
-        };
-      };
-    });
-  };
-
-  const standardizeFullImage = (file: File): Promise<string> => {
-    return new Promise((resolve) => {
-      const reader = new FileReader();
-      reader.readAsDataURL(file);
-      reader.onload = (e) => {
-        const img = new Image();
-        img.src = e.target?.result as string;
-        img.onload = () => {
-          const canvas = document.createElement('canvas');
-          const TARGET_W = 1920;
-          const TARGET_H = 1080;
-          canvas.width = TARGET_W;
-          canvas.height = TARGET_H;
-          const ctx = canvas.getContext('2d');
-          
-          if (ctx) {
-            ctx.imageSmoothingEnabled = true;
-            ctx.imageSmoothingQuality = 'high';
-            
-            ctx.fillStyle = 'black'; // Better for backgrounds
-            ctx.fillRect(0, 0, TARGET_W, TARGET_H);
-
-            const imgRatio = img.width / img.height;
-            const targetRatio = TARGET_W / TARGET_H;
-            let drawW, drawH, offsetLeft, offsetTop;
-
-            if (imgRatio > targetRatio) {
-              drawH = TARGET_H;
-              drawW = img.width * (TARGET_H / img.height);
-              offsetLeft = (TARGET_W - drawW) / 2;
-              offsetTop = 0;
-            } else {
-              drawW = TARGET_W;
-              drawH = img.height * (TARGET_W / img.width);
-              offsetLeft = 0;
-              offsetTop = (TARGET_H - drawH) / 2;
-            }
-
-            ctx.drawImage(img, offsetLeft, offsetTop, drawW, drawH);
-            resolve(canvas.toDataURL('image/jpeg', 0.92));
+            resolve(canvas.toDataURL('image/jpeg', 0.8));
           } else {
             resolve(e.target?.result as string);
           }
@@ -273,13 +262,11 @@ function App() {
     const file = event.target.files?.[0];
     if (!file) return;
     setIsLoading(true);
-    setStatus('Processing to Perfect Quality (1200x1600)...');
     try {
       const base64 = await standardizeNewArrival(file);
       setProductForm(prev => ({ ...prev, image: base64 }));
-      setStatus('Perfect 1200x1600 image ready.');
     } catch (error) {
-       setStatus('Error processing image.');
+       showStatus('Error processing image.', 'error');
     } finally {
       setIsLoading(false);
     }
@@ -288,24 +275,17 @@ function App() {
   const handleGalleryImagesSelect = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files;
     if (!files || files.length === 0) return;
-    
     setIsLoading(true);
-    setStatus(`Processing ${files.length} gallery images...`);
-    
     try {
       const processedImages: string[] = [];
-      // Process only up to 5 images
       const filesArray = Array.from(files).slice(0, 5);
-      
       for (const file of filesArray) {
         const base64 = await standardizeNewArrival(file);
         processedImages.push(base64);
       }
-      
       setProductForm(prev => ({ ...prev, gallery: processedImages }));
-      setStatus(`${processedImages.length} gallery images ready.`);
     } catch (error) {
-      setStatus('Error processing gallery images.');
+      showStatus('Error processing gallery.', 'error');
     } finally {
       setIsLoading(false);
     }
@@ -314,84 +294,80 @@ function App() {
   const handleAddProduct = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!productForm.image || !productForm.name || !productForm.price) {
-      setStatus('Please fill name, price and select an image.');
+      showStatus('Please fill name, price and image.', 'error');
       return;
     }
 
     setIsLoading(true);
-    setStatus('Adding to Atlas...');
-
     try {
       const dataToSend = {
         ...productForm,
         price: Number(productForm.price),
         originalPrice: Number(productForm.originalPrice) || undefined,
-        category: productForm.category
       };
 
-      const response = await fetch(`${API_BASE}/api/add-product`, {
-        method: 'POST',
+      const url = editingId ? `${API_BASE}/api/products/${editingId}` : `${API_BASE}/api/add-product`;
+      const method = editingId ? 'PUT' : 'POST';
+
+      const response = await fetch(url, {
+        method: method,
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(dataToSend),
       });
 
       if (response.ok) {
-        setStatus('Saved successfully!');
-        setProductForm({ 
-          name: '', price: '', originalPrice: '', discount: '', image: '', 
-          gallery: [], sizes: [], details: '', category: '',
-          isNewArrival: false, isBestSeller: false
-        });
+        showStatus(editingId ? 'Product updated successfully!' : 'Product added successfully!');
+        resetForms();
         fetchProducts();
       } else {
-        setStatus('Failed to save.');
+        showStatus('Failed to save product.', 'error');
       }
     } catch (error) {
-      setStatus('Error connecting to server.');
+      showStatus('Server connection error.', 'error');
     } finally {
       setIsLoading(false);
     }
   };
 
-  const handleDeleteBanner = async (id: string) => {
-    if (!confirm('Remove this banner?')) return;
+  const handleEditProduct = async (product: Product) => {
+    setEditingId(product._id);
+    setIsLoading(true);
     try {
-      const response = await fetch(`${API_BASE}/api/banners/${id}`, { method: 'DELETE' });
+      const response = await fetch(`${API_BASE}/api/products/${product._id}`);
       if (response.ok) {
-        setStatus('Banner removed.');
-        fetchBanners();
+        const fullProduct = await response.json();
+        setProductForm({
+          name: fullProduct.name,
+          price: fullProduct.price.toString(),
+          originalPrice: fullProduct.originalPrice?.toString() || '',
+          discount: fullProduct.discount || '',
+          image: fullProduct.image,
+          gallery: fullProduct.gallery || [],
+          sizes: fullProduct.sizes || [],
+          details: fullProduct.details || '',
+          category: fullProduct.category,
+          isNewArrival: fullProduct.isNewArrival || false,
+          isBestSeller: fullProduct.isBestSeller || false
+        });
+        window.scrollTo({ top: 0, behavior: 'smooth' });
       }
     } catch (error) {
-      setStatus('Error removing banner.');
+      showStatus('Error loading details.', 'error');
+    } finally {
+      setIsLoading(false);
     }
   };
 
   const handleDeleteProduct = async (id: string) => {
-    if (!confirm('Remove this product?')) return;
+    if (!confirm('Permanently delete this product?')) return;
     try {
       const response = await fetch(`${API_BASE}/api/products/${id}`, { method: 'DELETE' });
       if (response.ok) {
-        setStatus('Product removed.');
+        showStatus('Product deleted.');
         fetchProducts();
       }
     } catch (error) {
-      setStatus('Error removing product.');
-    }
-  };
-
-  const handleCategoryFullImageSelect = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (!file) return;
-    setIsLoading(true);
-    setStatus('Processing high-quality background (1920x1080)...');
-    try {
-      const base64 = await standardizeFullImage(file);
-      setCategoryForm(prev => ({ ...prev, fullImage: base64 }));
-      setStatus('Background image ready.');
-    } catch (error) {
-      setStatus('Error processing full image.');
-    } finally {
-      setIsLoading(false);
+      showStatus('Deletion failed.', 'error');
     }
   };
 
@@ -399,13 +375,11 @@ function App() {
     const file = event.target.files?.[0];
     if (!file) return;
     setIsLoading(true);
-    setStatus('Optimizing thumbnail...');
     try {
       const base64 = await optimizeImage(file);
       setCategoryForm(prev => ({ ...prev, thumbnailImage: base64 }));
-      setStatus('Thumbnail ready.');
     } catch (error) {
-      setStatus('Error processing thumbnail.');
+      showStatus('Error processing thumbnail.', 'error');
     } finally {
       setIsLoading(false);
     }
@@ -413,17 +387,18 @@ function App() {
 
   const handleAddCategory = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!categoryForm.thumbnailImage || !categoryForm.name || !categoryForm.description) {
-      setStatus('Please fill all fields and select a Category Image.');
+    if (!categoryForm.thumbnailImage || !categoryForm.name) {
+      showStatus('Name and image are required.', 'error');
       return;
     }
 
     setIsLoading(true);
-    setStatus('Adding category to Atlas...');
-
     try {
-      const response = await fetch(`${API_BASE}/api/add-category`, {
-        method: 'POST',
+      const url = editingId ? `${API_BASE}/api/categories/${editingId}` : `${API_BASE}/api/add-category`;
+      const method = editingId ? 'PUT' : 'POST';
+
+      const response = await fetch(url, {
+        method: method,
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           name: categoryForm.name,
@@ -433,278 +408,491 @@ function App() {
       });
 
       if (response.ok) {
-        setStatus('Category added successfully!');
-        setCategoryForm({ name: '', description: '', fullImage: '', thumbnailImage: '' });
+        showStatus(editingId ? 'Category updated!' : 'Category added!');
+        resetForms();
         fetchCategories();
       } else {
-        setStatus('Failed to add category.');
+        showStatus('Save failed.', 'error');
       }
     } catch (error) {
-      setStatus('Error connecting to server.');
+      showStatus('Connection error.', 'error');
     } finally {
       setIsLoading(false);
     }
   };
 
+  const handleEditCategory = (category: Category) => {
+    setEditingId(category._id);
+    setCategoryForm({
+      name: category.name,
+      description: category.description,
+      fullImage: category.fullImage || '',
+      thumbnailImage: category.thumbnailImage || category.image || ''
+    });
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
   const handleDeleteCategory = async (id: string) => {
-    if (!confirm('Remove this category?')) return;
+    if (!confirm('Delete this category?')) return;
     try {
       const response = await fetch(`${API_BASE}/api/categories/${id}`, { method: 'DELETE' });
       if (response.ok) {
-        setStatus('Category removed.');
+        showStatus('Category removed.');
         fetchCategories();
       }
     } catch (error) {
-      setStatus('Error removing category.');
+      showStatus('Error deleting category.', 'error');
     }
+  };
+
+  const handleReelVideoSelect = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    
+    // Check file size (limit to 10MB for Base64 storage)
+    if (file.size > 10 * 1024 * 1024) {
+      showStatus('Video too large. Please keep under 10MB.', 'error');
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = (e) => {
+        setReelForm(prev => ({ ...prev, videoUrl: e.target?.result as string }));
+        setIsLoading(false);
+      };
+    } catch (error) {
+      showStatus('Error processing video.', 'error');
+      setIsLoading(false);
+    }
+  };
+
+  const handleAddReel = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!reelForm.videoUrl || !reelForm.productId) {
+      showStatus('Video and Dress selection are required.', 'error');
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      const response = await fetch(`${API_BASE}/api/add-reel`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(reelForm),
+      });
+
+      if (response.ok) {
+        showStatus('Reel added successfully!');
+        resetForms();
+        fetchReels();
+      } else {
+        showStatus('Failed to save reel.', 'error');
+      }
+    } catch (error) {
+      showStatus('Connection error.', 'error');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleDeleteReel = async (id: string) => {
+    if (!confirm('Delete this reel?')) return;
+    try {
+      const response = await fetch(`${API_BASE}/api/reels/${id}`, { method: 'DELETE' });
+      if (response.ok) {
+        showStatus('Reel deleted.');
+        fetchReels();
+      }
+    } catch (error) {
+      showStatus('Error deleting reel.', 'error');
+    }
+  };
+
+  const handleDeleteBanner = async (id: string) => {
+    if (!confirm('Remove this banner?')) return;
+    try {
+      const response = await fetch(`${API_BASE}/api/banners/${id}`, { method: 'DELETE' });
+      if (response.ok) {
+        showStatus('Banner removed.');
+        fetchBanners();
+      }
+    } catch (error) {
+      showStatus('Error removing banner.', 'error');
+    }
+  };
+
+  const resetForms = () => {
+    setEditingId(null);
+    setProductForm({ 
+      name: '', price: '', originalPrice: '', discount: '', image: '', 
+      gallery: [], sizes: [], details: '', category: '',
+      isNewArrival: false, isBestSeller: false
+    });
+    setCategoryForm({ name: '', description: '', fullImage: '', thumbnailImage: '' });
+    setReelForm({ videoUrl: '', productId: '', category: '' });
   };
 
   return (
     <div className="admin-container">
-      <header className="admin-header">
-        <div className="logo">GRIDOX <span>Owner Portal</span></div>
-        <nav>
+      {/* Sidebar */}
+      <aside className="sidebar">
+        <div className="sidebar-header">
+          <div className="logo">
+            GRIDOX
+            <span>OWNER PORTAL</span>
+          </div>
+        </div>
+        
+        <nav className="nav-menu">
           <ul>
-            <li onClick={() => setActiveTab('banners')} className={activeTab === 'banners' ? 'active' : ''}>Banners</li>
-            <li onClick={() => setActiveTab('categories')} className={activeTab === 'categories' ? 'active' : ''}>Categories</li>
-            <li onClick={() => setActiveTab('dresses')} className={activeTab === 'dresses' ? 'active' : ''}>Add Dress</li>
-            <li>Settings</li>
+            <li className={activeTab === 'banners' ? 'active' : ''} onClick={() => { setActiveTab('banners'); resetForms(); }}>
+              <span className="icon">🖼️</span> Banners
+            </li>
+            <li className={activeTab === 'categories' ? 'active' : ''} onClick={() => { setActiveTab('categories'); resetForms(); }}>
+              <span className="icon">📂</span> Categories
+            </li>
+            <li className={activeTab === 'dresses' ? 'active' : ''} onClick={() => { setActiveTab('dresses'); resetForms(); }}>
+              <span className="icon">👗</span> Dresses
+            </li>
+            <li className={activeTab === 'reels' ? 'active' : ''} onClick={() => { setActiveTab('reels'); resetForms(); }}>
+              <span className="icon">🎬</span> Reels
+            </li>
           </ul>
         </nav>
-      </header>
 
+        <div className="sidebar-footer">
+          <div className="user-info">
+            <div className="avatar">👤</div>
+            <span>Admin Control</span>
+          </div>
+        </div>
+      </aside>
+
+      {/* Main Content */}
       <main className="admin-main">
-        {activeTab === 'banners' ? (
-          <>
+        {/* Page Header */}
+        <div className="page-header">
             <div className="page-title">
-              <h1>Main Banner Management</h1>
-              <p>Upload images for the homepage hero carousel.</p>
+                <h1>{activeTab.charAt(0).toUpperCase() + activeTab.slice(1)}</h1>
+                <p>Manage your storefront content and inventory.</p>
             </div>
-            <input type="file" ref={bannerInputRef} onChange={handleBannerUpload} accept="image/*" style={{ display: 'none' }} />
-            <div className="banner-grid">
-              <div className="banner-card add-new" onClick={() => bannerInputRef.current?.click()}>
-                <div className="card-content">
-                  {isLoading ? <div className="spinner"></div> : <><div className="plus-icon">+</div><h3>Add Banner</h3></>}
-                </div>
-              </div>
-              {banners.map(banner => (
-                <div key={banner._id} className="banner-card fade-in">
-                   <div className="banner-preview" style={{backgroundImage: `url("${banner.imageUrl}")`}}></div>
-                   <div className="banner-info">
-                     <div className="info-header">
-                        <h4>{banner.title}</h4>
-                        <button className="delete-btn" onClick={() => handleDeleteBanner(banner._id)}>Remove</button>
-                     </div>
-                   </div>
-                </div>
-              ))}
-            </div>
-          </>
-        ) : activeTab === 'categories' ? (
-          <>
-            <div className="page-title">
-              <h1>Category Management</h1>
-              <p>Add and manage main categories displayed on the shop section.</p>
-            </div>
-            
-            <form className="product-form card" onSubmit={handleAddCategory} style={{ maxWidth: '600px', margin: '0 auto 40px' }}>
-              <div style={{ textAlign: 'center', marginBottom: '20px' }}>
-                <p style={{ fontSize: '1.1rem', fontWeight: 'bold', marginBottom: '4px', color: '#8b231a' }}>Recommended: 1200px x 1600px</p>
-                <p style={{ fontSize: '0.85rem', color: '#666', marginBottom: '15px' }}>(Standard 3:4 Portrait Ratio)</p>
-                
-                <div className="image-upload-box" onClick={() => categoryThumbInputRef.current?.click()} style={{ height: '350px', width: '260px', margin: '0 auto 20px', border: '2px dashed #8b231a' }}>
-                  {categoryForm.thumbnailImage ? (
-                    <img src={categoryForm.thumbnailImage} alt="Preview" className="preview-img" />
-                  ) : (
-                    <div className="placeholder">
-                      <span>+</span>
-                      <p>Select Category Image</p>
+            {isLoading && <div className="spinner"></div>}
+        </div>
+
+        {activeTab === 'banners' && (
+          <div className="fade-in">
+             <div className="content-grid">
+                <div className="upload-zone" onClick={() => {
+                   const input = document.createElement('input');
+                   input.type = 'file';
+                   input.accept = 'image/*';
+                   input.onchange = (e) => handleBannerUpload(e as any);
+                   input.click();
+                }}>
+                    <div className="upload-placeholder">
+                        <span className="icon">➕</span>
+                        <p>Upload New Banner</p>
                     </div>
-                  )}
-                  <input type="file" ref={categoryThumbInputRef} onChange={handleCategoryThumbImageSelect} accept="image/*" style={{ display: 'none' }} />
                 </div>
-              </div>
-
-              <div className="form-fields">
-                <input type="text" placeholder="Category Name (e.g. PEPLUM CO-ORDS)" value={categoryForm.name} onChange={e => setCategoryForm({...categoryForm, name: e.target.value})} required />
-                <textarea 
-                  placeholder="Short Description for SEO and Display" 
-                  value={categoryForm.description} 
-                  onChange={e => setCategoryForm({...categoryForm, description: e.target.value})} 
-                  required 
-                  rows={4}
-                  style={{ padding: '12px', borderRadius: '8px', border: '1px solid #ddd', marginBottom: '15px', width: '100%', fontFamily: 'inherit' }}
-                />
-                <button type="submit" disabled={isLoading || !categoryForm.thumbnailImage || !categoryForm.name} className="submit-btn" style={{ backgroundColor: '#8b231a' }}>
-                  {isLoading ? 'Saving...' : 'Add Category to Site'}
-                </button>
-              </div>
-            </form>
-
-            <div className="product-list-grid">
-              {categories.map(cat => (
-                <div key={cat._id} className="product-admin-card fade-in">
-                  <div className="prod-img" style={{backgroundImage: `url("${cat.thumbnailImage || cat.image}")`}}></div>
-                  <div className="prod-info">
-                    <h5>{cat.name}</h5>
-                    <p style={{ fontSize: '0.8rem', color: '#666', marginBottom: '10px', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
-                      {cat.description}
-                    </p>
-                    <button className="remove-link" onClick={() => handleDeleteCategory(cat._id)}>Remove Category</button>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </>
-        ) : (
-          <>
-            <div className="page-title">
-              <h1>Dress Management</h1>
-              <p>Add new dresses to specific categories with detailed looks and sizes.</p>
-            </div>
-            
-            <form className="product-form card" onSubmit={handleAddProduct} style={{ maxWidth: '900px', margin: '0 auto 40px' }}>
-              <div className="form-grid" style={{ gridTemplateColumns: '1fr 1fr', gap: '30px' }}>
-                <div className="image-sections">
-                  <h3 style={{ marginBottom: '15px', fontSize: '1.1rem' }}>1. Product Images</h3>
-                  <div className="image-upload-box main" onClick={() => productInputRef.current?.click()} style={{ height: '300px', marginBottom: '15px' }}>
-                    {productForm.image ? (
-                      <img src={productForm.image} alt="Main" className="preview-img" />
-                    ) : (
-                      <div className="placeholder">
-                        <span>+</span>
-                        <p>Main Dress Image (Portrait)</p>
-                      </div>
-                    )}
-                    <input type="file" ref={productInputRef} onChange={handleProductImageSelect} accept="image/*" style={{ display: 'none' }} />
-                  </div>
-                  
-                  <p style={{ fontSize: '0.9rem', marginBottom: '8px', fontWeight: 'bold' }}>Gallery (5 Different Looks)</p>
-                  <div className="gallery-upload-row" style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
-                    {[0, 1, 2, 3, 4].map(i => (
-                      <div key={i} className="gallery-thumb" style={{ width: '60px', height: '80px', border: '1px dashed #ccc', borderRadius: '4px', overflow: 'hidden', position: 'relative' }}>
-                        {productForm.gallery[i] ? (
-                          <img src={productForm.gallery[i]} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                        ) : (
-                          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', color: '#999' }}>+</div>
-                        )}
-                      </div>
-                    ))}
-                    <button type="button" onClick={() => galleryInputRef.current?.click()} className="mini-btn" style={{ height: '80px', padding: '0 10px', fontSize: '0.8rem' }}>Upload Looks</button>
-                    <input type="file" ref={galleryInputRef} onChange={handleGalleryImagesSelect} accept="image/*" multiple style={{ display: 'none' }} />
-                  </div>
-                </div>
-
-                <div className="form-fields">
-                  <h3 style={{ marginBottom: '15px', fontSize: '1.1rem' }}>2. Product Information</h3>
-                  
-                  <select 
-                    value={productForm.category} 
-                    onChange={e => setProductForm({...productForm, category: e.target.value})}
-                    required
-                    style={{ padding: '12px', borderRadius: '8px', border: '1px solid #ddd', marginBottom: '15px', width: '100%' }}
-                  >
-                    <option value="">Select Category</option>
-                    {categories.map(cat => (
-                      <option key={cat._id} value={cat.slug}>{cat.name}</option>
-                    ))}
-                  </select>
-
-                  <input type="text" placeholder="Dress Name" value={productForm.name} onChange={e => setProductForm({...productForm, name: e.target.value})} required />
-                  
-                  <div className="price-row">
-                    <input type="number" placeholder="Price" value={productForm.price} onChange={e => setProductForm({...productForm, price: e.target.value})} required />
-                    <input type="number" placeholder="Old Price" value={productForm.originalPrice} onChange={e => setProductForm({...productForm, originalPrice: e.target.value})} />
-                  </div>
-                  
-                  <input type="text" placeholder="Discount (e.g. 10% OFF)" value={productForm.discount} onChange={e => setProductForm({...productForm, discount: e.target.value})} />
-                  
-                  <div className="size-selector" style={{ marginBottom: '15px' }}>
-                    <p style={{ fontSize: '0.9rem', marginBottom: '8px', fontWeight: 'bold' }}>Available Sizes</p>
-                    <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
-                      {['XS', 'S', 'M', 'L', 'XL', 'XXL', '3XL'].map(size => (
-                        <label key={size} style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '0.85rem', cursor: 'pointer' }}>
-                          <input 
-                            type="checkbox" 
-                            checked={productForm.sizes.includes(size)}
-                            onChange={(e) => {
-                              const newSizes = e.target.checked 
-                                ? [...productForm.sizes, size]
-                                : productForm.sizes.filter(s => s !== size);
-                              setProductForm({...productForm, sizes: newSizes});
-                            }}
-                          />
-                          {size}
-                        </label>
-                      ))}
+                {banners.map(banner => (
+                    <div key={banner._id} className="item-card">
+                        <div className="item-image" style={{backgroundImage: `url("${banner.imageUrl}")`}}></div>
+                        <div className="card-actions">
+                            <button className="btn-icon edit" onClick={() => {
+                                const input = document.createElement('input');
+                                input.type = 'file';
+                                input.accept = 'image/*';
+                                input.onchange = (e) => handleBannerUpload(e as any, banner._id);
+                                input.click();
+                            }}>Change</button>
+                            <button className="btn-icon delete" onClick={() => handleDeleteBanner(banner._id)}>Remove</button>
+                        </div>
                     </div>
-                  </div>
-
-                  <textarea 
-                    placeholder="Product Details (Fabric, Care, etc.)" 
-                    value={productForm.details} 
-                    onChange={e => setProductForm({...productForm, details: e.target.value})} 
-                    rows={4}
-                    style={{ padding: '12px', borderRadius: '8px', border: '1px solid #ddd', marginBottom: '15px', width: '100%', fontFamily: 'inherit' }}
-                  />
-
-                  <div className="special-flags" style={{ display: 'flex', gap: '20px', marginBottom: '20px', padding: '15px', background: '#f9f9f9', borderRadius: '8px' }}>
-                    <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', fontWeight: '600' }}>
-                      <input 
-                        type="checkbox" 
-                        checked={productForm.isNewArrival} 
-                        onChange={e => setProductForm({...productForm, isNewArrival: e.target.checked})}
-                      />
-                      Mark as New Arrival 🌟
-                    </label>
-                    <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', fontWeight: '600' }}>
-                      <input 
-                        type="checkbox" 
-                        checked={productForm.isBestSeller} 
-                        onChange={e => setProductForm({...productForm, isBestSeller: e.target.checked})}
-                      />
-                      Mark as Best Seller 🔥
-                    </label>
-                  </div>
-
-                  <button type="submit" disabled={isLoading || !productForm.image || !productForm.category} className="submit-btn" style={{ backgroundColor: '#8b231a' }}>
-                    {isLoading ? 'Saving...' : 'Add Dress to Collection'}
-                  </button>
-                </div>
-              </div>
-            </form>
-
-            <div className="product-list-grid">
-              {products.map(product => (
-                <div key={product._id} className="product-admin-card fade-in">
-                  <div className="prod-img" style={{backgroundImage: `url("${product.image}")`}}>
-                    <span className="cat-badge" style={{ position: 'absolute', top: '10px', left: '10px', background: 'rgba(0,0,0,0.6)', color: 'white', padding: '2px 8px', borderRadius: '4px', fontSize: '0.7rem' }}>
-                      {product.category}
-                    </span>
-                    {product.discount && <span className="discount-badge">-{product.discount}</span>}
-                  </div>
-                  <div className="prod-info">
-                    <h5>{product.name}</h5>
-                    <div className="prices">
-                      <span className="p">Rs. {product.price}</span>
-                      {product.originalPrice && <span className="op">Rs. {product.originalPrice}</span>}
-                    </div>
-                    <button className="remove-link" onClick={() => handleDeleteProduct(product._id)}>Remove</button>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </>
+                ))}
+             </div>
+          </div>
         )}
 
+        {activeTab === 'categories' && (
+          <div className="fade-in">
+            <div className="glass-card">
+              <h2 className="form-section-title">{editingId ? 'Edit Category' : 'Create New Category'}</h2>
+              <form onSubmit={handleAddCategory}>
+                  <div className="form-grid">
+                    <div className="upload-zone" onClick={() => categoryThumbInputRef.current?.click()}>
+                        {categoryForm.thumbnailImage ? (
+                            <img src={categoryForm.thumbnailImage} className="preview-full" alt="Preview" />
+                        ) : (
+                            <div className="upload-placeholder">
+                                <span className="icon">📁</span>
+                                <p>Category Image (Portrait)</p>
+                            </div>
+                        )}
+                        <input type="file" ref={categoryThumbInputRef} onChange={handleCategoryThumbImageSelect} style={{display:'none'}} accept="image/*" />
+                    </div>
+                    <div className="form-controls">
+                        <div className="form-group">
+                            <label>Category Name</label>
+                            <input className="input-styled" type="text" value={categoryForm.name} onChange={e => setCategoryForm({...categoryForm, name: e.target.value})} placeholder="e.g. LUXURY CO-ORDS" required />
+                        </div>
+                        <div className="form-group">
+                            <label>Description (SEO)</label>
+                            <textarea className="input-styled" value={categoryForm.description} onChange={e => setCategoryForm({...categoryForm, description: e.target.value})} placeholder="Describe this category..." required />
+                        </div>
+                        <button type="submit" disabled={isLoading} className="primary-btn">
+                            {editingId ? 'Update Category' : 'Save Category'}
+                        </button>
+                        {editingId && <button type="button" onClick={resetForms} className="secondary-btn">Cancel Edit</button>}
+                    </div>
+                  </div>
+              </form>
+            </div>
+
+            <div className="content-grid">
+                {categories.map(cat => (
+                    <div key={cat._id} className="item-card">
+                        <div className="item-image" style={{backgroundImage: `url("${cat.thumbnailImage || cat.image}")`}}></div>
+                        <div className="item-body">
+                            <h3>{cat.name}</h3>
+                        </div>
+                        <div className="card-actions">
+                            <button className="btn-icon edit" onClick={() => handleEditCategory(cat)}>Edit</button>
+                            <button className="btn-icon delete" onClick={() => handleDeleteCategory(cat._id)}>Delete</button>
+                        </div>
+                    </div>
+                ))}
+            </div>
+          </div>
+        )}
+
+        {activeTab === 'dresses' && (
+          <div className="fade-in">
+            <div className="glass-card">
+                <h2 className="form-section-title">{editingId ? 'Edit Dress Details' : 'Add New Dress to Collection'}</h2>
+                <form onSubmit={handleAddProduct}>
+                    <div className="form-grid">
+                        <div className="image-side">
+                            <div className="upload-zone" onClick={() => productInputRef.current?.click()}>
+                                {productForm.image ? (
+                                    <img src={productForm.image} className="preview-full" alt="Main" />
+                                ) : (
+                                    <div className="upload-placeholder">
+                                        <span className="icon">📷</span>
+                                        <p>Main Portrait Image</p>
+                                    </div>
+                                )}
+                                <input type="file" ref={productInputRef} onChange={handleProductImageSelect} style={{display:'none'}} accept="image/*" />
+                            </div>
+                            <div className="gallery-row">
+                                {[0,1,2,3,4].map(i => (
+                                    <div key={i} className="gallery-box">
+                                        {productForm.gallery[i] ? <img src={productForm.gallery[i]} /> : '+'}
+                                    </div>
+                                ))}
+                                <button type="button" onClick={() => galleryInputRef.current?.click()} className="mini-btn">Upload Looks</button>
+                                <input type="file" ref={galleryInputRef} onChange={handleGalleryImagesSelect} multiple style={{display:'none'}} />
+                            </div>
+                        </div>
+
+                        <div className="form-side">
+                            <div className="form-group">
+                                <label>Dress Name</label>
+                                <input className="input-styled" type="text" value={productForm.name} onChange={e => setProductForm({...productForm, name: e.target.value})} placeholder="Dress name" required />
+                            </div>
+                            <div className="price-row">
+                                <div className="form-group">
+                                    <label>Price (Rs.)</label>
+                                    <input className="input-styled" type="number" value={productForm.price} onChange={e => setProductForm({...productForm, price: e.target.value})} required />
+                                </div>
+                                <div className="form-group">
+                                    <label>Old Price</label>
+                                    <input className="input-styled" type="number" value={productForm.originalPrice} onChange={e => setProductForm({...productForm, originalPrice: e.target.value})} />
+                                </div>
+                            </div>
+                            <div className="form-group">
+                                <label>Category</label>
+                                <select className="select-styled" value={productForm.category} onChange={e => setProductForm({...productForm, category: e.target.value})} required>
+                                    <option value="">Choose category</option>
+                                    {categories.map(c => <option key={c._id} value={c.slug}>{c.name}</option>)}
+                                </select>
+                            </div>
+                            <div className="form-group">
+                                <label>Sizes</label>
+                                <div className="size-pills-container">
+                                    {['XS','S','M','L','XL','XXL','3XL'].map(sz => (
+                                        <label key={sz} className="size-pill">
+                                            <input type="checkbox" checked={productForm.sizes.includes(sz)} onChange={e => {
+                                                const newSizes = e.target.checked ? [...productForm.sizes, sz] : productForm.sizes.filter(s => s !== sz);
+                                                setProductForm({...productForm, sizes: newSizes});
+                                            }} />
+                                            <label>{sz}</label>
+                                        </label>
+                                    ))}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="form-group" style={{marginTop:'25px'}}>
+                        <label>Product Details (Rich Text)</label>
+                        <textarea className="input-styled" value={productForm.details} onChange={e => setProductForm({...productForm, details: e.target.value})} placeholder="Fabric, fit, care instructions..." />
+                    </div>
+
+                    <div className="flags-container">
+                        <label className="flag-item">
+                            <input type="checkbox" checked={productForm.isNewArrival} onChange={e => setProductForm({...productForm, isNewArrival: e.target.checked})} />
+                            New Arrival 🌟
+                        </label>
+                        <label className="flag-item">
+                            <input type="checkbox" checked={productForm.isBestSeller} onChange={e => setProductForm({...productForm, isBestSeller: e.target.checked})} />
+                            Best Seller 🔥
+                        </label>
+                    </div>
+
+                    <button type="submit" disabled={isLoading} className="primary-btn">
+                        {editingId ? 'Update Dress' : 'Publish Dress'}
+                    </button>
+                    {editingId && <button type="button" onClick={resetForms} className="secondary-btn">Cancel Edit</button>}
+                </form>
+            </div>
+
+            <div className="content-grid">
+                {products.map(p => (
+                    <div key={p._id} className="item-card">
+                        <div className="item-image" style={{backgroundImage: `url("${p.image}")`}}>
+                            {p.category && <span className="badge-tag">{p.category}</span>}
+                        </div>
+                        <div className="item-body">
+                            <h3>{p.name}</h3>
+                            <div className="item-price">
+                                Rs. {p.price} 
+                                {p.originalPrice && <span className="old">Rs. {p.originalPrice}</span>}
+                            </div>
+                        </div>
+                        <div className="card-actions">
+                            <button className="btn-icon edit" onClick={() => handleEditProduct(p)}>Edit</button>
+                            <button className="btn-icon delete" onClick={() => handleDeleteProduct(p._id)}>Remove</button>
+                        </div>
+                    </div>
+                ))}
+            </div>
+          </div>
+        )}
+
+        {activeTab === 'reels' && (
+          <div className="fade-in">
+            <div className="glass-card">
+              <h2 className="form-section-title">Upload New Reel</h2>
+              <form onSubmit={handleAddReel}>
+                <div className="form-grid">
+                  <div className="upload-zone" onClick={() => {
+                      const input = document.createElement('input');
+                      input.type = 'file';
+                      input.accept = 'video/mp4,video/quicktime';
+                      input.onchange = (e) => handleReelVideoSelect(e as any);
+                      input.click();
+                  }}>
+                    {reelForm.videoUrl ? (
+                      <video className="preview-full" src={reelForm.videoUrl} autoPlay loop muted />
+                    ) : (
+                      <div className="upload-placeholder">
+                        <span className="icon">🎥</span>
+                        <p>Upload Video (MP4/MOV)</p>
+                        <p style={{fontSize: '10px', marginTop: '5px'}}>Max size 10MB</p>
+                      </div>
+                    )}
+                  </div>
+                  <div className="form-controls">
+                    <div className="form-group">
+                      <label>Select Category</label>
+                      <select className="select-styled" value={reelForm.category} onChange={e => setReelForm({...reelForm, category: e.target.value})} required>
+                        <option value="">Choose category</option>
+                        {categories.map(c => <option key={c._id} value={c.slug}>{c.name}</option>)}
+                      </select>
+                    </div>
+                    <div className="form-group">
+                      <label>Link Specific Dress</label>
+                      <select className="select-styled" value={reelForm.productId} onChange={e => setReelForm({...reelForm, productId: e.target.value})} required>
+                        <option value="">Choose dress from category</option>
+                        {products
+                          .filter(p => !reelForm.category || p.category === reelForm.category)
+                          .map(p => <option key={p._id} value={p._id}>{p.name} (Rs. {p.price})</option>)
+                        }
+                      </select>
+                    </div>
+                    <button type="submit" disabled={isLoading || !reelForm.videoUrl} className="primary-btn">
+                      Publish Reel
+                    </button>
+                    {reelForm.videoUrl && <button type="button" onClick={resetForms} className="secondary-btn">Clear Form</button>}
+                  </div>
+                </div>
+              </form>
+            </div>
+
+            <div className="content-grid">
+              {reels.map(reel => (
+                <ReelAdminCard key={reel._id} reel={reel} API_BASE={API_BASE} onDelete={() => handleDeleteReel(reel._id)} />
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Status Toast */}
         {status && (
-          <div className={`status-message ${status.includes('Error') || status.includes('Failed') ? 'error' : 'success'}`}>
-            {status}
+          <div className={`status-toast ${status.type}`}>
+            {status.type === 'success' ? '✅' : '❌'} {status.message}
           </div>
         )}
       </main>
+      <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
     </div>
   )
+}
+
+// Sub-component for lazy loading video in Admin Card
+function ReelAdminCard({ reel, API_BASE, onDelete }: any) {
+    const [videoSrc, setVideoSrc] = useState<string | null>(null);
+
+    useEffect(() => {
+        if (reel.videoUrl) {
+            setVideoSrc(reel.videoUrl);
+            return;
+        }
+        const load = async () => {
+            try {
+                const res = await fetch(`${API_BASE}/api/reels/video/${reel._id}`);
+                if (res.ok) {
+                    const data = await res.json();
+                    setVideoSrc(data.url);
+                }
+            } catch (e) {
+                console.error(e);
+            }
+        };
+        load();
+    }, [reel._id]);
+
+    return (
+        <div className="item-card">
+            <div className="item-image" style={{padding: 0}}>
+                {videoSrc ? (
+                    <video src={videoSrc} style={{width: '100%', height: '100%', objectFit: 'cover'}} muted loop onMouseEnter={e => e.currentTarget.play()} onMouseLeave={e => e.currentTarget.pause()} />
+                ) : (
+                    <div className="spinner" style={{marginTop: '40%'}}></div>
+                )}
+            </div>
+            <div className="item-body">
+                <h3>{reel.productId?.name || 'Unknown Dress'}</h3>
+                <p style={{fontSize: '11px', color: '#64748b'}}>Category: {reel.category}</p>
+            </div>
+            <div className="card-actions">
+                <button className="btn-icon delete" onClick={onDelete}>Remove</button>
+            </div>
+        </div>
+    );
 }
 
 export default App

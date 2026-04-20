@@ -5,12 +5,12 @@
 
 .reels-title {
   text-align: center;
-  font-family: 'Playfair Display', serif;
-  font-size: 3.5rem;
-  font-weight: 500;
-  margin-bottom: 3rem;
+  font-family: 'Outfit', sans-serif;
+  font-size: 2.75rem;
+  font-weight: 700;
+  margin-bottom: 3.5rem;
   color: #1a1a1a;
-  letter-spacing: 0.02em;
+  letter-spacing: -0.01em;
 }
 
 .reels-slider-wrapper {
@@ -37,15 +37,16 @@
 
 .reel-card {
   flex: 0 0 auto;
-  width: 220px;
+  width: 240px;
   aspect-ratio: 9 / 16;
   position: relative;
-  border-radius: 12px;
+  border-radius: 16px;
   overflow: hidden;
   cursor: pointer;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  border: 1px solid #000;
+  transition: var(--transition, all 0.4s cubic-bezier(0.4, 0, 0.2, 1));
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  background: #f8fafc;
 }
 
 .reel-card:hover {

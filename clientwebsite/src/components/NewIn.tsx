@@ -70,38 +70,51 @@ const NewIn = () => {
           onScroll={handleScroll}
           className="flex overflow-x-auto snap-x snap-mandatory gap-3 px-4 pb-4 md:grid md:grid-cols-4 md:gap-6 md:px-6 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
         >
-          {activeProducts.map((product: any) => (
-            <div 
-              key={product._id || product.id} 
-              className="w-[38vw] sm:w-[32vw] md:w-full snap-start shrink-0 flex flex-col group cursor-pointer"
-              onClick={() => { 
-                const categorySlug = product.category || 'new-arrivals';
-                const productId = product._id;
-                navigate(`/category/${categorySlug}/product/${productId}`);
-              }}
-            >
-              {/* Image Container */}
-              <div className="relative aspect-[3/4] w-full rounded-xl overflow-hidden bg-white">
-                <OptimizedImage 
-                  src={product.image} 
-                  alt={product.name} 
-                  className="w-full h-full object-cover transition-transform duration-500"
-                  isProductImage
-                />
-              </div>
+          {activeProducts.length > 0 ? (
+            activeProducts.map((product: any) => (
+              <div 
+                key={product._id || product.id} 
+                className="w-[38vw] sm:w-[32vw] md:w-full snap-start shrink-0 flex flex-col group cursor-pointer"
+                onClick={() => { 
+                  const categorySlug = product.category || 'new-arrivals';
+                  const productId = product._id;
+                  navigate(`/category/${categorySlug}/product/${productId}`);
+                }}
+              >
+                {/* Image Container */}
+                <div className="relative aspect-[3/4] w-full rounded-xl overflow-hidden bg-white">
+                  <OptimizedImage 
+                    src={product.image} 
+                    alt={product.name} 
+                    className="w-full h-full object-cover transition-transform duration-500"
+                    isProductImage
+                  />
+                </div>
 
-              {/* Product Info */}
-              <div className="mt-4 text-center">
-                <h3 className="text-sm text-foreground font-medium">{product.name}</h3>
-                <div className="mt-1.5 flex items-center justify-center gap-2">
-                  <span className="text-primary font-medium text-[15px]">Rs. {product.price.toLocaleString()}</span>
-                  {product.originalPrice && (
-                    <span className="text-muted-foreground line-through text-[13px]">Rs. {product.originalPrice.toLocaleString()}</span>
-                  )}
+                {/* Product Info */}
+                <div className="mt-4 text-center">
+                  <h3 className="text-sm text-foreground font-medium">{product.name}</h3>
+                  <div className="mt-1.5 flex items-center justify-center gap-2">
+                    <span className="text-primary font-medium text-[15px]">Rs. {product.price.toLocaleString()}</span>
+                    {product.originalPrice && (
+                      <span className="text-muted-foreground line-through text-[13px]">Rs. {product.originalPrice.toLocaleString()}</span>
+                    )}
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
+            ))
+          ) : (
+            /* Premium Skeletons */
+            Array.from({ length: 4 }).map((_, idx) => (
+              <div key={`skel-new-${idx}`} className="w-[38vw] sm:w-[32vw] md:w-full snap-start shrink-0 flex flex-col">
+                <div className="relative aspect-[3/4] w-full rounded-xl overflow-hidden skeleton"></div>
+                <div className="mt-4 text-center flex flex-col items-center gap-2">
+                  <div className="skeleton-text skeleton" style={{ width: '80%' }}></div>
+                  <div className="skeleton-text skeleton" style={{ width: '40%' }}></div>
+                </div>
+              </div>
+            ))
+          )}
         </div>
 
         {/* Pagination Dots (Mobile Only) */}
