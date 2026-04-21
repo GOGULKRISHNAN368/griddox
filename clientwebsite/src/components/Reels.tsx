@@ -24,7 +24,7 @@ const Reels: React.FC = () => {
   const sliderRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
 
-  const API_BASE = window.location.hostname === 'localhost' ? 'http://localhost:3001' : `http://${window.location.hostname}:3001`;
+  const API_BASE = '/api';
 
   useEffect(() => {
     fetchReels();
@@ -32,7 +32,7 @@ const Reels: React.FC = () => {
 
   const fetchReels = async () => {
     try {
-      const response = await fetch(`${API_BASE}/api/reels`);
+      const response = await fetch(`${API_BASE}/reels`);
       if (response.ok) {
         const data = await response.json();
         setReelsData(data);
@@ -250,7 +250,7 @@ const ReelItem: React.FC<{
     }
 
     try {
-        const res = await fetch(`${API_BASE}/api/reels/video/${reel._id}`);
+        const res = await fetch(`${API_BASE}/reels/video/${reel._id}`);
         if (res.ok) {
             const data = await res.json();
             setVideoSrc(data.url);
@@ -327,7 +327,7 @@ const ReelModal: React.FC<{
 
     const loadModalVideo = async () => {
         try {
-            const res = await fetch(`${API_BASE}/api/reels/video/${reel._id}`);
+            const res = await fetch(`${API_BASE}/reels/video/${reel._id}`);
             if (res.ok) {
                 const data = await res.json();
                 setVideoSrc(data.url);

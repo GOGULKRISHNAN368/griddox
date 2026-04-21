@@ -23,8 +23,7 @@ const HeroCarousel = () => {
   useEffect(() => {
     const fetchBanners = async () => {
       try {
-        const apiBase = window.location.hostname === 'localhost' ? 'http://localhost:3001' : `http://${window.location.hostname}:3001`;
-        const response = await fetch(`${apiBase}/api/banners`);
+        const response = await fetch(`/api/banners`);
         if (response.ok) {
           const data = await response.json();
           if (data && data.length > 0) {

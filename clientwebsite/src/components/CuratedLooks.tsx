@@ -28,8 +28,7 @@ const CuratedLooks: React.FC = () => {
   useEffect(() => {
     const fetchLooks = async () => {
       try {
-        const apiBase = window.location.hostname === 'localhost' ? 'http://localhost:3001' : `http://${window.location.hostname}:3001`;
-        const response = await fetch(`${apiBase}/api/products?isBestSeller=true&limit=8`);
+        const response = await fetch(`/api/products?isBestSeller=true&limit=8`);
         if (response.ok) {
           const data = await response.json();
           setLooks(data);

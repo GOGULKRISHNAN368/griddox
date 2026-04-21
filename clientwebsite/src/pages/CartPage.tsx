@@ -20,11 +20,27 @@ const MOCK_CART: CartItem[] = [
 
 const CartPage = () => {
   const navigate = useNavigate();
-  const [items, setItems] = useState<CartItem[]>(MOCK_CART);
+  const [items, setItems] = useState<CartItem[]>(() => {
+    const saved = localStorage.getItem('gridox_cart');
+    if (saved) {
+      try { return JSON.parse(saved); } catch (e) {}
+    }
+    return [];
+  });
 
-  const remove = (id: string) => setItems((prev) => prev.filter((i) => i.id !== id));
-  const updateQty = (id: string, qty: number) =>
-    setItems((prev) => prev.map((i) => (i.id === id ? { ...i, quantity: qty } : i)));
+  const remove = (id: string) => {
+    const newItems = items.filter((i) => i.id !== id);
+    setItems(newItems);
+    localStorage.setItem('gridox_cart', JSON.stringify(newItems));
+    window.dispatchEvent(new Event('cartUpdated'));
+  };
+  
+  const updateQty = (id: string, qty: number) => {
+    const newItems = items.map((i) => (i.id === id ? { ...i, quantity: qty } : i));
+    setItems(newItems);
+    localStorage.setItem('gridox_cart', JSON.stringify(newItems));
+    window.dispatchEvent(new Event('cartUpdated'));
+  };
 
   const subtotal = items.reduce((sum, i) => sum + i.price * i.quantity, 0);
 

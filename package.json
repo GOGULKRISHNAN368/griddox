@@ -1,0 +1,15 @@
+{
+  "name": "gridox-root",
+  "version": "1.0.0",
+  "scripts": {
+    "build:client": "cd clientwebsite && npm install && npm run build",
+    "build:backend": "cd backend && npm install",
+    "build": "npm run build:client && npm run build:backend",
+    "start": "cd backend && node server.js",
+    "dev": "concurrently \"cd backend && npm run dev\" \"cd clientwebsite && npm run dev\"",
+    "install:all": "npm install && cd backend && npm install && cd ../clientwebsite && npm install && cd ../ownersite && npm install"
+  },
+  "dependencies": {
+    "concurrently": "^8.2.2"
+  }
+}

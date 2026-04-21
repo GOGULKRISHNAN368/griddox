@@ -6,12 +6,23 @@ import { ViteImageOptimizer } from "vite-plugin-image-optimizer";
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => ({
   server: {
-    host: "::",
+    host: true,
     port: 8080,
+    strictPort: false,
     hmr: {
       overlay: false,
     },
+
+    proxy: {
+      "/api": {
+        target: "http://127.0.0.1:3001",
+        changeOrigin: true,
+        secure: false,
+        xfwd: true,
+      },
+    }
   },
+
   plugins: [
     react(),
     ViteImageOptimizer({

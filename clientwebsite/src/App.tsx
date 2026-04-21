@@ -15,6 +15,8 @@ const NotFound = lazy(() => import("./pages/NotFound.tsx"));
 const CartPage = lazy(() => import("./pages/CartPage.tsx"));
 const StoreLocator = lazy(() => import("./pages/StoreLocator.tsx"));
 const CoimbatoreStyleGuide = lazy(() => import("./pages/CoimbatoreStyleGuide.tsx"));
+const AuthPage = lazy(() => import("./pages/AuthPage.tsx"));
+// Dashboard removed as per user request
 
 // Simple loading fallback
 const PageLoader = () => (
@@ -42,7 +44,9 @@ const App = () => (
 
               <Route path="/store-locator" element={<StoreLocator />} />
               <Route path="/style-guide/coimbatore" element={<CoimbatoreStyleGuide />} />
+              <Route path="/auth" element={<AuthPage />} />
               <Route path="*" element={<NotFound />} />
+
             </Routes>
           </Suspense>
         </BrowserRouter>

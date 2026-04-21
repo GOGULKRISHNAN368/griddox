@@ -2,12 +2,24 @@ const express = require('express');
 const cors = require('cors');
 const mongoose = require('mongoose');
 const cloudinary = require('cloudinary').v2;
+const cookieParser = require('cookie-parser');
+const passport = require('passport');
 require('dotenv').config({ path: '../.env' });
+require('./passport-config'); // Load passport configuration
 
+const path = require('path');
 const app = express();
-app.use(cors());
+
+app.set('trust proxy', 1);
+app.use(cors({
+  origin: true,
+  credentials: true
+}));
+
+app.use(cookieParser());
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ limit: '50mb', extended: true }));
+app.use(passport.initialize());
 
 const PORT = process.env.PORT || 3001;
 
@@ -35,13 +47,29 @@ const uploadToCloudinary = async (base64Data, folder = 'gridox', resourceType = 
 
 // MongoDB Connection
 let MONGODB_URI = process.env.MONGODB_URI;
-if (MONGODB_URI && (!MONGODB_URI.includes('.net/') || MONGODB_URI.endsWith('.net/'))) {
-    MONGODB_URI = MONGODB_URI.replace('.net/?', '.net/gridox_db?');
+
+// FORCE test database
+if (MONGODB_URI) {
+  if (MONGODB_URI.includes('.net/')) {
+    const base = MONGODB_URI.split('.net/')[0];
+    const params = MONGODB_URI.split('?')[1] || '';
+    MONGODB_URI = `${base}.net/test?${params}`;
+  }
 }
 
-mongoose.connect(MONGODB_URI)
-  .then(() => console.log('Connected to MongoDB Atlas: gridox_db'))
-  .catch(err => console.error('Could not connect to MongoDB Atlas', err));
+console.log('Connecting to MongoDB...');
+// Log URI with password masked for safety
+const maskedURI = MONGODB_URI ? MONGODB_URI.replace(/:([^@]+)@/, ':****@') : 'MISSING';
+console.log('Target URI:', maskedURI);
+
+mongoose.connect(MONGODB_URI, {
+  serverSelectionTimeoutMS: 5000 // Timeout after 5 seconds instead of hanging
+})
+  .then(() => console.log('Successfully connected to MongoDB Atlas (database: test)!'))
+  .catch(err => {
+    console.error('❌ MONGODB CONNECTION ERROR:', err.message);
+  });
+
 
 // Schema
 const BannerSchema = new mongoose.Schema({
@@ -92,23 +120,65 @@ const ReelSchema = new mongoose.Schema({
 
 const Reel = mongoose.model('Reel', ReelSchema);
 
+const InstagramPostSchema = new mongoose.Schema({
+  imageUrl: { type: String, required: true },
+  link: String,
+  createdAt: { type: Date, default: Date.now }
+});
+
+const InstagramPost = mongoose.model('InstagramPost', InstagramPostSchema);
+
+const LeadSchema = new mongoose.Schema({
+  email: { type: String, required: true },
+  phone: String,
+  createdAt: { type: Date, default: Date.now }
+});
+
+const Lead = mongoose.model('Lead', LeadSchema);
+
+const authRoutes = require('./routes/auth');
+const { verifyToken } = require('./middleware/auth');
+const User = require('./models/User');
+
 // API Routes
+app.get('/', (req, res) => {
+  const host = req.headers.host || 'localhost:3001';
+  const frontendHost = host.replace(':3001', ':8080');
+  res.redirect(`http://${frontendHost}/`);
+});
+
+app.use('/api/auth', authRoutes);
+
+// Protected Dashboard Route
+app.get('/api/dashboard', verifyToken, async (req, res) => {
+  try {
+    const user = await User.findById(req.user.userId).select('-password -refreshToken');
+    res.status(200).json({ message: 'Welcome to your dashboard', user });
+  } catch (error) {
+    res.status(500).json({ message: 'Error fetching user data' });
+  }
+});
+
+app.get('/api/check-auth', verifyToken, (req, res) => {
+  res.status(200).json({ authenticated: true, user: req.user });
+});
+
 app.post('/api/add-banner', async (req, res) => {
   try {
     const { title, imageUrl, link } = req.body;
     const cloudUrl = await uploadToCloudinary(imageUrl, 'gridox_banners');
-    
+
     const newBanner = new Banner({ title, imageUrl: cloudUrl, link });
     const savedBanner = await newBanner.save();
-    
+
     res.status(201).send({ message: 'Banner added successfully', data: savedBanner });
   } catch (error) {
     console.error('Error adding banner:', error);
-    res.status(500).send({ 
-       message: error.message.includes('authentication failed') 
-         ? 'Database Authentication Failed. Please check your password in .env' 
-         : 'Error adding banner to database',
-       error: error.message 
+    res.status(500).send({
+      message: error.message.includes('authentication failed')
+        ? 'Database Authentication Failed. Please check your password in .env'
+        : 'Error adding banner to database',
+      error: error.message
     });
   }
 });
@@ -158,10 +228,10 @@ app.get('/api/products', async (req, res) => {
     if (category) query.category = category;
     if (isNewArrival === 'true') query.isNewArrival = true;
     if (isBestSeller === 'true') query.isBestSeller = true;
-    
+
     // PROJECT fields to exclude heavy images (gallery) and long details when fetching a list
     const products = await Product.find(query)
-      .select('-gallery -details -__v') 
+      .select('-gallery -details -__v')
       .sort({ createdAt: -1 })
       .lean(); // Faster query execution
 
@@ -185,11 +255,11 @@ app.get('/api/products/:id', async (req, res) => {
 app.post('/api/add-product', async (req, res) => {
   try {
     const productData = req.body;
-    
+
     // Upload images to Cloudinary
     if (productData.image) productData.image = await uploadToCloudinary(productData.image, 'gridox_products');
     if (productData.gallery && Array.isArray(productData.gallery)) {
-        productData.gallery = await Promise.all(productData.gallery.map(img => uploadToCloudinary(img, 'gridox_products')));
+      productData.gallery = await Promise.all(productData.gallery.map(img => uploadToCloudinary(img, 'gridox_products')));
     }
 
     const newProduct = new Product(productData);
@@ -214,10 +284,10 @@ app.put('/api/products/:id', async (req, res) => {
   try {
     const { id } = req.params;
     const productData = req.body;
-    
+
     if (productData.image) productData.image = await uploadToCloudinary(productData.image, 'gridox_products');
     if (productData.gallery && Array.isArray(productData.gallery)) {
-        productData.gallery = await Promise.all(productData.gallery.map(img => uploadToCloudinary(img, 'gridox_products')));
+      productData.gallery = await Promise.all(productData.gallery.map(img => uploadToCloudinary(img, 'gridox_products')));
     }
 
     const updated = await Product.findByIdAndUpdate(id, productData, { new: true });
@@ -241,14 +311,14 @@ app.post('/api/add-category', async (req, res) => {
   try {
     const { name, thumbnailImage, description } = req.body;
     const cloudUrl = await uploadToCloudinary(thumbnailImage, 'gridox_categories');
-    
+
     const slug = name.toLowerCase().replace(/ /g, '-').replace(/[^\w-]+/g, '');
-    const newCategory = new Category({ 
-      name, 
+    const newCategory = new Category({
+      name,
       thumbnailImage: cloudUrl,
       image: cloudUrl, // sync for legacy
-      description, 
-      slug 
+      description,
+      slug
     });
     const saved = await newCategory.save();
     res.status(201).send({ message: 'Category added successfully', data: saved });
@@ -271,11 +341,11 @@ app.put('/api/categories/:id', async (req, res) => {
   try {
     const { id } = req.params;
     const { name, thumbnailImage, description } = req.body;
-    
+
     const updateData = { name, description };
     if (thumbnailImage && thumbnailImage.startsWith('data:')) {
-        updateData.thumbnailImage = await uploadToCloudinary(thumbnailImage, 'gridox_categories');
-        updateData.image = updateData.thumbnailImage;
+      updateData.thumbnailImage = await uploadToCloudinary(thumbnailImage, 'gridox_categories');
+      updateData.image = updateData.thumbnailImage;
     }
     if (name) updateData.slug = name.toLowerCase().replace(/ /g, '-').replace(/[^\w-]+/g, '');
 
@@ -291,17 +361,17 @@ app.get('/api/reels', async (req, res) => {
   try {
     // Return all reels, but we'll selectively clean the videoUrl in the results
     const reels = await Reel.find().populate('productId').sort({ createdAt: -1 });
-    
+
     const optimizedReels = reels.map(r => {
-        const reelObj = r.toObject();
-        // If it's heavy Base64, remove it from list to keep response small
-        if (reelObj.videoUrl && reelObj.videoUrl.startsWith('data:')) {
-            reelObj.videoUrl = ''; // Frontend will fetch it lazily
-            reelObj.isBase64 = true;
-        } else {
-            reelObj.isBase64 = false;
-        }
-        return reelObj;
+      const reelObj = r.toObject();
+      // If it's heavy Base64, remove it from list to keep response small
+      if (reelObj.videoUrl && reelObj.videoUrl.startsWith('data:')) {
+        reelObj.videoUrl = ''; // Frontend will fetch it lazily
+        reelObj.isBase64 = true;
+      } else {
+        reelObj.isBase64 = false;
+      }
+      return reelObj;
     });
 
     res.status(200).send(optimizedReels);
@@ -315,10 +385,10 @@ app.get('/api/reels/video/:id', async (req, res) => {
   try {
     const reel = await Reel.findById(req.params.id);
     if (!reel) return res.status(404).send('Not found');
-    
+
     // If it's a URL, redirect or return the URL
     if (!reel.videoUrl.startsWith('data:')) {
-        return res.status(200).send({ url: reel.videoUrl, isBase64: false });
+      return res.status(200).send({ url: reel.videoUrl, isBase64: false });
     }
 
     // If it's Base64, return it
@@ -334,9 +404,9 @@ app.post('/api/add-reel', async (req, res) => {
     if (!videoUrl || !productId) {
       return res.status(400).send({ message: 'Missing video or product association' });
     }
-    
+
     const cloudUrl = await uploadToCloudinary(videoUrl, 'gridox_reels', 'video');
-    
+
     const newReel = new Reel({ videoUrl: cloudUrl, videoType, productId, category });
     const saved = await newReel.save();
     res.status(201).send({ message: 'Reel added successfully', data: saved });
@@ -355,6 +425,189 @@ app.delete('/api/reels/:id', async (req, res) => {
   }
 });
 
-app.listen(PORT, () => {
-  console.log(`Server running on http://localhost:${PORT}`);
+// Instagram Feed Routes
+app.get('/api/instagram-posts', async (req, res) => {
+  try {
+    const posts = await InstagramPost.find().sort({ createdAt: -1 });
+    res.status(200).send(posts);
+  } catch (error) {
+    res.status(500).send({ message: 'Error fetching instagram posts', error: error.message });
+  }
+});
+
+app.post('/api/add-instagram-post', async (req, res) => {
+  try {
+    const { imageUrl, link } = req.body;
+    console.log('Instagram Upload Attempted. Link:', link);
+
+    if (!imageUrl) return res.status(400).send({ message: 'No image provided' });
+
+    const cloudUrl = await uploadToCloudinary(imageUrl, 'gridox_instagram');
+    const newPost = new InstagramPost({ imageUrl: cloudUrl, link });
+    const saved = await newPost.save();
+
+    console.log('Instagram Post Saved Successfully:', saved._id);
+    res.status(201).send({ message: 'Instagram post added successfully', data: saved });
+  } catch (error) {
+    console.error('SERVER ERROR (Instagram Upload):', error);
+    res.status(500).send({ message: 'Error adding instagram post', error: error.message });
+  }
+});
+
+app.delete('/api/instagram-posts/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    await InstagramPost.findByIdAndDelete(id);
+    res.status(200).send({ message: 'Instagram post removed successfully' });
+  } catch (error) {
+    res.status(500).send({ message: 'Error removing instagram post', error: error.message });
+  }
+});
+
+// OTP Route
+const nodemailer = require('nodemailer');
+
+app.post('/api/send-otp', async (req, res) => {
+  try {
+    const { email, otp } = req.body;
+    let messagesSent = [];
+    let isMock = false;
+
+    // --- EMAIL DISPATCH ---
+    if (email) {
+      const smtpUser = process.env.SMTP_EMAIL;
+      const smtpPass = process.env.SMTP_PASSWORD;
+      
+      if (smtpUser && smtpPass) {
+        const transporter = nodemailer.createTransport({
+          service: 'gmail', // Standard fallback, can configure different host depending on provider
+          auth: {
+            user: smtpUser,
+            pass: smtpPass
+          }
+        });
+
+        // Fire and forget email to avoid UI lag
+        transporter.sendMail({
+          from: `"Gridox Fashion" <${smtpUser}>`,
+          to: email,
+          subject: "Your Gridox Verification Code",
+          text: `Use this code to verify your account and get 10% off: ${otp}`,
+          html: `<div style="font-family: sans-serif; padding: 20px;">
+                  <h2 style="color: #000;">Gridox</h2>
+                  <p>Thanks for joining! Use the code below to verify your account:</p>
+                  <h1 style="letter-spacing: 5px; color: #000; background: #f4f4f4; padding: 10px; display: inline-block; border-radius: 5px;">${otp}</h1>
+                  <p>Get ready for exclusive fashion drops.</p>
+                 </div>`
+        }).then(() => console.log(`OTP emailed successfully to ${email}`))
+          .catch(err => console.error("OTP email failed:", err));
+          
+        messagesSent.push('email');
+      } else {
+        console.log(`SMTP keys missing! (mocking OTP dispatch): EMAIL to ${email} -> OTP: ${otp}`);
+        messagesSent.push('mock-email');
+        isMock = true;
+      }
+    } else {
+      return res.status(400).send({ message: 'Email is required' });
+    }
+
+    res.status(200).send({ 
+      success: true, 
+      message: isMock ? 'Mock OTP sent (Keys missing)' : 'OTP sent successfully',
+      dispatchedVia: messagesSent
+    });
+
+  } catch (error) {
+    console.error('Error sending OTP:', error);
+    res.status(500).send({ message: 'Error sending OTP', error: error.message });
+  }
+});
+
+// Lead Capture Route
+app.post('/api/leads', async (req, res) => {
+  try {
+    const { email, phone } = req.body;
+    if (!email) {
+      return res.status(400).send({ message: 'Email is required for lead generation' });
+    }
+
+    const newLead = new Lead({ email, phone });
+    const saved = await newLead.save();
+    console.log(`Lead Captured Successfully: ${email} | ${phone || 'No Phone'}`);
+    
+    // Setup Lead Notification Email
+    const smtpUser = process.env.SMTP_EMAIL;
+    const smtpPass = process.env.SMTP_PASSWORD;
+    if (smtpUser && smtpPass) {
+      const transporter = nodemailer.createTransport({
+        service: 'gmail',
+        auth: {
+          user: smtpUser,
+          pass: smtpPass
+        }
+      });
+
+      // Fire and forget lead notification to avoid UI lag
+      transporter.sendMail({
+        from: `"Gridox Notification" <${smtpUser}>`,
+        to: 'gogulpvt@gmail.com',
+        subject: "🎉 New Verified Lead Captured",
+        html: `<div style="font-family: sans-serif; padding: 20px; border: 1px solid #eee; max-width: 500px;">
+                <h2 style="color: #d11243; margin-top: 0;">New Lead Alert</h2>
+                <p>A new customer has successfully verified their email to claim the discount code.</p>
+                <div style="background: #f9f9f9; padding: 15px; border-radius: 5px; margin: 15px 0;">
+                  <p style="margin: 0 0 10px 0;"><strong>Email:</strong> <a href="mailto:${email}">${email}</a></p>
+                  <p style="margin: 0;"><strong>Phone:</strong> ${phone || '<i>Not provided</i>'}</p>
+                </div>
+                <p style="font-size: 12px; color: #888;">This lead has been saved to your MongoDB Atlas dashboard.</p>
+               </div>`
+      }).catch(err => console.error("Lead alert email failed:", err)); // Fail silently if mail errors out
+    }
+    
+    res.status(201).send({ message: 'Lead created successfully', data: saved });
+  } catch (error) {
+    console.error('Error creating lead:', error);
+    res.status(500).send({ message: 'Error creating lead', error: error.message });
+  }
+});
+
+// Fetch all leads
+app.get('/api/leads', async (req, res) => {
+  try {
+    const leads = await Lead.find().sort({ createdAt: -1 });
+    res.status(200).send(leads);
+  } catch (error) {
+    res.status(500).send({ message: 'Error fetching leads', error: error.message });
+  }
+});
+
+// Delete a lead
+app.delete('/api/leads/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    await Lead.findByIdAndDelete(id);
+    res.status(200).send({ message: 'Lead removed successfully' });
+  } catch (error) {
+    res.status(500).send({ message: 'Error removing lead', error: error.message });
+  }
+});
+
+// Serve static assets in production
+if (process.env.NODE_ENV === 'production') {
+  // Set static folder
+  app.use(express.static(path.join(__dirname, '../clientwebsite/dist')));
+
+  app.get('*', (req, res) => {
+    // If it's an API route that didn't match, let it fall through or error here
+    if (req.path.startsWith('/api')) {
+      return res.status(404).json({ message: 'API route not found' });
+    }
+    // Else serve the frontend index.html
+    res.sendFile(path.resolve(__dirname, '../clientwebsite', 'dist', 'index.html'));
+  });
+}
+
+app.listen(process.env.PORT || 3001, '0.0.0.0', () => {
+    console.log(`Server running on port ${process.env.PORT || 3001}`);
 });

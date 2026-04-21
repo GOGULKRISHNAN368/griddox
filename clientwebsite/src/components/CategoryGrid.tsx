@@ -34,8 +34,7 @@ const CategoryGrid: React.FC = () => {
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const apiBase = window.location.hostname === 'localhost' ? 'http://localhost:3001' : `http://${window.location.hostname}:3001`;
-        const response = await fetch(`${apiBase}/api/categories`);
+        const response = await fetch(`/api/categories`);
         const data = await response.json();
         setCategories(data.map((c: any) => ({
           id: c._id,

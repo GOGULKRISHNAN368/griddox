@@ -1,0 +1,102 @@
+.bulk-banner-section {
+    position: relative;
+    width: 100%;
+    height: 180px;
+    background-image: url('https://images.unsplash.com/photo-1558591710-4b4a1ae0f04d?q=80&w=2000&auto=format&fit=crop'); /* Aesthetic fabric/abstract background */
+    background-size: cover;
+    background-position: center;
+    display: flex;
+    align-items: center;
+    overflow: hidden;
+    margin: 40px 0;
+}
+
+.bulk-banner-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 40px;
+}
+
+.bulk-banner-content {
+    display: flex;
+    width: 100%;
+    max-width: 1400px;
+    justify-content: space-between;
+    align-items: center;
+    color: #e5e5e5;
+    text-align: center;
+    gap: 20px;
+}
+
+.bulk-banner-left h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 2.2rem;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    margin: 0;
+}
+
+.bulk-banner-center h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 2.8rem;
+    font-weight: 500;
+    font-style: italic;
+    margin: 0;
+    letter-spacing: 0.05em;
+    color: #d1b894; /* Elegant gold/bronze for Bulk */
+}
+
+.bulk-banner-right {
+    text-align: right;
+}
+
+.inquiry-text {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.85rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    margin: 0 0 4px 0;
+}
+
+.whatsapp-text {
+    font-family: 'Inter', sans-serif;
+    font-size: 1.1rem;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    margin: 0;
+}
+
+/* Responsive Styles */
+@media (max-width: 1024px) {
+    .bulk-banner-left h2 { font-size: 1.8rem; }
+    .bulk-banner-center h3 { font-size: 2.3rem; }
+}
+
+@media (max-width: 768px) {
+    .bulk-banner-section {
+        height: auto;
+        padding: 40px 10px;
+    }
+    
+    .bulk-banner-overlay {
+        position: relative;
+        background: rgba(0, 0, 0, 0.8);
+        padding: 20px;
+    }
+
+    .bulk-banner-content {
+        flex-direction: column;
+        gap: 30px;
+    }
+
+    .bulk-banner-right {
+        text-align: center;
+    }
+
+    .bulk-banner-left h2 { font-size: 1.5rem; }
+    .bulk-banner-center h3 { font-size: 2rem; }
+}

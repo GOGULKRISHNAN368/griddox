@@ -9,6 +9,13 @@ interface Banner {
   createdAt: string;
 }
 
+interface InstagramPost {
+  _id: string;
+  imageUrl: string;
+  link: string;
+  createdAt: string;
+}
+
 interface Product {
   _id: string;
   name: string;
@@ -36,14 +43,22 @@ interface Category {
   createdAt: string;
 }
 
-function App() {
-  const [activeTab, setActiveTab] = useState<'banners' | 'categories' | 'dresses' | 'reels'>('banners');
+interface Lead {
+  _id: string;
+  email: string;
+  phone?: string;
+  createdAt: string;
+}
+
+const App = () => {
+  const [activeTab, setActiveTab] = useState<'banners' | 'categories' | 'dresses' | 'reels' | 'instagram' | 'leads'>('banners');
   const [status, setStatus] = useState<{ message: string, type: 'success' | 'error' } | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [banners, setBanners] = useState<Banner[]>([]);
   const [products, setProducts] = useState<Product[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [reels, setReels] = useState<any[]>([]);
+  const [leads, setLeads] = useState<Lead[]>([]);
   const [editingId, setEditingId] = useState<string | null>(null);
   
   // Product Form State
@@ -76,7 +91,8 @@ function App() {
     category: ''
   });
 
-  const API_BASE = window.location.hostname === 'localhost' ? 'http://localhost:3001' : `http://${window.location.hostname}:3001`;
+  const API_BASE = '';
+
   const productInputRef = useRef<HTMLInputElement>(null);
   const galleryInputRef = useRef<HTMLInputElement>(null);
   const categoryThumbInputRef = useRef<HTMLInputElement>(null);
@@ -100,6 +116,10 @@ function App() {
       fetchReels();
       fetchProducts();
       fetchCategories();
+    } else if (activeTab === 'instagram') {
+      fetchInstagramPosts();
+    } else if (activeTab === 'leads') {
+      fetchLeads();
     }
   }, [activeTab]);
 
@@ -153,6 +173,88 @@ function App() {
       }
     } catch (error) {
       console.error('Error fetching reels:', error);
+    }
+  };
+
+  const [instagramPosts, setInstagramPosts] = useState<InstagramPost[]>([]);
+
+  const fetchInstagramPosts = async () => {
+    try {
+      const response = await fetch(`${API_BASE}/api/instagram-posts`);
+      if (response.ok) {
+        const data = await response.json();
+        setInstagramPosts(data);
+      }
+    } catch (error) {
+      console.error('Error fetching instagram posts:', error);
+    }
+  };
+
+  const handleInstagramUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    setIsLoading(true);
+    showStatus('Uploading to Instagram feed...', 'success');
+
+    try {
+      const base64 = await optimizeImage(file);
+      const response = await fetch(`${API_BASE}/api/add-instagram-post`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ imageUrl: base64, link: 'https://instagram.com/gridox.clothing' }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        showStatus('Instagram post added!');
+        fetchInstagramPosts();
+      } else {
+        showStatus(`Upload failed: ${data.message || 'Unknown error'}`, 'error');
+      }
+    } catch (error: any) {
+       showStatus(`Connection error: ${error.message}`, 'error');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleDeleteInstagram = async (id: string) => {
+    if (!confirm('Delete this post?')) return;
+    try {
+      const response = await fetch(`${API_BASE}/api/instagram-posts/${id}`, { method: 'DELETE' });
+      if (response.ok) {
+        showStatus('Post deleted.');
+        fetchInstagramPosts();
+      }
+    } catch (error) {
+      showStatus('Error.', 'error');
+    }
+  };
+
+  const fetchLeads = async () => {
+    try {
+      const response = await fetch(`${API_BASE}/api/leads`);
+      if (response.ok) {
+        const data = await response.json();
+        setLeads(data);
+      }
+    } catch (error) {
+      console.error('Error fetching leads:', error);
+    }
+  };
+
+  const handleDeleteLead = async (id: string) => {
+    if (!confirm('Mark as verified & remove?')) return;
+    try {
+      const response = await fetch(`${API_BASE}/api/leads/${id}`, { method: 'DELETE' });
+      if (response.ok) {
+        showStatus('Lead marked as verified and deleted.');
+        fetchLeads();
+      }
+    } catch (error) {
+      showStatus('Error removing lead.', 'error');
     }
   };
 
@@ -560,6 +662,12 @@ function App() {
             <li className={activeTab === 'reels' ? 'active' : ''} onClick={() => { setActiveTab('reels'); resetForms(); }}>
               <span className="icon">🎬</span> Reels
             </li>
+            <li className={activeTab === 'instagram' ? 'active' : ''} onClick={() => { setActiveTab('instagram'); resetForms(); }}>
+              <span className="icon">📸</span> Instagram
+            </li>
+            <li className={activeTab === 'leads' ? 'active' : ''} onClick={() => { setActiveTab('leads'); resetForms(); }}>
+              <span className="icon">📋</span> Leads
+            </li>
           </ul>
         </nav>
 
@@ -595,6 +703,7 @@ function App() {
                     <div className="upload-placeholder">
                         <span className="icon">➕</span>
                         <p>Upload New Banner</p>
+                        <p className="upload-hint">(Recommended: 1920x800)</p>
                     </div>
                 </div>
                 {banners.map(banner => (
@@ -628,7 +737,8 @@ function App() {
                         ) : (
                             <div className="upload-placeholder">
                                 <span className="icon">📁</span>
-                                <p>Category Image (Portrait)</p>
+                                <p>Category Image</p>
+                                <p className="upload-hint">(Recommended: 600x900 Portrait)</p>
                             </div>
                         )}
                         <input type="file" ref={categoryThumbInputRef} onChange={handleCategoryThumbImageSelect} style={{display:'none'}} accept="image/*" />
@@ -682,6 +792,7 @@ function App() {
                                     <div className="upload-placeholder">
                                         <span className="icon">📷</span>
                                         <p>Main Portrait Image</p>
+                                        <p className="upload-hint">(Ideal: 1200x1600)</p>
                                     </div>
                                 )}
                                 <input type="file" ref={productInputRef} onChange={handleProductImageSelect} style={{display:'none'}} accept="image/*" />
@@ -837,6 +948,59 @@ function App() {
                 <ReelAdminCard key={reel._id} reel={reel} API_BASE={API_BASE} onDelete={() => handleDeleteReel(reel._id)} />
               ))}
             </div>
+          </div>
+        )}
+
+        {activeTab === 'instagram' && (
+          <div className="fade-in">
+             <div className="content-grid">
+                <div className="upload-zone" onClick={() => {
+                   const input = document.createElement('input');
+                   input.type = 'file';
+                   input.accept = 'image/*';
+                   input.onchange = (e) => handleInstagramUpload(e as any);
+                   input.click();
+                }}>
+                    <div className="upload-placeholder">
+                        <span className="icon">📸</span>
+                        <p>Upload Instagram Post</p>
+                        <p className="upload-hint">(Ideal: 1080x1080 Square)</p>
+                    </div>
+                </div>
+                {instagramPosts.map(post => (
+                    <div key={post._id} className="item-card">
+                        <div className="item-image" style={{backgroundImage: `url("${post.imageUrl}")`}}></div>
+                        <div className="card-actions">
+                            <button className="btn-icon delete" onClick={() => handleDeleteInstagram(post._id)}>Remove</button>
+                        </div>
+                    </div>
+                ))}
+              </div>
+          </div>
+        )}
+
+        {activeTab === 'leads' && (
+          <div className="fade-in">
+             <div className="glass-card" style={{padding: '20px'}}>
+                 <h2 className="form-section-title">Collected Customer Leads</h2>
+                 <p style={{color: '#64748b', fontSize: '14px', marginBottom: '20px'}}>
+                    When customers verify their OTP, their contact data is stored here securely.
+                 </p>
+                 <div style={{display: 'flex', flexDirection: 'column', gap: '15px'}}>
+                    {leads.length === 0 ? <p style={{textAlign: 'center', opacity: 0.5}}>No leads captured yet.</p> : leads.map(lead => (
+                        <div key={lead._id} style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', backgroundColor: '#f8fafc', padding: '15px 20px', borderRadius: '8px', border: '1px solid #e2e8f0'}}>
+                            <div>
+                                <h3 style={{margin: '0 0 5px 0', fontSize: '18px'}}>{lead.email}</h3>
+                                <p style={{margin: 0, color: '#475569', fontSize: '14px'}}>📞 {lead.phone || 'No phone provided'}</p>
+                                <p style={{margin: '5px 0 0 0', color: '#94a3b8', fontSize: '12px'}}>🕒 {new Date(lead.createdAt).toLocaleString()}</p>
+                            </div>
+                            <button className="primary-btn" style={{padding: '8px 16px', width: 'auto'}} onClick={() => handleDeleteLead(lead._id)}>
+                                ✅ Verified
+                            </button>
+                        </div>
+                    ))}
+                 </div>
+             </div>
           </div>
         )}
 

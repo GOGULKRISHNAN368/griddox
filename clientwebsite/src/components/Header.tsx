@@ -1,14 +1,15 @@
-import { Search, ShoppingCart, Menu, X, MapPin } from "lucide-react";
-import { useState } from "react";
+import { Search, ShoppingCart, Menu, X, MapPin, User, LogOut, Package, Truck } from "lucide-react";
+
+import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { NAV_TARGETS } from "@/fixes/navConfig"; // fix: nav scroll links
+import SearchModal from "./SearchModal";
 
 const navLinks = [
   { name: "HOME" },
   { name: "NEW" },
   { name: "SHOP" },
-  { name: "TRACK ORDER" },
-  { name: "STORE LOCATOR" },
+  { name: "BULK QUERIES" },
   { name: "ABOUT US" },
 ];
 
@@ -31,6 +32,64 @@ function handleNavClick(name: string, navigate: ReturnType<typeof useNavigate>) 
 const Header = () => {
   const [menuOpen, setMenuOpen] = useState(false);
   const navigate = useNavigate(); // fix: nav scroll links
+  const [userData, setUserData] = useState<any>(null);
+  const [profileOpen, setProfileOpen] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
+  const [cartCount, setCartCount] = useState(0);
+  const profileRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const updateCartCount = () => {
+      const saved = localStorage.getItem('gridox_cart');
+      if (saved) {
+        try {
+          const items = JSON.parse(saved);
+          const count = items.reduce((sum: number, item: any) => sum + item.quantity, 0);
+          setCartCount(count);
+        } catch (e) {}
+      } else {
+        setCartCount(0);
+      }
+    };
+
+    updateCartCount();
+    window.addEventListener('cartUpdated', updateCartCount);
+    return () => window.removeEventListener('cartUpdated', updateCartCount);
+  }, []);
+
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        const response = await fetch('/api/dashboard', { credentials: 'include' });
+        if (response.ok) {
+          const data = await response.json();
+          setUserData(data.user);
+        }
+      } catch (error) {
+        // silently fail
+      }
+    };
+    fetchUserData();
+
+    const handleClickOutside = (event: MouseEvent) => {
+      if (profileRef.current && !profileRef.current.contains(event.target as Node)) {
+        setProfileOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  const handleLogout = async () => {
+    try {
+      await fetch('/api/auth/logout', { method: 'POST', credentials: 'include' });
+      setUserData(null);
+      setProfileOpen(false);
+      navigate('/');
+    } catch (error) {
+      console.error('Logout failed');
+    }
+  };
 
   return (
     <header className="bg-background border-b border-border sticky top-0 z-[1000]">
@@ -64,20 +123,72 @@ const Header = () => {
 
         {/* Icons */}
         <div className="flex items-center gap-4">
-          <button aria-label="Search" className="text-foreground hover:text-accent transition-colors">
+          <button aria-label="Search" onClick={() => setSearchOpen(true)} className="text-foreground hover:text-accent transition-colors">
             <Search size={20} />
           </button>
-          <button 
-            aria-label="Store Locator" 
-            onClick={() => navigate("/store-locator")} 
-            className="text-foreground hover:text-accent transition-colors"
-          >
-            <MapPin size={20} />
-          </button>
+
+          {userData ? (
+            <div className="relative" ref={profileRef}>
+              <button
+                aria-label="Profile Menu"
+                onClick={() => setProfileOpen(!profileOpen)}
+                className="w-8 h-8 rounded-full bg-rose-50 border border-rose-100 flex items-center justify-center text-[#8b231a] font-bold hover:bg-rose-100 transition-colors cursor-pointer"
+              >
+                {userData.name.charAt(0).toUpperCase()}
+              </button>
+
+              {profileOpen && (
+                <div className="absolute right-0 mt-2 w-64 bg-white rounded-2xl shadow-xl border border-gray-100 py-2 z-50 animate-in fade-in slide-in-from-top-2 duration-200">
+                  <div className="px-4 py-3 border-b border-gray-50 flex flex-col">
+                    <span className="text-sm font-bold text-gray-900 truncate">{userData.name}</span>
+                    <span className="text-xs text-gray-500 truncate">{userData.email}</span>
+                  </div>
+                  <div className="p-2 flex flex-col gap-1">
+                    <button
+                      onClick={() => { setProfileOpen(false); navigate('/'); }}
+                      className="w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-xl flex items-center gap-2 transition-colors cursor-pointer border-none bg-transparent"
+                    >
+                      <Package size={16} className="opacity-70" />
+                      My Orders
+                    </button>
+                    <button
+                      onClick={() => { setProfileOpen(false); navigate('/'); }}
+                      className="w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-xl flex items-center gap-2 transition-colors cursor-pointer border-none bg-transparent"
+                    >
+                      <Truck size={16} className="opacity-70" />
+                      Track Orders
+                    </button>
+                    <div className="h-[1px] bg-gray-100 my-1 mx-2"></div>
+                    <button
+                      onClick={handleLogout}
+                      className="w-full text-left px-3 py-2 text-sm text-red-600 hover:bg-red-50 rounded-xl flex items-center gap-2 transition-colors cursor-pointer border-none bg-transparent"
+                    >
+                      <LogOut size={16} />
+                      Logout
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+          ) : (
+            <button
+              aria-label="Account"
+              onClick={() => navigate("/auth")}
+              className="text-foreground hover:text-accent transition-colors"
+            >
+              <User size={20} />
+            </button>
+          )}
 
           <button aria-label="Cart" onClick={() => navigate("/cart")} className="text-foreground hover:text-accent transition-colors relative"> {/* fix: cart route */}
             <ShoppingCart size={20} />
+            {cartCount > 0 && (
+              <span className="absolute -top-2 -right-2 bg-[#8b231a] text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center">
+                {cartCount}
+              </span>
+            )}
           </button>
+
         </div>
       </div>
 
@@ -95,6 +206,9 @@ const Header = () => {
           ))}
         </nav>
       )}
+
+      {/* Search Modal */}
+      <SearchModal isOpen={searchOpen} onClose={() => setSearchOpen(false)} />
     </header>
   );
 };

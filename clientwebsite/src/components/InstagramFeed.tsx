@@ -12,21 +12,33 @@ const InstagramFeed: React.FC = () => {
     }
   };
 
+  const [posts, setPosts] = React.useState<any[]>([]);
+
+  React.useEffect(() => {
+    fetch(`/api/instagram-posts`)
+      .then(res => res.json())
+      .then(data => {
+          if (data && data.length > 0) setPosts(data);
+          else setPosts(mockPosts); // Fallback
+      })
+      .catch(() => setPosts(mockPosts)); // Fallback on error
+  }, []);
+
   const INSTA_URL = "https://www.instagram.com/gridox.clothing?igsh=MWhqN2ZoNHM4ODI3aQ==";
 
-  // Mock data for Instagram posts
-  const posts = [
-    { id: 1, image: "https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=600", username: "gridox.clothing" },
-    { id: 2, image: "https://images.unsplash.com/photo-1483985988355-763728e1935b?w=600", username: "gridox.clothing" },
-    { id: 3, image: "https://images.unsplash.com/photo-1496747611176-843222e1e57c?w=600", username: "gridox.clothing" },
-    { id: 4, image: "https://images.unsplash.com/photo-1539109132314-34a95bfad718?w=600", username: "gridox.clothing" },
-    { id: 5, image: "https://images.unsplash.com/photo-1534033641177-111042981cc1?w=600", username: "gridox.clothing" },
-    { id: 6, image: "https://images.unsplash.com/photo-1509631179647-0177331693ae?w=600", username: "gridox.clothing" }
+  // Static fallback data
+  const mockPosts = [
+    { _id: "m1", imageUrl: "https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=600" },
+    { _id: "m2", imageUrl: "https://images.unsplash.com/photo-1483985988355-763728e1935b?w=600" },
+    { _id: "m3", imageUrl: "https://images.unsplash.com/photo-1496747611176-843222e1e57c?w=600" },
+    { _id: "m4", imageUrl: "https://images.unsplash.com/photo-1539109132314-34a95bfad718?w=600" },
+    { _id: "m5", imageUrl: "https://images.unsplash.com/photo-1534033641177-111042981cc1?w=600" },
+    { _id: "m6", imageUrl: "https://images.unsplash.com/photo-1509631179647-0177331693ae?w=600" }
   ];
 
   return (
     <section className="insta-feed-section">
-      <h2 className="insta-feed-title">BEST OF INSTAGRAM</h2>
+      <h2 className="insta-feed-title">STYLED FOR EVERY MOMENT</h2>
       
       <div className="insta-grid-wrapper">
         <div className="insta-posts-grid" ref={gridRef}>
@@ -42,7 +54,7 @@ const InstagramFeed: React.FC = () => {
                       </div>
                     </div>
                     <div className="insta-user-meta">
-                      <span className="insta-username">{post.username}</span>
+                      <span className="insta-username">gridox.clothing</span>
                     </div>
                   </div>
                   <MoreHorizontal size={16} className="insta-more-icon" />
@@ -52,7 +64,7 @@ const InstagramFeed: React.FC = () => {
               {/* Content Area - Clickable */}
               <a href={INSTA_URL} target="_blank" rel="noopener noreferrer" className="insta-image-link">
                 <div className="insta-image-container group">
-                  <img src={post.image} alt="Instagram Post" className="insta-post-image" />
+                  <img src={post.imageUrl || post.image} alt="Instagram Post" className="insta-post-image" />
                 </div>
               </a>
 

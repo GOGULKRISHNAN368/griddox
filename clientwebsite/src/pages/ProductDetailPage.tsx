@@ -1,4 +1,4 @@
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, useNavigate } from "react-router-dom";
 import { Heart, ChevronLeft, Truck, RotateCcw, Shield, Banknote } from "lucide-react";
 import { Helmet } from "react-helmet-async";
 import { useState, useEffect } from "react";
@@ -25,6 +25,7 @@ interface Product {
 
 const ProductDetailPage = () => {
   const { productId } = useParams<{ slug: string; productId: string }>();
+  const navigate = useNavigate();
   const [product, setProduct] = useState<Product | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [selectedSize, setSelectedSize] = useState<string | null>(null);
@@ -34,8 +35,7 @@ const ProductDetailPage = () => {
     window.scrollTo(0, 0);
     const fetchProduct = async () => {
       try {
-        const apiBase = window.location.hostname === 'localhost' ? 'http://localhost:3001' : `http://${window.location.hostname}:3001`;
-        const response = await fetch(`${apiBase}/api/products/${productId}`);
+        const response = await fetch(`/api/products/${productId}`);
         const found = await response.json();
         setProduct(found);
       } catch (error) {
@@ -76,6 +76,33 @@ const ProductDetailPage = () => {
       toast.error("Please select a size");
       return;
     }
+    
+    const currentCartStr = localStorage.getItem('gridox_cart');
+    let cart = [];
+    if (currentCartStr) {
+      try { cart = JSON.parse(currentCartStr); } catch (e) {}
+    }
+    
+    const newItem = {
+      id: `${product._id}-${selectedSize || 'Standard'}`,
+      productId: product._id,
+      name: product.name,
+      price: product.price,
+      quantity: 1,
+      image: product.image,
+      size: selectedSize || 'Standard'
+    };
+    
+    const existingIndex = cart.findIndex(i => i.id === newItem.id);
+    if (existingIndex >= 0) {
+      cart[existingIndex].quantity += 1;
+    } else {
+      cart.push(newItem);
+    }
+    
+    localStorage.setItem('gridox_cart', JSON.stringify(cart));
+    window.dispatchEvent(new Event('cartUpdated'));
+    
     toast.success("Added to bag!", {
       description: `${product.name} - ${selectedSize || "Standard"}`,
     });
@@ -86,7 +113,8 @@ const ProductDetailPage = () => {
       toast.error("Please select a size");
       return;
     }
-    toast.info("Redirecting to checkout...");
+    handleAddToBag();
+    navigate('/cart');
   };
 
   return (

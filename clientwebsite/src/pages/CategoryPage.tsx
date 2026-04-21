@@ -24,8 +24,7 @@ const CategoryPage = () => {
     window.scrollTo(0, 0);
     const fetchProducts = async () => {
       try {
-        const apiBase = window.location.hostname === 'localhost' ? 'http://localhost:3001' : `http://${window.location.hostname}:3001`;
-        const response = await fetch(`${apiBase}/api/products?category=${slug}`);
+        const response = await fetch(`/api/products?category=${slug}`);
         const data = await response.json();
         setProducts(data);
       } catch (error) {

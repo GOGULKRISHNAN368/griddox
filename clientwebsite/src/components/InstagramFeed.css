@@ -6,11 +6,12 @@
 .insta-feed-title {
   text-align: center;
   font-family: 'Playfair Display', serif;
-  font-size: 2rem;
-  font-weight: 500;
-  margin-bottom: 3.5rem;
-  color: #1a1a1a;
-  letter-spacing: 0.1em;
+  font-size: 1.5rem;
+  font-weight: 400;
+  margin-bottom: 3rem;
+  color: #2c2c2c;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
 }
 
 .insta-grid-wrapper {
