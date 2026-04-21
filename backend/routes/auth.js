@@ -196,9 +196,9 @@ router.get('/google/callback', (req, res, next) => {
       maxAge: 7 * 24 * 60 * 60 * 1000
     });
 
-    res.redirect('/');
+    res.redirect('https://gridox-store.vercel.app');
   } catch (error) {
-    res.redirect('/auth?error=token_err');
+    res.redirect('https://gridox-store.vercel.app/auth?error=token_err');
   }
 });
 
