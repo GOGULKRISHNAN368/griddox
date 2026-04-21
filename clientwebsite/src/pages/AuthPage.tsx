@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
 
-const API_URL = '/api';
+const API_URL = 'https://griddox-1.onrender.com/api';
 
 const AuthPage = () => {
   const [isLogin, setIsLogin] = useState(true);

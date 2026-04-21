@@ -151,8 +151,8 @@ router.get('/google', (req, res, next) => {
   if (req.headers.host.includes('localhost') || req.headers.host.includes('127.0.0.1')) {
     callbackURL = 'http://localhost:8080/api/auth/google/callback';
   } else {
-    // CRITICAL: Point to Vercel so the Set-Cookie domain matches the storefront
-    callbackURL = 'https://gridox-store.vercel.app/api/auth/google/callback';
+    // AS REQUESTED: Use ONLY the Render callback for production
+    callbackURL = 'https://griddox-1.onrender.com/api/auth/google/callback';
   }
   
   passport.authenticate('google', { 
@@ -166,8 +166,8 @@ router.get('/google/callback', (req, res, next) => {
   if (req.headers.host.includes('localhost') || req.headers.host.includes('127.0.0.1')) {
     callbackURL = 'http://localhost:8080/api/auth/google/callback';
   } else {
-    // CRITICAL: Must match the initiating URL exactly
-    callbackURL = 'https://gridox-store.vercel.app/api/auth/google/callback';
+    // AS REQUESTED: Points exclusively to Render
+    callbackURL = 'https://griddox-1.onrender.com/api/auth/google/callback';
   }
 
   passport.authenticate('google', { 
@@ -179,6 +179,7 @@ router.get('/google/callback', (req, res, next) => {
   try {
     const { accessToken, refreshToken } = generateTokens(req.user);
     
+    // Cookie setup for cross-domain mobile stability
     res.cookie('accessToken', accessToken, {
       httpOnly: true,
       secure: true,
@@ -193,7 +194,8 @@ router.get('/google/callback', (req, res, next) => {
       maxAge: 7 * 24 * 60 * 60 * 1000
     });
 
-    res.redirect('https://gridox-store.vercel.app');
+    // AS REQUESTED: Redirect back to the Frontend (Vercel)
+    res.redirect('https://gridox-store.vercel.app/');
   } catch (error) {
     res.redirect('https://gridox-store.vercel.app/auth?error=token_err');
   }
