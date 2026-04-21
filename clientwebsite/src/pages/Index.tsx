@@ -38,18 +38,22 @@ const Index = () => {
         <AnnouncementBar />
       </div>
 
-      <HeroCarousel />
+      <div className="animate-in fade-in duration-700 ease-out fill-mode-both">
+        <HeroCarousel />
+      </div>
 
       {/* Announcement Bar - Mobile Bottom (Below Carousel) */}
       <div className="md:hidden">
         <AnnouncementBar />
       </div>
 
-      <div id="new-arrivals"><NewIn /></div>
-      <CategoryGrid />
-      <CuratedLooks />
-      <BestSellers />
-      <BulkOrderBanner />
+      <div className="animate-in fade-in slide-in-from-bottom-4 duration-1000 delay-300 fill-mode-both">
+        <div id="new-arrivals"><NewIn /></div>
+        <CategoryGrid />
+        <CuratedLooks />
+        <BestSellers />
+        <BulkOrderBanner />
+      </div>
 
       <Suspense fallback={<SectionSkeleton />}>
         <Reels />

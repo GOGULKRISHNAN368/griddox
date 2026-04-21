@@ -63,7 +63,8 @@ const HeroCarousel = () => {
 
   return (
     <div
-      className="relative w-full overflow-hidden select-none cursor-grab active:cursor-grabbing bg-white"
+      className="relative w-full aspect-[16/9] md:aspect-[21/9] min-h-[300px] md:min-h-[500px] overflow-hidden select-none cursor-grab active:cursor-grabbing bg-[#FDFBF9]"
+      style={{ isolation: 'isolate' }}
       onTouchStart={(e) => setTouchStart(e.targetTouches[0].clientX)}
       onTouchMove={(e) => setTouchEnd(e.targetTouches[0].clientX)}
       onTouchEnd={handleSwipeEnd}
@@ -104,7 +105,6 @@ const HeroCarousel = () => {
             >
               <OptimizedImage
                 src={shouldLoad ? slide.imageUrl : ""}
-               fallbackSrc={slide.imageUrl} // Optional placeholder
                 alt={slide.title || "Banner"}
                 priority={i === 0}
                 className="w-full h-auto object-contain"
