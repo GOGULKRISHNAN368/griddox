@@ -33,9 +33,17 @@ const OptimizedImage: React.FC<OptimizedImageProps> = ({
     if (onClick) onClick(e);
   };
 
+  // Apply Cloudinary transformations if it's a Cloudinary URL
+  let optimizedSrc = src;
+  if (src && src.includes('cloudinary.com')) {
+    // Inject f_auto (format) and q_auto (quality)
+    // Works with upload/v1234/path format
+    optimizedSrc = src.replace('/upload/', '/upload/f_auto,q_auto,w_1600/');
+  }
+
   return (
     <img
-      src={src}
+      src={optimizedSrc}
       alt={alt}
       className={className}
       loading={priority ? "eager" : "lazy"}
