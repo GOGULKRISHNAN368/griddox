@@ -595,15 +595,22 @@ app.delete('/api/leads/:id', async (req, res) => {
 
 // Serve static assets in production
 if (process.env.NODE_ENV === 'production') {
-  // Set static folder
+  // 1. Set static folder for Owner Site (Must come first!)
+  app.use('/owner', express.static(path.join(__dirname, '../ownersite/dist')));
+
+  // 2. Set static folder for Client Site
   app.use(express.static(path.join(__dirname, '../clientwebsite/dist')));
 
+  // Handle Owner Site Routing
+  app.get('/owner/*', (req, res) => {
+    res.sendFile(path.resolve(__dirname, '../ownersite', 'dist', 'index.html'));
+  });
+
+  // Handle Client Site Routing
   app.get('*', (req, res) => {
-    // If it's an API route that didn't match, let it fall through or error here
     if (req.path.startsWith('/api')) {
       return res.status(404).json({ message: 'API route not found' });
     }
-    // Else serve the frontend index.html
     res.sendFile(path.resolve(__dirname, '../clientwebsite', 'dist', 'index.html'));
   });
 }
