@@ -36,14 +36,14 @@ const OptimizedImage: React.FC<OptimizedImageProps> = ({
   // Apply Cloudinary transformations if it's a Cloudinary URL
   let optimizedSrc = src;
   if (src && src.includes('cloudinary.com')) {
-    // Inject f_auto (format), q_auto (quality), and a sensible width
-    const width = priority ? '1200' : '800';
-    optimizedSrc = src.replace('/upload/', `/upload/f_auto,q_auto,w_${width}/`);
+    // Inject f_auto (format), q_80 (requested quality range 75-85), and resolution
+    const width = priority ? '1920' : '800';
+    optimizedSrc = src.replace('/upload/', `/upload/f_auto,q_80,w_${width}/`);
   }
 
   // Create a tiny blur placeholder URL
   const lowResSrc = src && src.includes('cloudinary.com') 
-    ? src.replace('/upload/', '/upload/f_auto,q_auto,w_50,e_blur:1000/')
+    ? src.replace('/upload/', '/upload/f_auto,q_10,w_50,e_blur:1000/')
     : src;
 
   return (

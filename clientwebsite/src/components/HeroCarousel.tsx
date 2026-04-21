@@ -45,7 +45,7 @@ const HeroCarousel = () => {
             // Match the Cloudinary optimization used in OptimizedImage
             const firstImg = data[0].imageUrl;
             if (firstImg.includes('cloudinary.com')) {
-              preloadLink.href = firstImg.replace('/upload/', '/upload/f_auto,q_auto,w_1200/');
+              preloadLink.href = firstImg.replace('/upload/', '/upload/f_auto,q_80,w_1920/');
             } else {
               preloadLink.href = firstImg;
             }
