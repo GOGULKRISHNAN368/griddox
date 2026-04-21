@@ -36,6 +36,20 @@ const HeroCarousel = () => {
           const data = await response.json();
           if (data && data.length > 0) {
             setSlides(data);
+            
+            // 🔥 Dynamic Preload (Best Practice #6)
+            // Preload the very first banner image as soon as we know the URL
+            const preloadLink = document.createElement("link");
+            preloadLink.rel = "preload";
+            preloadLink.as = "image";
+            // Match the Cloudinary optimization used in OptimizedImage
+            const firstImg = data[0].imageUrl;
+            if (firstImg.includes('cloudinary.com')) {
+              preloadLink.href = firstImg.replace('/upload/', '/upload/f_auto,q_auto,w_1200/');
+            } else {
+              preloadLink.href = firstImg;
+            }
+            document.head.appendChild(preloadLink);
           }
         }
       } catch (error) {
