@@ -2,13 +2,13 @@ import { lazy, Suspense } from "react";
 import { Helmet } from "react-helmet-async";
 import Header from "@/components/Header";
 import HeroCarousel from "@/components/HeroCarousel";
-import CategoryGrid from "@/components/CategoryGrid";
 import AnnouncementBar from "@/components/AnnouncementBar";
-import BestSellers from "@/components/BestSellers";
-import CuratedLooks from "@/components/CuratedLooks";
-import BulkOrderBanner from "@/components/BulkOrderBanner";
 import NewIn from "@/components/NewIn";
-
+ 
+const CategoryGrid = lazy(() => import("@/components/CategoryGrid"));
+const BestSellers = lazy(() => import("@/components/BestSellers"));
+const CuratedLooks = lazy(() => import("@/components/CuratedLooks"));
+const BulkOrderBanner = lazy(() => import("@/components/BulkOrderBanner"));
 const Reels = lazy(() => import("@/components/Reels"));
 const InstagramFeed = lazy(() => import("@/components/InstagramFeed"));
 const CustomerReviews = lazy(() => import("@/components/CustomerReviews"));
@@ -49,13 +49,13 @@ const Index = () => {
 
       <div className="animate-in fade-in slide-in-from-bottom-4 duration-1000 delay-300 fill-mode-both">
         <div id="new-arrivals"><NewIn /></div>
+      </div>
+
+      <Suspense fallback={<SectionSkeleton />}>
         <CategoryGrid />
         <CuratedLooks />
         <BestSellers />
         <BulkOrderBanner />
-      </div>
-
-      <Suspense fallback={<SectionSkeleton />}>
         <Reels />
         <InstagramFeed />
         <CustomerReviews />
