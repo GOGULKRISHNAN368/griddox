@@ -81,8 +81,7 @@ const HeroCarousel = () => {
     setTouchEnd(0);
   }, [touchStart, touchEnd, slides.length]);
 
-  if (slides.length === 0) return null;
-
+  // Always render the container even if fetching (to avoid layout shift)
   return (
     <div
       className="relative w-full aspect-[16/9] md:aspect-[21/9] min-h-[300px] md:min-h-[500px] overflow-hidden select-none cursor-grab active:cursor-grabbing bg-[#FDFBF9]"
