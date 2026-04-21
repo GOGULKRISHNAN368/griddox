@@ -7,9 +7,7 @@ import AnnouncementBar from "@/components/AnnouncementBar";
 import BestSellers from "@/components/BestSellers";
 import CuratedLooks from "@/components/CuratedLooks";
 import BulkOrderBanner from "@/components/BulkOrderBanner";
-
-// Lazy load below-the-fold components
-const NewIn = lazy(() => import("@/components/NewIn"));
+import NewIn from "@/components/NewIn";
 
 const Reels = lazy(() => import("@/components/Reels"));
 const InstagramFeed = lazy(() => import("@/components/InstagramFeed"));
@@ -47,13 +45,13 @@ const Index = () => {
         <AnnouncementBar />
       </div>
 
-      <Suspense fallback={<SectionSkeleton />}>
-        <div id="new-arrivals"><NewIn /></div>
-        <CategoryGrid />
-        <CuratedLooks />
-        <BestSellers />
-        <BulkOrderBanner />
+      <div id="new-arrivals"><NewIn /></div>
+      <CategoryGrid />
+      <CuratedLooks />
+      <BestSellers />
+      <BulkOrderBanner />
 
+      <Suspense fallback={<SectionSkeleton />}>
         <Reels />
         <InstagramFeed />
         <CustomerReviews />
