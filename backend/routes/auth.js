@@ -147,16 +147,17 @@ router.post('/logout', async (req, res) => {
 /* --- GOOGLE OAUTH ROUTES --- */
 
 router.get('/google', (req, res, next) => {
-  const host = req.headers.host.includes('3001') 
-    ? req.headers.host.replace(':3001', ':8080') 
-    : req.headers.host;
-    
-  const protocol = req.headers['x-forwarded-proto'] || req.protocol;
-  const callbackURL = `${protocol}://${host}/api/auth/google/callback`;
+  // Determine the correct callback URL based on environment
+  let callbackURL;
+  if (req.headers.host.includes('localhost') || req.headers.host.includes('127.0.0.1')) {
+    callbackURL = 'http://localhost:8080/api/auth/google/callback';
+  } else {
+    // Force the Render URL as the source of truth for production callback
+    callbackURL = 'https://griddox-1.onrender.com/api/auth/google/callback';
+  }
   
   console.log('🔍 GOOGLE AUTH ATTEMPT');
-  console.log('   Host:', host);
-  console.log('   Callback:', callbackURL);
+  console.log('   Final Callback URL:', callbackURL);
 
   passport.authenticate('google', { 
     scope: ['profile', 'email'],
@@ -165,16 +166,15 @@ router.get('/google', (req, res, next) => {
 });
 
 router.get('/google/callback', (req, res, next) => {
-  // Use a more robust way to capture the host that matches the initiating request
-  const host = req.headers.host.includes('3001') 
-    ? req.headers.host.replace(':3001', ':8080') 
-    : req.headers.host;
-    
-  const protocol = req.headers['x-forwarded-proto'] || req.protocol;
-  const callbackURL = `${protocol}://${host}/api/auth/google/callback`;
+  let callbackURL;
+  if (req.headers.host.includes('localhost') || req.headers.host.includes('127.0.0.1')) {
+    callbackURL = 'http://localhost:8080/api/auth/google/callback';
+  } else {
+    callbackURL = 'https://griddox-1.onrender.com/api/auth/google/callback';
+  }
 
   passport.authenticate('google', { 
-    failureRedirect: '/auth?error=google_failed', 
+    failureRedirect: 'https://gridox-store.vercel.app/auth?error=google_failed', 
     session: false,
     callbackURL: callbackURL 
   })(req, res, next);
