@@ -37,15 +37,15 @@ router.post('/signup', async (req, res) => {
 
     res.cookie('accessToken', tokens.accessToken, {
       httpOnly: true,
-      secure: false,
-      sameSite: 'lax',
+      secure: true,
+      sameSite: 'none',
       maxAge: 15 * 60 * 1000
     });
 
     res.cookie('refreshToken', tokens.refreshToken, {
       httpOnly: true,
-      secure: false,
-      sameSite: 'lax',
+      secure: true,
+      sameSite: 'none',
       maxAge: 7 * 24 * 60 * 60 * 1000
     });
 
@@ -75,15 +75,15 @@ router.post('/login', async (req, res) => {
 
     res.cookie('accessToken', tokens.accessToken, {
       httpOnly: true,
-      secure: false,
-      sameSite: 'lax',
+      secure: true,
+      sameSite: 'none',
       maxAge: 15 * 60 * 1000
     });
 
     res.cookie('refreshToken', tokens.refreshToken, {
       httpOnly: true,
-      secure: false,
-      sameSite: 'lax',
+      secure: true,
+      sameSite: 'none',
       maxAge: 7 * 24 * 60 * 60 * 1000
     });
 
@@ -112,15 +112,15 @@ router.post('/refresh-token', async (req, res) => {
 
     res.cookie('accessToken', tokens.accessToken, {
       httpOnly: true,
-      secure: false,
-      sameSite: 'lax',
+      secure: true,
+      sameSite: 'none',
       maxAge: 15 * 60 * 1000
     });
 
     res.cookie('refreshToken', tokens.refreshToken, {
       httpOnly: true,
-      secure: false,
-      sameSite: 'lax',
+      secure: true,
+      sameSite: 'none',
       maxAge: 7 * 24 * 60 * 60 * 1000
     });
 
@@ -139,26 +139,21 @@ router.post('/logout', async (req, res) => {
       await User.findByIdAndUpdate(decoded.userId, { $unset: { refreshToken: 1 } });
     }
   }
-  res.clearCookie('accessToken');
-  res.clearCookie('refreshToken');
+  res.clearCookie('accessToken', { secure: true, sameSite: 'none' });
+  res.clearCookie('refreshToken', { secure: true, sameSite: 'none' });
   res.status(200).json({ message: 'Logged out successfully' });
 });
 
 /* --- GOOGLE OAUTH ROUTES --- */
 
 router.get('/google', (req, res, next) => {
-  // Determine the correct callback URL based on environment
   let callbackURL;
   if (req.headers.host.includes('localhost') || req.headers.host.includes('127.0.0.1')) {
     callbackURL = 'http://localhost:8080/api/auth/google/callback';
   } else {
-    // Force the Render URL as the source of truth for production callback
     callbackURL = 'https://griddox-1.onrender.com/api/auth/google/callback';
   }
   
-  console.log('🔍 GOOGLE AUTH ATTEMPT');
-  console.log('   Final Callback URL:', callbackURL);
-
   passport.authenticate('google', { 
     scope: ['profile', 'email'],
     callbackURL: callbackURL
@@ -184,15 +179,15 @@ router.get('/google/callback', (req, res, next) => {
     
     res.cookie('accessToken', accessToken, {
       httpOnly: true,
-      secure: false,
-      sameSite: 'lax',
+      secure: true,
+      sameSite: 'none',
       maxAge: 15 * 60 * 1000
     });
 
     res.cookie('refreshToken', refreshToken, {
       httpOnly: true,
-      secure: false,
-      sameSite: 'lax',
+      secure: true,
+      sameSite: 'none',
       maxAge: 7 * 24 * 60 * 60 * 1000
     });
 
