@@ -90,19 +90,28 @@ const HeroCarousel = () => {
         className="flex transition-transform duration-700 ease-in-out"
         style={{ transform: `translateX(-${current * 100}%)` }}
       >
-        {slides.map((slide, i) => (
-          <div
-            key={i}
-            className="relative w-full flex-shrink-0 overflow-hidden flex items-center justify-center p-0"
-          >
-            <OptimizedImage
-              src={slide.imageUrl}
-              alt={slide.title || "Banner"}
-              priority={i === 0}
-              className="w-full h-auto object-contain"
-            />
-          </div>
-        ))}
+        {slides.map((slide, i) => {
+          // Logic: Only load the image if it's the current slide, or the one right before/after it
+          const isActive = i === current;
+          const isNext = i === (current + 1) % slides.length;
+          const isPrev = i === (current - 1 + slides.length) % slides.length;
+          const shouldLoad = isActive || isNext || isPrev;
+
+          return (
+            <div
+              key={i}
+              className="relative w-full flex-shrink-0 overflow-hidden flex items-center justify-center p-0"
+            >
+              <OptimizedImage
+                src={shouldLoad ? slide.imageUrl : ""}
+               fallbackSrc={slide.imageUrl} // Optional placeholder
+                alt={slide.title || "Banner"}
+                priority={i === 0}
+                className="w-full h-auto object-contain"
+              />
+            </div>
+          );
+        })}
       </div>
 
       {/* Pagination Dots */}
