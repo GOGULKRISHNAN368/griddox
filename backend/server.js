@@ -151,13 +151,6 @@ const authRoutes = require('./routes/auth');
 const { verifyToken } = require('./middleware/auth');
 const User = require('./models/User');
 
-// API Routes
-app.get('/', (req, res) => {
-  const host = req.headers.host || 'localhost:3001';
-  const frontendHost = host.replace(':3001', ':8080');
-  res.redirect(`http://${frontendHost}/`);
-});
-
 app.use('/api/auth', authRoutes);
 
 // Protected Dashboard Route
