@@ -593,27 +593,9 @@ app.delete('/api/leads/:id', async (req, res) => {
   }
 });
 
-// Serve static assets in production
-if (process.env.NODE_ENV === 'production') {
-  // 1. Set static folder for Owner Site (Must come first!)
-  app.use('/owner', express.static(path.join(__dirname, '../ownersite/dist')));
-
-  // 2. Set static folder for Client Site
-  app.use(express.static(path.join(__dirname, '../clientwebsite/dist')));
-
-  // Handle Owner Site Routing
-  app.get('/owner/*', (req, res) => {
-    res.sendFile(path.resolve(__dirname, '../ownersite', 'dist', 'index.html'));
-  });
-
-  // Handle Client Site Routing
-  app.get('*', (req, res) => {
-    if (req.path.startsWith('/api')) {
-      return res.status(404).json({ message: 'API route not found' });
-    }
-    res.sendFile(path.resolve(__dirname, '../clientwebsite', 'dist', 'index.html'));
-  });
-}
+app.get('/', (req, res) => {
+  res.status(200).json({ message: 'Gridox API is running' });
+});
 
 app.listen(process.env.PORT || 3001, '0.0.0.0', () => {
     console.log(`Server running on port ${process.env.PORT || 3001}`);
