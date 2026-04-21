@@ -12,7 +12,15 @@ interface Banner {
 }
 
 const HeroCarousel = () => {
-  const [slides, setSlides] = useState<Banner[]>([]);
+  // Static fallback banner to show instantly while Render wakes up
+  const [slides, setSlides] = useState<Banner[]>([
+    {
+      imageUrl: "https://res.cloudinary.com/dts769o9h/image/upload/v1721564400/static_banner_placeholder.jpg",
+      title: "Premium Fashion Collection",
+      subtitle: "Discover Your Style",
+      cta: "Explore Now"
+    }
+  ]);
   const [current, setCurrent] = useState(0);
 
   const [touchStart, setTouchStart] = useState(0);
