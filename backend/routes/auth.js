@@ -93,67 +93,11 @@ router.post('/login', async (req, res) => {
   }
 });
 
-// GET /refresh-token
-router.post('/refresh-token', async (req, res) => {
-  const refreshToken = req.cookies.refreshToken;
-  if (!refreshToken) return res.status(401).json({ message: 'No refresh token' });
-
-  try {
-    const decoded = jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET);
-    const user = await User.findById(decoded.userId);
-
-    if (!user || user.refreshToken !== refreshToken) {
-      return res.status(403).json({ message: 'Invalid refresh token' });
-    }
-
-    const tokens = generateTokens(user);
-    user.refreshToken = tokens.refreshToken;
-    await user.save();
-
-    res.cookie('accessToken', tokens.accessToken, {
-      httpOnly: true,
-      secure: true,
-      sameSite: 'none',
-      maxAge: 15 * 60 * 1000
-    });
-
-    res.cookie('refreshToken', tokens.refreshToken, {
-      httpOnly: true,
-      secure: true,
-      sameSite: 'none',
-      maxAge: 7 * 24 * 60 * 60 * 1000
-    });
-
-    res.status(200).json({ message: 'Token refreshed' });
-  } catch (error) {
-    res.status(403).json({ message: 'Invalid refresh token' });
-  }
-});
-
-// POST /logout
-router.post('/logout', async (req, res) => {
-  const refreshToken = req.cookies.refreshToken;
-  if (refreshToken) {
-    const decoded = jwt.decode(refreshToken);
-    if (decoded) {
-      await User.findByIdAndUpdate(decoded.userId, { $unset: { refreshToken: 1 } });
-    }
-  }
-  res.clearCookie('accessToken', { secure: true, sameSite: 'none' });
-  res.clearCookie('refreshToken', { secure: true, sameSite: 'none' });
-  res.status(200).json({ message: 'Logged out successfully' });
-});
-
 /* --- GOOGLE OAUTH ROUTES --- */
 
 router.get('/google', (req, res, next) => {
-  let callbackURL;
-  if (req.headers.host.includes('localhost') || req.headers.host.includes('127.0.0.1')) {
-    callbackURL = 'http://localhost:8080/api/auth/google/callback';
-  } else {
-    // AS REQUESTED: Use ONLY the Render callback for production
-    callbackURL = 'https://griddox-1.onrender.com/api/auth/google/callback';
-  }
+  // Using an explicit redirect URI to prevent loops and mismatches
+  const callbackURL = 'https://griddox-1.onrender.com/api/auth/google/callback';
   
   passport.authenticate('google', { 
     scope: ['profile', 'email'],
@@ -162,13 +106,7 @@ router.get('/google', (req, res, next) => {
 });
 
 router.get('/google/callback', (req, res, next) => {
-  let callbackURL;
-  if (req.headers.host.includes('localhost') || req.headers.host.includes('127.0.0.1')) {
-    callbackURL = 'http://localhost:8080/api/auth/google/callback';
-  } else {
-    // AS REQUESTED: Points exclusively to Render
-    callbackURL = 'https://griddox-1.onrender.com/api/auth/google/callback';
-  }
+  const callbackURL = 'https://griddox-1.onrender.com/api/auth/google/callback';
 
   passport.authenticate('google', { 
     failureRedirect: 'https://gridox-store.vercel.app/auth?error=google_failed', 
@@ -179,7 +117,6 @@ router.get('/google/callback', (req, res, next) => {
   try {
     const { accessToken, refreshToken } = generateTokens(req.user);
     
-    // Cookie setup for cross-domain mobile stability
     res.cookie('accessToken', accessToken, {
       httpOnly: true,
       secure: true,
@@ -194,11 +131,17 @@ router.get('/google/callback', (req, res, next) => {
       maxAge: 7 * 24 * 60 * 60 * 1000
     });
 
-    // AS REQUESTED: Redirect back to the Frontend (Vercel)
     res.redirect('https://gridox-store.vercel.app/');
   } catch (error) {
     res.redirect('https://gridox-store.vercel.app/auth?error=token_err');
   }
+});
+
+// Logout
+router.post('/logout', (req, res) => {
+  res.clearCookie('accessToken', { secure: true, sameSite: 'none' });
+  res.clearCookie('refreshToken', { secure: true, sameSite: 'none' });
+  res.status(200).json({ message: 'Logged out successfully' });
 });
 
 module.exports = router;
