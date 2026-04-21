@@ -3,8 +3,8 @@ import { Helmet } from "react-helmet-async";
 import Header from "@/components/Header";
 import HeroCarousel from "@/components/HeroCarousel";
 import AnnouncementBar from "@/components/AnnouncementBar";
-import NewIn from "@/components/NewIn";
- 
+
+const NewIn = lazy(() => import("@/components/NewIn"));
 const CategoryGrid = lazy(() => import("@/components/CategoryGrid"));
 const BestSellers = lazy(() => import("@/components/BestSellers"));
 const CuratedLooks = lazy(() => import("@/components/CuratedLooks"));
@@ -47,11 +47,8 @@ const Index = () => {
         <AnnouncementBar />
       </div>
 
-      <div className="animate-in fade-in slide-in-from-bottom-4 duration-1000 delay-300 fill-mode-both">
-        <div id="new-arrivals"><NewIn /></div>
-      </div>
-
       <Suspense fallback={<SectionSkeleton />}>
+        <div id="new-arrivals"><NewIn /></div>
         <CategoryGrid />
         <CuratedLooks />
         <BestSellers />
