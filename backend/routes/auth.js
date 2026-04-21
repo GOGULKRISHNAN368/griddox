@@ -151,7 +151,8 @@ router.get('/google', (req, res, next) => {
   if (req.headers.host.includes('localhost') || req.headers.host.includes('127.0.0.1')) {
     callbackURL = 'http://localhost:8080/api/auth/google/callback';
   } else {
-    callbackURL = 'https://griddox-1.onrender.com/api/auth/google/callback';
+    // CRITICAL: Point to Vercel so the Set-Cookie domain matches the storefront
+    callbackURL = 'https://gridox-store.vercel.app/api/auth/google/callback';
   }
   
   passport.authenticate('google', { 
@@ -165,7 +166,8 @@ router.get('/google/callback', (req, res, next) => {
   if (req.headers.host.includes('localhost') || req.headers.host.includes('127.0.0.1')) {
     callbackURL = 'http://localhost:8080/api/auth/google/callback';
   } else {
-    callbackURL = 'https://griddox-1.onrender.com/api/auth/google/callback';
+    // CRITICAL: Must match the initiating URL exactly
+    callbackURL = 'https://gridox-store.vercel.app/api/auth/google/callback';
   }
 
   passport.authenticate('google', { 
