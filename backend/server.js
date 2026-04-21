@@ -605,7 +605,7 @@ app.delete('/api/leads/:id', async (req, res) => {
 });
 
 app.get('/', (req, res) => {
-  res.status(200).json({ message: 'Gridox API is running' });
+  res.status(200).json({ status: 'API Online', service: 'Gridox Engine' });
 });
 
 app.listen(process.env.PORT || 3001, '0.0.0.0', () => {
