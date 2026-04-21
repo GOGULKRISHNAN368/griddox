@@ -11,10 +11,21 @@ const path = require('path');
 const app = express();
 
 app.set('trust proxy', 1);
-app.use(cors({
-  origin: true,
-  credentials: true
-}));
+// CORS Configuration - Ensure Vercel can talk to Render
+const corsOptions = {
+    origin: [
+        'http://localhost:8080',
+        'http://127.0.0.1:8080',
+        'https://gridox-store.vercel.app',
+        'https://gridox-owner.vercel.app'
+    ],
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'x-request-with']
+};
+
+app.use(cors(corsOptions));
+app.options('*', cors(corsOptions)); // Enable pre-flight for all routes
 
 app.use(cookieParser());
 app.use(express.json({ limit: '50mb' }));
