@@ -155,6 +155,16 @@ const User = require('./models/User');
 
 app.use('/api/auth', authRoutes);
 
+// Auth Status Check for debugging
+app.get('/api/auth/status', (req, res) => {
+  res.json({
+    googleConfigured: !!(process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET),
+    callbackURL: "https://griddox-1.onrender.com/api/auth/google/callback",
+    frontendURL: process.env.FRONTEND_URL,
+    clientIdPrefix: process.env.GOOGLE_CLIENT_ID ? process.env.GOOGLE_CLIENT_ID.substring(0, 10) + "..." : "NONE"
+  });
+});
+
 // Protected Dashboard Route
 app.get('/api/dashboard', verifyToken, async (req, res) => {
   try {
