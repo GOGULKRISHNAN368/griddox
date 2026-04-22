@@ -92,11 +92,12 @@ router.post('/send-otp', async (req, res) => {
     );
 
     // Send Email
+    console.log(`Sending OTP ${otp} to ${email}...`);
     await sendOTPEmail(email, otp);
 
     res.status(200).json({ message: 'OTP sent successfully to your email' });
   } catch (error) {
-    console.error('OTP Error:', error);
+    console.error('OTP SEND ERROR:', error);
     res.status(500).json({ message: 'Error sending OTP', error: error.message });
   }
 });
@@ -170,12 +171,15 @@ router.post('/login', async (req, res) => {
         { upsert: true, new: true }
       );
       await sendOTPEmail(email, generatedOtp);
+      console.log(`Login OTP sent to ${email}`);
       return res.status(200).json({ message: 'OTP sent to your email', otpRequired: true });
     }
 
     // Verify OTP
+    console.log(`Verifying Login OTP for ${email}: ${otp}`);
     const otpRecord = await OTP.findOne({ email, otp });
     if (!otpRecord) {
+      console.log(`Invalid OTP for ${email}`);
       return res.status(400).json({ message: 'Invalid or expired OTP' });
     }
 
@@ -241,27 +245,32 @@ router.get('/google/callback', (req, res, next) => {
     session: false
   })(req, res, next);
 }, async (req, res) => {
-  console.log('--- GOOGLE AUTH SUCCESS ---');
   try {
+    const userEmail = req.user.email || (req.user._json && req.user._json.email);
+    console.log(`Google Auth Success for ${userEmail}. Sending OTP...`);
+
     // Generate and send OTP
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
     await OTP.findOneAndUpdate(
-      { email: req.user.email },
+      { email: userEmail },
       { otp, createdAt: Date.now() },
       { upsert: true, new: true }
     );
-    await sendOTPEmail(req.user.email, otp);
+    await sendOTPEmail(userEmail, otp);
 
     // Set a temporary cookie to identify the pending Google user
-    res.cookie('pending_google_email', req.user.email, {
+    res.cookie('pending_google_email', userEmail, {
       httpOnly: true,
-      secure: true,
-      sameSite: 'none',
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
       maxAge: 10 * 60 * 1000 // 10 minutes
     });
 
-    res.redirect(`${redirectTo}/auth?google_otp=true&email=${req.user.email}`);
+    console.log(`Redirecting to frontend with google_otp=true for ${userEmail}`);
+    const redirectTo = req.cookies.auth_redirect_to || process.env.FRONTEND_URL;
+    res.redirect(`${redirectTo}/auth?google_otp=true&email=${encodeURIComponent(userEmail)}`);
   } catch (error) {
+    console.error('GOOGLE CALLBACK ERROR:', error);
     const fallback = req.cookies.auth_redirect_to || process.env.FRONTEND_URL;
     res.redirect(`${fallback}/auth?error=token_err`);
   }
@@ -270,11 +279,14 @@ router.get('/google/callback', (req, res, next) => {
 // POST /google/verify-otp
 router.post('/google/verify-otp', async (req, res) => {
   try {
-    const { otp } = req.body;
-    const email = req.cookies.pending_google_email;
+    const { otp, email: emailFromBody } = req.body;
+    const email = req.cookies.pending_google_email || emailFromBody;
+    
+    console.log(`Verifying Google OTP for ${email}: ${otp}`);
 
     if (!email) {
-      return res.status(400).json({ message: 'Google session expired. Please try again.' });
+      console.log('No email found in session or body');
+      return res.status(400).json({ message: 'Email session missing. Please try again.' });
     }
 
     const otpRecord = await OTP.findOne({ email, otp });
