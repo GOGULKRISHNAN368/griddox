@@ -2,7 +2,42 @@ const express = require('express');
 const router = express.Router();
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
+const OTP = require('../models/OTP');
 const passport = require('passport');
+const nodemailer = require('nodemailer');
+
+// Configure Nodemailer
+const transporter = nodemailer.createTransport({
+  service: 'gmail',
+  auth: {
+    user: process.env.SMTP_EMAIL,
+    pass: process.env.SMTP_PASSWORD
+  }
+});
+
+// Helper to send OTP
+const sendOTPEmail = async (email, otp) => {
+  const mailOptions = {
+    from: `"Gridox Fashion" <${process.env.SMTP_EMAIL}>`,
+    to: email,
+    subject: 'Gridox - Your Verification Code',
+    html: `
+      <div style="font-family: Arial, sans-serif; padding: 20px; border: 1px solid #eee; border-radius: 10px; max-width: 500px; margin: auto;">
+        <h2 style="color: #ff0000; text-align: center;">Gridox Verification</h2>
+        <p>Hello,</p>
+        <p>Your verification code is:</p>
+        <div style="font-size: 32px; font-weight: bold; text-align: center; padding: 10px; background: #f9f9f9; border-radius: 5px; color: #333; letter-spacing: 5px;">
+          ${otp}
+        </div>
+        <p style="color: #666; font-size: 14px; text-align: center; margin-top: 20px;">
+          This code will expire in 10 minutes. If you didn't request this, please ignore this email.
+        </p>
+      </div>
+    `
+  };
+
+  return transporter.sendMail(mailOptions);
+};
 
 // Helper to generate tokens
 const generateTokens = (user) => {
@@ -21,11 +56,64 @@ const generateTokens = (user) => {
   return { accessToken, refreshToken };
 };
 
+// POST /send-otp
+router.post('/send-otp', async (req, res) => {
+  try {
+    const { email, type } = req.body;
+
+    if (!email) {
+      return res.status(400).json({ message: 'Email is required' });
+    }
+
+    // If login, check if user exists
+    if (type === 'login') {
+      const user = await User.findOne({ email });
+      if (!user) {
+        return res.status(404).json({ message: 'No account found with this email' });
+      }
+    }
+
+    // If signup, check if user already exists
+    if (type === 'signup') {
+      const user = await User.findOne({ email });
+      if (user) {
+        return res.status(400).json({ message: 'User already exists' });
+      }
+    }
+
+    // Generate 6-digit OTP
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+
+    // Save OTP to DB
+    await OTP.findOneAndUpdate(
+      { email },
+      { otp, createdAt: Date.now() },
+      { upsert: true, new: true }
+    );
+
+    // Send Email
+    await sendOTPEmail(email, otp);
+
+    res.status(200).json({ message: 'OTP sent successfully to your email' });
+  } catch (error) {
+    console.error('OTP Error:', error);
+    res.status(500).json({ message: 'Error sending OTP', error: error.message });
+  }
+});
+
 // POST /signup
 router.post('/signup', async (req, res) => {
   try {
-    const { name, email, password } = req.body;
+    const { name, email, password, otp } = req.body;
     
+    if (!otp) return res.status(400).json({ message: 'OTP is required' });
+
+    // Verify OTP
+    const otpRecord = await OTP.findOne({ email, otp });
+    if (!otpRecord) {
+      return res.status(400).json({ message: 'Invalid or expired OTP' });
+    }
+
     let user = await User.findOne({ email });
     if (user) return res.status(400).json({ message: 'User already exists' });
 
@@ -34,6 +122,9 @@ router.post('/signup', async (req, res) => {
     user.refreshToken = tokens.refreshToken;
     
     await user.save();
+    
+    // Delete OTP after successful signup
+    await OTP.deleteOne({ email });
 
     res.cookie('accessToken', tokens.accessToken, {
       httpOnly: true,
@@ -58,7 +149,7 @@ router.post('/signup', async (req, res) => {
 // POST /login
 router.post('/login', async (req, res) => {
   try {
-    const { email, password } = req.body;
+    const { email, password, otp } = req.body;
     const user = await User.findOne({ email });
 
     if (!user) {
@@ -69,9 +160,31 @@ router.post('/login', async (req, res) => {
       return res.status(401).json({ message: 'Incorrect password. Please try again.' });
     }
 
+    // If OTP is not provided, it's the first step of login
+    if (!otp) {
+      // Generate and send OTP
+      const generatedOtp = Math.floor(100000 + Math.random() * 900000).toString();
+      await OTP.findOneAndUpdate(
+        { email },
+        { otp: generatedOtp, createdAt: Date.now() },
+        { upsert: true, new: true }
+      );
+      await sendOTPEmail(email, generatedOtp);
+      return res.status(200).json({ message: 'OTP sent to your email', otpRequired: true });
+    }
+
+    // Verify OTP
+    const otpRecord = await OTP.findOne({ email, otp });
+    if (!otpRecord) {
+      return res.status(400).json({ message: 'Invalid or expired OTP' });
+    }
+
     const tokens = generateTokens(user);
     user.refreshToken = tokens.refreshToken;
     await user.save();
+
+    // Delete OTP after successful login
+    await OTP.deleteOne({ email });
 
     res.cookie('accessToken', tokens.accessToken, {
       httpOnly: true,

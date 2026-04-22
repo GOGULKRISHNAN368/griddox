@@ -12,6 +12,8 @@ const AuthPage = () => {
   const [isLogin, setIsLogin] = useState(true);
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [showOtp, setShowOtp] = useState(false);
+  const [otp, setOtp] = useState('');
   const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
@@ -29,31 +31,61 @@ const AuthPage = () => {
     setLoading(true);
 
     try {
-      const endpoint = isLogin ? '/auth/login' : '/auth/signup';
-      const response = await fetch(`${API_URL}${endpoint}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData),
-        credentials: 'include'
-      });
+      if (!showOtp) {
+        // Step 1: Send OTP
+        const endpoint = isLogin ? '/auth/login' : '/auth/send-otp';
+        const payload = isLogin 
+          ? { email: formData.email, password: formData.password } 
+          : { email: formData.email, type: 'signup' };
 
-
-      const data = await response.json();
-
-      if (response.ok) {
-        toast.success(data.message, {
-          icon: <CheckCircle2 className="text-green-500" />,
+        const response = await fetch(`${API_URL}${endpoint}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+          credentials: 'include'
         });
-        navigate('/');
-      } else if (response.status === 404 && isLogin) {
-        toast.error('Email not registered. Please create an account.', {
-          icon: <AlertCircle className="text-red-500" />,
-        });
-        setIsLogin(false); // Automatically switch to register form
+
+        const data = await response.json();
+
+        if (response.ok) {
+          if (isLogin && data.otpRequired) {
+            setShowOtp(true);
+            toast.success('OTP sent to your email');
+          } else if (!isLogin) {
+            setShowOtp(true);
+            toast.success('OTP sent to your email');
+          } else {
+            // Already logged in? (Shouldn't happen with the new logic but good to handle)
+            toast.success(data.message);
+            navigate('/');
+          }
+        } else {
+          toast.error(data.message || 'Error sending OTP');
+        }
       } else {
-        toast.error(data.message || 'Something went wrong', {
-          icon: <AlertCircle className="text-red-500" />,
+        // Step 2: Verify OTP and Login/Signup
+        const endpoint = isLogin ? '/auth/login' : '/auth/signup';
+        const payload = isLogin 
+          ? { ...formData, otp } 
+          : { ...formData, otp };
+
+        const response = await fetch(`${API_URL}${endpoint}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+          credentials: 'include'
         });
+
+        const data = await response.json();
+
+        if (response.ok) {
+          toast.success(data.message, {
+            icon: <CheckCircle2 className="text-green-500" />,
+          });
+          navigate('/');
+        } else {
+          toast.error(data.message || 'Verification failed');
+        }
       }
     } catch (error) {
       toast.error('Failed to connect to server');
@@ -144,6 +176,27 @@ const AuthPage = () => {
               </div>
             </div>
 
+            {showOtp && (
+              <div className="space-y-1.5 animate-in fade-in slide-in-from-top-2 duration-300">
+                <Label htmlFor="otp">Verification Code (OTP)</Label>
+                <div className="relative group">
+                  <CheckCircle2 className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 group-focus-within:text-[#8b231a] transition-colors" />
+                  <Input 
+                    id="otp" 
+                    placeholder="123456" 
+                    className="pl-10 h-12 rounded-xl border-gray-200 focus:ring-2 focus:ring-[#8b231a]/10 focus:border-[#8b231a] transition-all text-center tracking-[0.5em] font-bold text-lg"
+                    value={otp}
+                    onChange={(e) => setOtp(e.target.value)}
+                    maxLength={6}
+                    required
+                  />
+                </div>
+                <p className="text-[10px] text-gray-400 text-center">
+                  Please enter the 6-digit code sent to your email.
+                </p>
+              </div>
+            )}
+
             <Button 
                 type="submit" 
                 className="w-full h-12 rounded-xl bg-[#8b231a] hover:bg-[#6e1c14] text-white font-semibold transition-all flex items-center justify-center gap-2 group shadow-lg shadow-rose-900/20"
@@ -153,7 +206,7 @@ const AuthPage = () => {
                 <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
               ) : (
                 <>
-                  {isLogin ? 'Sign In' : 'Get Started'}
+                  {showOtp ? 'Verify & Continue' : (isLogin ? 'Sign In' : 'Get Started')}
                   <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                 </>
               )}
@@ -185,7 +238,11 @@ const AuthPage = () => {
             <p className="text-gray-500 text-sm">
               {isLogin ? "Don't have an account?" : "Already have an account?"}{' '}
               <button 
-                onClick={() => setIsLogin(!isLogin)}
+                onClick={() => {
+                  setIsLogin(!isLogin);
+                  setShowOtp(false);
+                  setOtp('');
+                }}
                 className="text-[#8b231a] font-bold hover:underline transition-all"
               >
                 {isLogin ? 'Register Now' : 'Log In'}
