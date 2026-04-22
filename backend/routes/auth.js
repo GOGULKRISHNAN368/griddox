@@ -114,10 +114,26 @@ router.get('/google', (req, res, next) => {
     maxAge: 5 * 60 * 1000 // 5 minutes
   });
 
-  passport.authenticate('google', { 
-    scope: ['profile', 'email'],
-    state: true
-  })(req, res, next);
+  // WRAP Passport in a try/catch to see why it might be failing
+  try {
+    passport.authenticate('google', { 
+        scope: ['profile', 'email'],
+        state: true
+    })(req, res, (err) => {
+        if (err) {
+            console.error('Passport Auth Error:', err);
+            return res.status(500).json({ 
+                error: 'Passport failed to start', 
+                details: err.message,
+                stack: err.stack 
+            });
+        }
+        next();
+    });
+  } catch (err) {
+    console.error('Internal Auth Error:', err);
+    res.status(500).json({ error: 'Internal server error during auth start', details: err.message });
+  }
 });
 
 router.get('/google/callback', (req, res, next) => {
