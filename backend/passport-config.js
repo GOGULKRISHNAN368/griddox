@@ -5,7 +5,7 @@ const User = require('./models/User');
 passport.use(new GoogleStrategy({
     clientID: (process.env.GOOGLE_CLIENT_ID || "").trim(),
     clientSecret: (process.env.GOOGLE_CLIENT_SECRET || "").trim(),
-    callbackURL: "https://griddox-1.onrender.com/api/auth/google/callback",
+    callbackURL: "https://griddox.vercel.app/api/auth/google/callback",
     proxy: true 
   },
   async (accessToken, refreshToken, profile, done) => {
