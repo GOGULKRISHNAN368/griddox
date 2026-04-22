@@ -96,44 +96,21 @@ router.post('/login', async (req, res) => {
 /* --- GOOGLE OAUTH ROUTES --- */
 
 router.get('/google', (req, res, next) => {
-  console.log('--- GOOGLE AUTH START ---');
+  console.log('--- GOOGLE AUTH DEBUG START ---');
   
-  // Determine which frontend the user came from
-  const referer = req.headers.referer || '';
-  let targetFrontend = process.env.FRONTEND_URL;
+  const referer = req.headers.referer || 'NONE';
+  const host = req.headers.host || 'NONE';
   
-  if (referer.includes('ownersite') || referer.includes('owner')) {
-    targetFrontend = 'https://ownersite-psi.vercel.app';
-  }
-
-  // Save the target frontend in a short-lived cookie
-  res.cookie('auth_redirect_to', targetFrontend, { 
-    httpOnly: true, 
-    secure: true, 
-    sameSite: 'none', 
-    maxAge: 5 * 60 * 1000 // 5 minutes
+  // DEBUG REPORT
+  return res.json({
+    message: "DEBUG MODE ACTIVE",
+    env_frontend: process.env.FRONTEND_URL,
+    detected_referer: referer,
+    detected_host: host,
+    google_keys_exist: !!(process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET),
+    client_id_start: process.env.GOOGLE_CLIENT_ID ? process.env.GOOGLE_CLIENT_ID.substring(0, 15) : 'MISSING',
+    callback_url_target: "https://griddox-1.onrender.com/api/auth/google/callback"
   });
-
-  // WRAP Passport in a try/catch to see why it might be failing
-  try {
-    passport.authenticate('google', { 
-        scope: ['profile', 'email'],
-        state: true
-    })(req, res, (err) => {
-        if (err) {
-            console.error('Passport Auth Error:', err);
-            return res.status(500).json({ 
-                error: 'Passport failed to start', 
-                details: err.message,
-                stack: err.stack 
-            });
-        }
-        next();
-    });
-  } catch (err) {
-    console.error('Internal Auth Error:', err);
-    res.status(500).json({ error: 'Internal server error during auth start', details: err.message });
-  }
 });
 
 router.get('/google/callback', (req, res, next) => {
