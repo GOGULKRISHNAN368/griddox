@@ -20,6 +20,18 @@ const Category = mongoose.model('Category', new mongoose.Schema({
   fullImage: String
 }, { strict: false }));
 
+const Banner = mongoose.model('Banner', new mongoose.Schema({
+  imageUrl: String
+}, { strict: false }));
+
+const Reel = mongoose.model('Reel', new mongoose.Schema({
+  videoUrl: String
+}, { strict: false }));
+
+const InstagramPost = mongoose.model('InstagramPost', new mongoose.Schema({
+  imageUrl: String
+}, { strict: false }));
+
 async function migrateAll() {
   try {
     await mongoose.connect(process.env.MONGODB_URI);
@@ -38,7 +50,31 @@ async function migrateAll() {
       }
     }
 
-    // 2. Migrate Products
+    // 2. Migrate Banners
+    const banners = await Banner.find();
+    console.log(`Migrating ${banners.length} Banners...`);
+    for (const banner of banners) {
+      if (banner.imageUrl && banner.imageUrl.startsWith('data:')) {
+        console.log(`Uploading Banner: ${banner.title || banner._id}`);
+        const result = await cloudinary.uploader.upload(banner.imageUrl, { folder: 'gridox_banners' });
+        banner.imageUrl = result.secure_url;
+        await banner.save();
+      }
+    }
+
+    // 3. Migrate Instagram Posts
+    const instaPosts = await InstagramPost.find();
+    console.log(`Migrating ${instaPosts.length} Instagram Posts...`);
+    for (const post of instaPosts) {
+      if (post.imageUrl && post.imageUrl.startsWith('data:')) {
+        console.log(`Uploading Instagram Post: ${post._id}`);
+        const result = await cloudinary.uploader.upload(post.imageUrl, { folder: 'gridox_instagram' });
+        post.imageUrl = result.secure_url;
+        await post.save();
+      }
+    }
+
+    // 4. Migrate Products
     const products = await Product.find();
     console.log(`Migrating ${products.length} Products...`);
     for (const prod of products) {
@@ -58,7 +94,6 @@ async function migrateAll() {
 
       // Gallery Images
       if (prod.gallery && prod.gallery.length > 0) {
-        console.log(`Checking galllery for: ${prod.name || prod._id}`);
         const newGallery = [];
         let galleryUpdated = false;
         
@@ -89,6 +124,25 @@ async function migrateAll() {
       }
     }
 
+    // 5. Migrate Reels (Video)
+    const reels = await Reel.find();
+    console.log(`Migrating ${reels.length} Reels...`);
+    for (const reel of reels) {
+      if (reel.videoUrl && reel.videoUrl.startsWith('data:')) {
+        console.log(`Uploading Reel Video: ${reel._id}`);
+        try {
+          const result = await cloudinary.uploader.upload(reel.videoUrl, { 
+            folder: 'gridox_reels',
+            resource_type: 'video'
+          });
+          reel.videoUrl = result.secure_url;
+          await reel.save();
+        } catch (e) {
+          console.error(`Failed video upload for ${reel._id}`, e.message);
+        }
+      }
+    }
+
     console.log('--- GLOBAL MIGRATION SUCCESSFULLY COMPLETED ---');
     process.exit(0);
   } catch (error) {
@@ -98,3 +152,4 @@ async function migrateAll() {
 }
 
 migrateAll();
+

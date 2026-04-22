@@ -60,7 +60,7 @@ const Header = () => {
   useEffect(() => {
     const fetchUserData = async () => {
       try {
-        const response = await fetch('https://griddox-1.onrender.com/api/dashboard', { credentials: 'include' });
+        const response = await fetch('/api/dashboard', { credentials: 'include' });
         if (response.ok) {
           const data = await response.json();
           setUserData(data.user);
@@ -82,7 +82,7 @@ const Header = () => {
 
   const handleLogout = async () => {
     try {
-      await fetch('https://griddox-1.onrender.com/api/auth/logout', { method: 'POST', credentials: 'include' });
+      await fetch('/api/auth/logout', { method: 'POST', credentials: 'include' });
       setUserData(null);
       setProfileOpen(false);
       navigate('/');

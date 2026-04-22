@@ -96,27 +96,46 @@ router.post('/login', async (req, res) => {
 /* --- GOOGLE OAUTH ROUTES --- */
 
 router.get('/google', (req, res, next) => {
-  // Using an explicit redirect URI to prevent loops and mismatches
-  const callbackURL = 'https://griddox-1.onrender.com/api/auth/google/callback';
+  console.log('--- GOOGLE AUTH START ---');
   
+  // Determine which frontend the user came from
+  const referer = req.headers.referer || '';
+  let targetFrontend = process.env.FRONTEND_URL;
+  
+  if (referer.includes('ownersite') || referer.includes('owner')) {
+    targetFrontend = 'https://ownersite-psi.vercel.app';
+  }
+
+  // Save the target frontend in a short-lived cookie
+  res.cookie('auth_redirect_to', targetFrontend, { 
+    httpOnly: true, 
+    secure: true, 
+    sameSite: 'none', 
+    maxAge: 5 * 60 * 1000 // 5 minutes
+  });
+
   passport.authenticate('google', { 
     scope: ['profile', 'email'],
-    callbackURL: callbackURL
+    state: true
   })(req, res, next);
 });
 
 router.get('/google/callback', (req, res, next) => {
-  const callbackURL = 'https://griddox-1.onrender.com/api/auth/google/callback';
+  console.log('--- GOOGLE AUTH CALLBACK RECEIVED ---');
 
   passport.authenticate('google', { 
-    failureRedirect: 'https://gridox-store.vercel.app/auth?error=google_failed', 
-    session: false,
-    callbackURL: callbackURL 
+    failureRedirect: `${process.env.FRONTEND_URL}/auth?error=google_failed`, 
+    session: false
   })(req, res, next);
 }, async (req, res) => {
+  console.log('--- GOOGLE AUTH SUCCESS ---');
   try {
     const { accessToken, refreshToken } = generateTokens(req.user);
+    const redirectTo = req.cookies.auth_redirect_to || process.env.FRONTEND_URL;
     
+    // Clear the redirect cookie
+    res.clearCookie('auth_redirect_to', { secure: true, sameSite: 'none' });
+
     res.cookie('accessToken', accessToken, {
       httpOnly: true,
       secure: true,
@@ -131,9 +150,10 @@ router.get('/google/callback', (req, res, next) => {
       maxAge: 7 * 24 * 60 * 60 * 1000
     });
 
-    res.redirect('https://gridox-store.vercel.app/');
+    res.redirect(`${redirectTo}/`);
   } catch (error) {
-    res.redirect('https://gridox-store.vercel.app/auth?error=token_err');
+    const fallback = req.cookies.auth_redirect_to || process.env.FRONTEND_URL;
+    res.redirect(`${fallback}/auth?error=token_err`);
   }
 });
 
