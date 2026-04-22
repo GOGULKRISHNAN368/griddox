@@ -19,7 +19,8 @@ const AuthPage = () => {
   const [formData, setFormData] = useState({
     name: '',
     email: '',
-    password: ''
+    password: '',
+    confirmPassword: ''
   });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -28,6 +29,14 @@ const AuthPage = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (!isLogin && formData.password !== formData.confirmPassword) {
+      toast.error('Passwords do not match', {
+        icon: <AlertCircle className="text-red-500" />,
+      });
+      return;
+    }
+
     setLoading(true);
 
     try {
@@ -175,6 +184,24 @@ const AuthPage = () => {
                 </button>
               </div>
             </div>
+
+            {!isLogin && (
+              <div className="space-y-1.5 transition-all duration-300">
+                <Label htmlFor="confirmPassword">Confirm Password</Label>
+                <div className="relative group">
+                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 group-focus-within:text-[#8b231a] transition-colors" />
+                  <Input 
+                    id="confirmPassword" 
+                    type={showPassword ? "text" : "password"} 
+                    placeholder="••••••••" 
+                    className="pl-10 h-12 rounded-xl border-gray-200 focus:ring-2 focus:ring-[#8b231a]/10 focus:border-[#8b231a] transition-all"
+                    value={formData.confirmPassword}
+                    onChange={handleChange}
+                    required={!isLogin}
+                  />
+                </div>
+              </div>
+            )}
 
             {showOtp && (
               <div className="space-y-1.5 animate-in fade-in slide-in-from-top-2 duration-300">
