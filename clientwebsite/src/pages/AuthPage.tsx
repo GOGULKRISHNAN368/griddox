@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { useNavigate, useLocation, useSearchParams } from 'react-router-dom';
 import { Mail, Lock, User, Github, Chrome, ArrowRight, CheckCircle2, AlertCircle, Eye, EyeOff } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -14,14 +14,27 @@ const AuthPage = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showOtp, setShowOtp] = useState(false);
   const [otp, setOtp] = useState('');
+  const [isGoogleOtp, setIsGoogleOtp] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
+  const [searchParams] = useSearchParams();
 
   const [formData, setFormData] = useState({
     name: '',
-    email: '',
+    email: searchParams.get('email') || '',
     password: '',
     confirmPassword: ''
   });
+
+  useEffect(() => {
+    if (searchParams.get('google_otp') === 'true') {
+      setShowOtp(true);
+      setIsGoogleOtp(true);
+      if (searchParams.get('email')) {
+        setFormData(prev => ({ ...prev, email: searchParams.get('email') || '' }));
+      }
+    }
+  }, [searchParams]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.id]: e.target.value });
@@ -73,10 +86,11 @@ const AuthPage = () => {
         }
       } else {
         // Step 2: Verify OTP and Login/Signup
-        const endpoint = isLogin ? '/auth/login' : '/auth/signup';
-        const payload = isLogin 
-          ? { ...formData, otp } 
-          : { ...formData, otp };
+        const endpoint = isGoogleOtp 
+          ? '/auth/google/verify-otp' 
+          : (isLogin ? '/auth/login' : '/auth/signup');
+          
+        const payload = { ...formData, otp };
 
         const response = await fetch(`${API_URL}${endpoint}`, {
           method: 'POST',
@@ -133,6 +147,7 @@ const AuthPage = () => {
                     value={formData.name}
                     onChange={handleChange}
                     required={!isLogin}
+                    disabled={showOtp}
                   />
                 </div>
               </div>
@@ -150,42 +165,46 @@ const AuthPage = () => {
                   value={formData.email}
                   onChange={handleChange}
                   required
+                  disabled={showOtp}
                 />
               </div>
             </div>
 
-            <div className="space-y-1.5">
-              <div className="flex justify-between items-center">
-                <Label htmlFor="password">Password</Label>
-                {isLogin && (
-                  <button type="button" className="text-xs text-[#8b231a] hover:underline font-medium">
-                    Forgot password?
+            {!isGoogleOtp && (
+              <div className="space-y-1.5">
+                <div className="flex justify-between items-center">
+                  <Label htmlFor="password">Password</Label>
+                  {isLogin && (
+                    <button type="button" className="text-xs text-[#8b231a] hover:underline font-medium">
+                      Forgot password?
+                    </button>
+                  )}
+                </div>
+                <div className="relative group">
+                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 group-focus-within:text-[#8b231a] transition-colors" />
+                  <Input 
+                    id="password" 
+                    type={showPassword ? "text" : "password"} 
+                    placeholder="••••••••" 
+                    className="pl-10 pr-10 h-12 rounded-xl border-gray-200 focus:ring-2 focus:ring-[#8b231a]/10 focus:border-[#8b231a] transition-all"
+                    value={formData.password}
+                    onChange={handleChange}
+                    required={!isGoogleOtp}
+                    disabled={showOtp}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 focus:outline-none transition-colors"
+                    aria-label={showPassword ? "Hide password" : "Show password"}
+                  >
+                    {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                   </button>
-                )}
+                </div>
               </div>
-              <div className="relative group">
-                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 group-focus-within:text-[#8b231a] transition-colors" />
-                <Input 
-                  id="password" 
-                  type={showPassword ? "text" : "password"} 
-                  placeholder="••••••••" 
-                  className="pl-10 pr-10 h-12 rounded-xl border-gray-200 focus:ring-2 focus:ring-[#8b231a]/10 focus:border-[#8b231a] transition-all"
-                  value={formData.password}
-                  onChange={handleChange}
-                  required
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 focus:outline-none transition-colors"
-                  aria-label={showPassword ? "Hide password" : "Show password"}
-                >
-                  {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                </button>
-              </div>
-            </div>
+            )}
 
-            {!isLogin && (
+            {!isGoogleOtp && !isLogin && (
               <div className="space-y-1.5 transition-all duration-300">
                 <Label htmlFor="confirmPassword">Confirm Password</Label>
                 <div className="relative group">
@@ -197,7 +216,8 @@ const AuthPage = () => {
                     className="pl-10 h-12 rounded-xl border-gray-200 focus:ring-2 focus:ring-[#8b231a]/10 focus:border-[#8b231a] transition-all"
                     value={formData.confirmPassword}
                     onChange={handleChange}
-                    required={!isLogin}
+                    required={!isLogin && !isGoogleOtp}
+                    disabled={showOtp}
                   />
                 </div>
               </div>
@@ -240,26 +260,30 @@ const AuthPage = () => {
             </Button>
           </form>
 
-          <div className="relative my-8">
-            <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-gray-100"></div>
-            </div>
-            <div className="relative flex justify-center text-xs uppercase">
-              <span className="bg-white px-2 text-gray-400 font-medium">Or continue with</span>
-            </div>
-          </div>
+          {!showOtp && (
+            <>
+              <div className="relative my-8">
+                <div className="absolute inset-0 flex items-center">
+                  <div className="w-full border-t border-gray-100"></div>
+                </div>
+                <div className="relative flex justify-center text-xs uppercase">
+                  <span className="bg-white px-2 text-gray-400 font-medium">Or continue with</span>
+                </div>
+              </div>
 
-          <div className="grid grid-cols-1 gap-3">
-            <Button 
-                variant="outline" 
-                type="button" 
-                className="h-12 rounded-xl border-gray-200 hover:bg-gray-50 flex items-center justify-center gap-3 transition-all"
-                onClick={handleGoogleLogin}
-            >
-              <Chrome className="w-5 h-5 text-blue-500" />
-              <span className="font-medium text-gray-700">Google Account</span>
-            </Button>
-          </div>
+              <div className="grid grid-cols-1 gap-3">
+                <Button 
+                    variant="outline" 
+                    type="button" 
+                    className="h-12 rounded-xl border-gray-200 hover:bg-gray-50 flex items-center justify-center gap-3 transition-all"
+                    onClick={handleGoogleLogin}
+                >
+                  <Chrome className="w-5 h-5 text-blue-500" />
+                  <span className="font-medium text-gray-700">Google Account</span>
+                </Button>
+              </div>
+            </>
+          )}
 
           <div className="mt-8 text-center">
             <p className="text-gray-500 text-sm">
@@ -269,6 +293,8 @@ const AuthPage = () => {
                   setIsLogin(!isLogin);
                   setShowOtp(false);
                   setOtp('');
+                  setIsGoogleOtp(false);
+                  navigate('/auth'); // Clear search params
                 }}
                 className="text-[#8b231a] font-bold hover:underline transition-all"
               >

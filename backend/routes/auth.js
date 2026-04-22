@@ -243,30 +243,75 @@ router.get('/google/callback', (req, res, next) => {
 }, async (req, res) => {
   console.log('--- GOOGLE AUTH SUCCESS ---');
   try {
-    const { accessToken, refreshToken } = generateTokens(req.user);
-    const redirectTo = req.cookies.auth_redirect_to || process.env.FRONTEND_URL;
-    
-    // Clear the redirect cookie
-    res.clearCookie('auth_redirect_to', { secure: true, sameSite: 'none' });
+    // Generate and send OTP
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+    await OTP.findOneAndUpdate(
+      { email: req.user.email },
+      { otp, createdAt: Date.now() },
+      { upsert: true, new: true }
+    );
+    await sendOTPEmail(req.user.email, otp);
 
-    res.cookie('accessToken', accessToken, {
+    // Set a temporary cookie to identify the pending Google user
+    res.cookie('pending_google_email', req.user.email, {
+      httpOnly: true,
+      secure: true,
+      sameSite: 'none',
+      maxAge: 10 * 60 * 1000 // 10 minutes
+    });
+
+    res.redirect(`${redirectTo}/auth?google_otp=true&email=${req.user.email}`);
+  } catch (error) {
+    const fallback = req.cookies.auth_redirect_to || process.env.FRONTEND_URL;
+    res.redirect(`${fallback}/auth?error=token_err`);
+  }
+});
+
+// POST /google/verify-otp
+router.post('/google/verify-otp', async (req, res) => {
+  try {
+    const { otp } = req.body;
+    const email = req.cookies.pending_google_email;
+
+    if (!email) {
+      return res.status(400).json({ message: 'Google session expired. Please try again.' });
+    }
+
+    const otpRecord = await OTP.findOne({ email, otp });
+    if (!otpRecord) {
+      return res.status(400).json({ message: 'Invalid or expired OTP' });
+    }
+
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    const tokens = generateTokens(user);
+    user.refreshToken = tokens.refreshToken;
+    await user.save();
+
+    // Cleanup
+    await OTP.deleteOne({ email });
+    res.clearCookie('pending_google_email', { secure: true, sameSite: 'none' });
+
+    res.cookie('accessToken', tokens.accessToken, {
       httpOnly: true,
       secure: true,
       sameSite: 'none',
       maxAge: 15 * 60 * 1000
     });
 
-    res.cookie('refreshToken', refreshToken, {
+    res.cookie('refreshToken', tokens.refreshToken, {
       httpOnly: true,
       secure: true,
       sameSite: 'none',
       maxAge: 7 * 24 * 60 * 60 * 1000
     });
 
-    res.redirect(`${redirectTo}/`);
+    res.status(200).json({ message: 'Login successful', user: { name: user.name, email: user.email } });
   } catch (error) {
-    const fallback = req.cookies.auth_redirect_to || process.env.FRONTEND_URL;
-    res.redirect(`${fallback}/auth?error=token_err`);
+    res.status(500).json({ message: 'Server error', error: error.message });
   }
 });
 
