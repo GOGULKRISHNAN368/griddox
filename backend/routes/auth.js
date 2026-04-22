@@ -96,9 +96,7 @@ router.post('/login', async (req, res) => {
 /* --- GOOGLE OAUTH ROUTES --- */
 
 router.get('/google', (req, res, next) => {
-  console.log('--- GOOGLE AUTH ATTEMPT ---');
-  
-  // Determine which frontend the user came from
+  // Determine which frontend the user came from for redirection
   const referer = req.headers.referer || '';
   let targetFrontend = process.env.FRONTEND_URL;
   
@@ -114,21 +112,12 @@ router.get('/google', (req, res, next) => {
     maxAge: 5 * 60 * 1000 // 5 minutes
   });
 
-  // Start Passport Auth with a custom error handler
+  // Start Passport Auth with account selection forced
   passport.authenticate('google', { 
     scope: ['profile', 'email'],
-    state: true
-  })(req, res, (err) => {
-    if (err) {
-      console.error('CRITICAL OAUTH ERROR:', err);
-      return res.status(500).json({ 
-        error: "Google Login failed to start", 
-        message: err.message,
-        stack: err.stack 
-      });
-    }
-    next();
-  });
+    state: true,
+    prompt: 'select_account' // <--- This forces Google to show the account list
+  })(req, res, next);
 });
 
 router.get('/google/callback', (req, res, next) => {
