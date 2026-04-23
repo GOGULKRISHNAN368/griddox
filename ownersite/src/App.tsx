@@ -742,14 +742,18 @@ const App = () => {
                     <div key={banner._id} className="item-card">
                         <div className="item-image" style={{backgroundImage: `url("${banner.imageUrl}")`}}></div>
                         <div className="card-actions">
-                            <button className="btn-icon edit" onClick={() => {
+                            <button className="btn-action edit" onClick={() => {
                                 const input = document.createElement('input');
                                 input.type = 'file';
                                 input.accept = 'image/*';
                                 input.onchange = (e) => handleBannerUpload(e as any, banner._id);
                                 input.click();
-                            }}>Change</button>
-                            <button className="btn-icon delete" onClick={() => handleDeleteBanner(banner._id)}>Remove</button>
+                            }}>
+                                <Edit2 size={16} /> <span>Change</span>
+                            </button>
+                            <button className="btn-action delete" onClick={() => handleDeleteBanner(banner._id)}>
+                                <Trash2 size={16} /> <span>Remove</span>
+                            </button>
                         </div>
                     </div>
                 ))}
@@ -801,8 +805,12 @@ const App = () => {
                             <h3>{cat.name}</h3>
                         </div>
                         <div className="card-actions">
-                            <button className="btn-icon edit" onClick={() => handleEditCategory(cat)}>Edit</button>
-                            <button className="btn-icon delete" onClick={() => handleDeleteCategory(cat._id)}>Delete</button>
+                            <button className="btn-action edit" onClick={() => handleEditCategory(cat)}>
+                                <Edit2 size={16} /> <span>Edit</span>
+                            </button>
+                            <button className="btn-action delete" onClick={() => handleDeleteCategory(cat._id)}>
+                                <Trash2 size={16} /> <span>Delete</span>
+                            </button>
                         </div>
                     </div>
                 ))}
@@ -920,8 +928,12 @@ const App = () => {
                             </div>
                         </div>
                         <div className="card-actions">
-                            <button className="btn-icon edit" onClick={() => handleEditProduct(p)}>Edit</button>
-                            <button className="btn-icon delete" onClick={() => handleDeleteProduct(p._id)}>Remove</button>
+                            <button className="btn-action edit" onClick={() => handleEditProduct(p)}>
+                                <Edit2 size={16} /> <span>Edit</span>
+                            </button>
+                            <button className="btn-action delete" onClick={() => handleDeleteProduct(p._id)}>
+                                <Trash2 size={16} /> <span>Remove</span>
+                            </button>
                         </div>
                     </div>
                 ))}
@@ -1024,7 +1036,9 @@ const App = () => {
                     <div key={post._id} className="item-card">
                         <div className="item-image" style={{backgroundImage: `url("${post.imageUrl}")`}}></div>
                         <div className="card-actions">
-                            <button className="btn-icon delete" onClick={() => handleDeleteInstagram(post._id)}>Remove</button>
+                            <button className="btn-action delete" onClick={() => handleDeleteInstagram(post._id)}>
+                                <Trash2 size={16} /> <span>Remove</span>
+                            </button>
                         </div>
                     </div>
                 ))}
@@ -1106,7 +1120,9 @@ function ReelAdminCard({ reel, API_BASE, onDelete }: any) {
                 <p style={{fontSize: '11px', color: '#64748b'}}>Category: {reel.category}</p>
             </div>
             <div className="card-actions">
-                <button className="btn-icon delete" onClick={onDelete}>Remove</button>
+                <button className="btn-action delete" onClick={onDelete}>
+                    <Trash2 size={16} /> <span>Remove</span>
+                </button>
             </div>
         </div>
     );
