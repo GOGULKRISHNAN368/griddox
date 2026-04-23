@@ -8,7 +8,7 @@ import SearchModal from "./SearchModal";
 const navLinks = [
   { name: "HOME" },
   { name: "NEW" },
-  { name: "SHOP" },
+  { name: "ADDRESS" },
   { name: "BULK QUERIES" },
   { name: "ABOUT US" },
 ];
@@ -54,7 +54,14 @@ const Header = () => {
 
     updateCartCount();
     window.addEventListener('cartUpdated', updateCartCount);
-    return () => window.removeEventListener('cartUpdated', updateCartCount);
+    
+    const handleOpenMenu = () => setMenuOpen(true);
+    window.addEventListener('openMobileMenu', handleOpenMenu);
+
+    return () => {
+      window.removeEventListener('cartUpdated', updateCartCount);
+      window.removeEventListener('openMobileMenu', handleOpenMenu);
+    };
   }, []);
 
   useEffect(() => {
@@ -123,7 +130,11 @@ const Header = () => {
 
         {/* Icons */}
         <div className="flex items-center gap-4">
-          <button aria-label="Search" onClick={() => setSearchOpen(true)} className="text-foreground hover:text-accent transition-colors">
+          <button 
+            aria-label="Search" 
+            onClick={() => setSearchOpen(true)} 
+            className="hidden md:block text-foreground hover:text-accent transition-colors"
+          >
             <Search size={20} />
           </button>
 
@@ -195,7 +206,9 @@ const Header = () => {
       {/* Mobile menu */}
       {menuOpen && (
         <nav className="md:hidden bg-background border-t border-border px-4 pb-4">
-          {navLinks.map((link) => (
+          {navLinks
+            .filter(link => link.name !== "ADDRESS")
+            .map((link) => (
             <button
               key={link.name}
               onClick={() => { handleNavClick(link.name, navigate); setMenuOpen(false); }} // fix: nav scroll links

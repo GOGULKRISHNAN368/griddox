@@ -1,4 +1,4 @@
-import { lazy, Suspense } from "react";
+import { lazy, Suspense, useEffect } from "react";
 import { Helmet } from "react-helmet-async";
 import Header from "@/components/Header";
 import HeroCarousel from "@/components/HeroCarousel";
@@ -19,6 +19,16 @@ const WhatsAppButton = lazy(() => import("@/components/WhatsAppButton"));
 const SectionSkeleton = () => <div className="h-[400px] w-full bg-muted/10 animate-pulse rounded-lg my-10" />;
 
 const Index = () => {
+  useEffect(() => {
+    if (window.location.hash) {
+      const id = window.location.hash.substring(1);
+      const el = document.getElementById(id);
+      if (el) {
+        setTimeout(() => el.scrollIntoView({ behavior: "smooth" }), 100);
+      }
+    }
+  }, []);
+
   return (
     <div className="min-h-screen bg-background pb-16 md:pb-0">
       <Helmet>

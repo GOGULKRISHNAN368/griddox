@@ -16,12 +16,12 @@ const StoreLocator = () => {
       {/* Hero Section - Sleeker and more minimalist */}
       <section className="relative h-[30vh] md:h-[50vh] flex items-center justify-center overflow-hidden bg-[#1a1a1a]">
         <div className="absolute inset-0 bg-gradient-to-b from-charcoal/40 to-[#1a1a1a] z-10" />
-        <img 
+        <img
           src="/store_locator_hero_1775658520224.png"
           alt="Gridox Store Interior"
           className="absolute inset-0 w-full h-full object-cover opacity-60 grayscale-[0.3]"
           onError={(e) => {
-             e.currentTarget.src = "https://images.unsplash.com/photo-1441986300917-64674bd600d8?auto=format&fit=crop&q=80&w=2000";
+            e.currentTarget.src = "https://images.unsplash.com/photo-1441986300917-64674bd600d8?auto=format&fit=crop&q=80&w=2000";
           }}
         />
         <div className="relative z-20 text-center space-y-4 md:space-y-6 px-4">
@@ -38,7 +38,7 @@ const StoreLocator = () => {
       <main className="container mx-auto px-4 py-12 md:py-24">
         <div className="max-w-7xl mx-auto">
           <div className="flex flex-col lg:grid lg:grid-cols-12 gap-12 md:gap-16 items-start">
-            
+
             {/* Left Content: The "Neat" details */}
             <div className="lg:col-span-5 space-y-12 md:space-y-16 w-full">
               <div className="space-y-6 md:space-y-8">
@@ -108,7 +108,7 @@ const StoreLocator = () => {
                 </div>
 
                 <div className="pt-2 md:pt-4">
-                  <a 
+                  <a
                     href={`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(address)}`}
                     target="_blank"
                     rel="noopener noreferrer"

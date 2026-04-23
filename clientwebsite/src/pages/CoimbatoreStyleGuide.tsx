@@ -50,7 +50,7 @@ const CoimbatoreStyleGuide = () => {
             <section>
               <h2 className="font-heading text-2xl md:text-3xl text-black italic mb-6">2. Modern Silhouettes: The Peplum Revolution</h2>
               <p>
-                The rise of the IT sector and startup culture in Coimbatore has brought a demand for "Fusion Wear". Our <strong>Peplum Co-ords</strong> have become a fan favorite for this reason. They offer the structured elegance of a Western outfit with the intricate craftsmanship of Indian ethnic wear. 
+                The rise of the IT sector and startup culture in Coimbatore has brought a demand for "Fusion Wear". Our <strong>Peplum Co-ords</strong> have become a fan favorite for this reason. They offer the structured elegance of a Western outfit with the intricate craftsmanship of Indian ethnic wear.
               </p>
               <p className="mt-4">
                 Whether it's a birthday celebration or a festive gathering, a peplum set provides a tailored fit that flatters the silhouette while maintaining the grace of traditional attire.
@@ -67,7 +67,7 @@ const CoimbatoreStyleGuide = () => {
             <section>
               <h2 className="font-heading text-2xl md:text-3xl text-black italic mb-6">Conclusion: Your Style, Tailored by Gridox</h2>
               <p>
-                Fashion in Coimbatore is about quality, comfort, and a touch of designer flair. At Gridox, with our in-house production unit, we ensure that every piece is crafted to meet these local standards. 
+                Fashion in Coimbatore is about quality, comfort, and a touch of designer flair. At Gridox, with our in-house production unit, we ensure that every piece is crafted to meet these local standards.
               </p>
               <p className="mt-4 font-bold text-[#8b231a]">
                 Visit our store locator to find our nearest outlet or shop our exclusive Coimbatore collection online with same-day dispatch.

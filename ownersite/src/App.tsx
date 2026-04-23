@@ -638,6 +638,23 @@ const App = () => {
     });
     setCategoryForm({ name: '', description: '', fullImage: '', thumbnailImage: '' });
     setReelForm({ videoUrl: '', productId: '', category: '' });
+    setReelSearchTerm('');
+  };
+
+  const [reelSearchTerm, setReelSearchTerm] = useState('');
+
+  const handlePasteProductUrl = (url: string) => {
+    // Try to extract ID from URL like .../product/ID
+    const match = url.match(/\/product\/([a-f0-9]{24})/i);
+    if (match && match[1]) {
+      const foundProduct = products.find(p => p._id === match[1]);
+      if (foundProduct) {
+        setReelForm(prev => ({ ...prev, productId: foundProduct._id, category: foundProduct.category }));
+        showStatus(`Linked: ${foundProduct.name}`);
+      } else {
+        showStatus('Product not found in database.', 'error');
+      }
+    }
   };
 
   return (
@@ -932,14 +949,31 @@ const App = () => {
                       </select>
                     </div>
                     <div className="form-group">
-                      <label>Link Specific Dress</label>
-                      <select className="select-styled" value={reelForm.productId} onChange={e => setReelForm({...reelForm, productId: e.target.value})} required>
-                        <option value="">Choose dress from category</option>
-                        {products
-                          .filter(p => !reelForm.category || p.category === reelForm.category)
-                          .map(p => <option key={p._id} value={p._id}>{p.name} (Rs. {p.price})</option>)
-                        }
-                      </select>
+                      <label>Link Dress (Search or Paste Link)</label>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                        <input 
+                          type="text" 
+                          className="input-styled" 
+                          placeholder="Search dress name or paste website link..." 
+                          value={reelSearchTerm}
+                          onChange={(e) => {
+                            const val = e.target.value;
+                            setReelSearchTerm(val);
+                            if (val.includes('/product/')) handlePasteProductUrl(val);
+                          }}
+                        />
+                        <select className="select-styled" value={reelForm.productId} onChange={e => setReelForm({...reelForm, productId: e.target.value})} required>
+                          <option value="">{reelForm.productId ? 'Linked Product Selected' : 'Choose dress from results'}</option>
+                          {products
+                            .filter(p => {
+                              const matchesSearch = p.name.toLowerCase().includes(reelSearchTerm.toLowerCase());
+                              const matchesCategory = !reelForm.category || p.category === reelForm.category;
+                              return matchesSearch && matchesCategory;
+                            })
+                            .map(p => <option key={p._id} value={p._id}>{p.name} (Rs. {p.price})</option>)
+                          }
+                        </select>
+                      </div>
                     </div>
                     <button type="submit" disabled={isLoading || !reelForm.videoUrl} className="primary-btn">
                       Publish Reel

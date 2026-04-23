@@ -52,7 +52,7 @@ const CategoryGrid: React.FC = () => {
   }, []);
 
   return (
-    <section className="category-grid-section">
+    <section id="categories" className="category-grid-section">
       <h2 className="section-title">Shop by Category</h2>
       <div className="category-grid">
         {categories.length > 0 ? (

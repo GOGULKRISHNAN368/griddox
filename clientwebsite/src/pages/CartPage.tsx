@@ -23,7 +23,7 @@ const CartPage = () => {
   const [items, setItems] = useState<CartItem[]>(() => {
     const saved = localStorage.getItem('gridox_cart');
     if (saved) {
-      try { return JSON.parse(saved); } catch (e) {}
+      try { return JSON.parse(saved); } catch (e) { }
     }
     return [];
   });
@@ -34,7 +34,7 @@ const CartPage = () => {
     localStorage.setItem('gridox_cart', JSON.stringify(newItems));
     window.dispatchEvent(new Event('cartUpdated'));
   };
-  
+
   const updateQty = (id: string, qty: number) => {
     const newItems = items.map((i) => (i.id === id ? { ...i, quantity: qty } : i));
     setItems(newItems);

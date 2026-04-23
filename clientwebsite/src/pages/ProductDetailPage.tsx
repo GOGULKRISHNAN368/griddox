@@ -85,13 +85,13 @@ const ProductDetailPage = () => {
       toast.error("Please select a size");
       return;
     }
-    
+
     const currentCartStr = localStorage.getItem('gridox_cart');
     let cart = [];
     if (currentCartStr) {
-      try { cart = JSON.parse(currentCartStr); } catch (e) {}
+      try { cart = JSON.parse(currentCartStr); } catch (e) { }
     }
-    
+
     const newItem = {
       id: `${product._id}-${selectedSize || 'Standard'}`,
       productId: product._id,
@@ -101,17 +101,17 @@ const ProductDetailPage = () => {
       image: product.image,
       size: selectedSize || 'Standard'
     };
-    
+
     const existingIndex = cart.findIndex(i => i.id === newItem.id);
     if (existingIndex >= 0) {
       cart[existingIndex].quantity += 1;
     } else {
       cart.push(newItem);
     }
-    
+
     localStorage.setItem('gridox_cart', JSON.stringify(cart));
     window.dispatchEvent(new Event('cartUpdated'));
-    
+
     toast.success("Added to bag!", {
       description: `${product.name} - ${selectedSize || "Standard"}`,
     });
@@ -190,11 +190,10 @@ const ProductDetailPage = () => {
                     <button
                       key={size}
                       onClick={() => setSelectedSize(size)}
-                      className={`w-12 h-12 rounded-full border text-xs font-bold transition-all ${
-                        selectedSize === size
+                      className={`w-12 h-12 rounded-full border text-xs font-bold transition-all ${selectedSize === size
                           ? "border-[#1a1a1a] bg-[#1a1a1a] text-white"
                           : "border-gray-200 text-[#1a1a1a] hover:border-[#1a1a1a]"
-                      }`}
+                        }`}
                     >
                       {size}
                     </button>
@@ -205,14 +204,14 @@ const ProductDetailPage = () => {
 
             {/* Refined Action Buttons */}
             <div className="flex gap-3 pt-6 sticky bottom-16 md:bottom-auto left-0 right-0 bg-white/80 backdrop-blur-md p-2 -mx-2 md:p-0 md:static md:bg-transparent md:backdrop-blur-none z-[50]">
-              <button 
-                onClick={handleAddToBag} 
+              <button
+                onClick={handleAddToBag}
                 className="flex-1 h-14 bg-white border border-[#1a1a1a] text-[#1a1a1a] font-bold text-[10px] tracking-[0.2em] rounded-md hover:bg-[#1a1a1a] hover:text-white transition-all uppercase shadow-sm"
               >
                 Add To Bag
               </button>
-              <button 
-                onClick={handleBuyNow} 
+              <button
+                onClick={handleBuyNow}
                 className="flex-1 h-14 bg-[#8b231a] text-white font-bold text-[10px] tracking-[0.2em] rounded-md hover:bg-[#a62b21] transition-all uppercase shadow-md active:scale-95 transform"
               >
                 Buy Now
@@ -284,10 +283,10 @@ const ProductDetailPage = () => {
       </div>
 
       {product && (
-        <SimilarProducts 
-          products={similarProducts} 
-          currentProductId={product._id} 
-          categorySlug={product.category} 
+        <SimilarProducts
+          products={similarProducts}
+          currentProductId={product._id}
+          categorySlug={product.category}
         />
       )}
 
