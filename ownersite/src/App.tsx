@@ -682,22 +682,22 @@ const App = () => {
         
         <nav className="nav-menu">
           <ul>
-            <li className={activeTab === 'banners' ? 'active' : ''} onClick={() => { setActiveTab('banners'); resetForms(); }}>
+            <li className={activeTab === 'banners' ? 'active' : ''} onClick={() => { setActiveTab('banners'); resetForms(); setIsMobileMenuOpen(false); }}>
               <span className="icon">🖼️</span> Banners
             </li>
-            <li className={activeTab === 'categories' ? 'active' : ''} onClick={() => { setActiveTab('categories'); resetForms(); }}>
+            <li className={activeTab === 'categories' ? 'active' : ''} onClick={() => { setActiveTab('categories'); resetForms(); setIsMobileMenuOpen(false); }}>
               <span className="icon">📂</span> Categories
             </li>
-            <li className={activeTab === 'dresses' ? 'active' : ''} onClick={() => { setActiveTab('dresses'); resetForms(); }}>
+            <li className={activeTab === 'dresses' ? 'active' : ''} onClick={() => { setActiveTab('dresses'); resetForms(); setIsMobileMenuOpen(false); }}>
               <span className="icon">👗</span> Dresses
             </li>
-            <li className={activeTab === 'reels' ? 'active' : ''} onClick={() => { setActiveTab('reels'); resetForms(); }}>
+            <li className={activeTab === 'reels' ? 'active' : ''} onClick={() => { setActiveTab('reels'); resetForms(); setIsMobileMenuOpen(false); }}>
               <span className="icon">🎬</span> Reels
             </li>
-            <li className={activeTab === 'instagram' ? 'active' : ''} onClick={() => { setActiveTab('instagram'); resetForms(); }}>
+            <li className={activeTab === 'instagram' ? 'active' : ''} onClick={() => { setActiveTab('instagram'); resetForms(); setIsMobileMenuOpen(false); }}>
               <span className="icon">📸</span> Instagram
             </li>
-            <li className={activeTab === 'leads' ? 'active' : ''} onClick={() => { setActiveTab('leads'); resetForms(); }}>
+            <li className={activeTab === 'leads' ? 'active' : ''} onClick={() => { setActiveTab('leads'); resetForms(); setIsMobileMenuOpen(false); }}>
               <span className="icon">📋</span> Leads
             </li>
           </ul>
