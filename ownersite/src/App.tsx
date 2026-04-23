@@ -53,6 +53,7 @@ interface Lead {
 
 const App = () => {
   const [activeTab, setActiveTab] = useState<'banners' | 'categories' | 'dresses' | 'reels' | 'instagram' | 'leads'>('banners');
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [status, setStatus] = useState<{ message: string, type: 'success' | 'error' } | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [banners, setBanners] = useState<Banner[]>([]);
@@ -659,8 +660,19 @@ const App = () => {
 
   return (
     <div className="admin-container">
+      {/* Mobile Header */}
+      <header className="mobile-header">
+        <div className="logo" style={{fontSize: '18px'}}>GRIDOX</div>
+        <button className="menu-toggle" onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}>
+          {isMobileMenuOpen ? '✕' : '☰'}
+        </button>
+      </header>
+
+      {/* Sidebar Overlay */}
+      <div className={`sidebar-overlay ${isMobileMenuOpen ? 'show' : ''}`} onClick={() => setIsMobileMenuOpen(false)}></div>
+
       {/* Sidebar */}
-      <aside className="sidebar">
+      <aside className={`sidebar ${isMobileMenuOpen ? 'open' : ''}`}>
         <div className="sidebar-header">
           <div className="logo">
             GRIDOX
