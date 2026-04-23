@@ -28,7 +28,7 @@ const CuratedLooks: React.FC = () => {
   useEffect(() => {
     const fetchLooks = async () => {
       try {
-        const response = await fetch(`/api/products?isBestSeller=true&limit=8`);
+        const response = await fetch(`/api/products?isCuratedLook=true&limit=8`);
         if (response.ok) {
           const data = await response.json();
           setLooks(data);
@@ -75,6 +75,8 @@ const CuratedLooks: React.FC = () => {
           }}
           initialSlide={2}
           loop={true}
+          loopedSlides={2}
+          watchSlidesProgress={true}
           speed={800}
           autoplay={{
             delay: 4000,

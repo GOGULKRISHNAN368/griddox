@@ -29,6 +29,7 @@ interface Product {
   category: string;
   isNewArrival?: boolean;
   isBestSeller?: boolean;
+  isCuratedLook?: boolean;
   createdAt: string;
 }
 
@@ -73,7 +74,8 @@ const App = () => {
     details: '',
     category: '',
     isNewArrival: false,
-    isBestSeller: false
+    isBestSeller: false,
+    isCuratedLook: false
   });
 
   // Category Form State
@@ -449,7 +451,8 @@ const App = () => {
           details: fullProduct.details || '',
           category: fullProduct.category,
           isNewArrival: fullProduct.isNewArrival || false,
-          isBestSeller: fullProduct.isBestSeller || false
+          isBestSeller: fullProduct.isBestSeller || false,
+          isCuratedLook: fullProduct.isCuratedLook || false
         });
         window.scrollTo({ top: 0, behavior: 'smooth' });
       }
@@ -631,7 +634,7 @@ const App = () => {
     setProductForm({ 
       name: '', price: '', originalPrice: '', discount: '', image: '', 
       gallery: [], sizes: [], details: '', category: '',
-      isNewArrival: false, isBestSeller: false
+      isNewArrival: false, isBestSeller: false, isCuratedLook: false
     });
     setCategoryForm({ name: '', description: '', fullImage: '', thumbnailImage: '' });
     setReelForm({ videoUrl: '', productId: '', category: '' });
@@ -860,6 +863,10 @@ const App = () => {
                         <label className="flag-item">
                             <input type="checkbox" checked={productForm.isBestSeller} onChange={e => setProductForm({...productForm, isBestSeller: e.target.checked})} />
                             Best Seller 🔥
+                        </label>
+                        <label className="flag-item">
+                            <input type="checkbox" checked={productForm.isCuratedLook} onChange={e => setProductForm({...productForm, isCuratedLook: e.target.checked})} />
+                            Curated Look ✨
                         </label>
                     </div>
 

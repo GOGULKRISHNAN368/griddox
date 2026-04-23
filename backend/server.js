@@ -101,6 +101,7 @@ const ProductSchema = new mongoose.Schema({
   discount: String,
   isNewArrival: { type: Boolean, default: false },
   isBestSeller: { type: Boolean, default: false },
+  isCuratedLook: { type: Boolean, default: false },
   image: String, // Main image (Base64)
   gallery: [String], // Array of 5 look images (Base64)
   sizes: [String], // Array of available sizes (e.g. S, M, L, XL)
@@ -239,11 +240,12 @@ app.get('/api/banners', async (req, res) => {
 
 app.get('/api/products', async (req, res) => {
   try {
-    const { category, isNewArrival, isBestSeller } = req.query;
+    const { category, isNewArrival, isBestSeller, isCuratedLook } = req.query;
     let query = {};
     if (category) query.category = category;
     if (isNewArrival === 'true') query.isNewArrival = true;
     if (isBestSeller === 'true') query.isBestSeller = true;
+    if (isCuratedLook === 'true') query.isCuratedLook = true;
 
     // PROJECT fields to exclude heavy images (gallery) and long details when fetching a list
     const products = await Product.find(query)

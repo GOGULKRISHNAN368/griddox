@@ -43,7 +43,7 @@
   opacity: 0.6 !important; /* Level 2 Cards */
   z-index: 5 !important;
 }
-
+ 
 .swiper-slide-active {
   z-index: 20 !important;
   opacity: 1 !important;

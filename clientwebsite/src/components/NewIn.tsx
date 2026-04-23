@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import OptimizedImage from "./OptimizedImage";
 import { Heart, ShoppingBag } from "lucide-react";
-import { HOME_PRODUCT_LINKS } from "@/fixes/homeProductLinks"; // fix: home product links
+
 const NewIn = () => {
   const navigate = useNavigate(); // fix: home product links
   const [activeProducts, setActiveProducts] = useState<any[]>([]);
@@ -22,7 +22,7 @@ const NewIn = () => {
           }
         }
       } catch (error) {
-        console.log("Using static products for New Arrivals");
+        console.error("Error fetching New Arrivals:", error);
       }
     };
     fetchNewArrivals();

@@ -20,7 +20,7 @@ const BestSellers = () => {
           }
         }
       } catch (error) {
-        console.log("Error fetching Best Sellers");
+        console.error("Error fetching Best Sellers:", error);
       }
     };
     fetchBestSellers();
