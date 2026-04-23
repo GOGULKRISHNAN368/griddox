@@ -4,6 +4,7 @@ import { Helmet } from "react-helmet-async";
 import { useState, useEffect } from "react";
 import ProductGallery from "@/components/ProductGallery";
 import Header from "@/components/Header";
+import SimilarProducts from "@/components/SimilarProducts";
 import BottomNav from "@/components/BottomNav";
 import WhatsAppButton from "@/components/WhatsAppButton";
 
@@ -24,27 +25,35 @@ interface Product {
 }
 
 const ProductDetailPage = () => {
-  const { productId } = useParams<{ slug: string; productId: string }>();
+  const { productId, slug } = useParams<{ slug: string; productId: string }>();
   const navigate = useNavigate();
   const [product, setProduct] = useState<Product | null>(null);
+  const [similarProducts, setSimilarProducts] = useState<Product[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [selectedSize, setSelectedSize] = useState<string | null>(null);
   const [pincode, setPincode] = useState("");
 
   useEffect(() => {
     window.scrollTo(0, 0);
-    const fetchProduct = async () => {
+    const fetchProductAndSimilar = async () => {
       try {
         const response = await fetch(`/api/products/${productId}`);
         const found = await response.json();
         setProduct(found);
+
+        // Fetch similar products from same category
+        if (found && found.category) {
+          const simResp = await fetch(`/api/products?category=${found.category}`);
+          const simData = await simResp.json();
+          setSimilarProducts(simData);
+        }
       } catch (error) {
-        console.error('Error fetching product:', error);
+        console.error('Error fetching product details:', error);
       } finally {
         setIsLoading(false);
       }
     };
-    fetchProduct();
+    fetchProductAndSimilar();
   }, [productId]);
 
   if (isLoading) {
@@ -273,6 +282,14 @@ const ProductDetailPage = () => {
           </div>
         </div>
       </div>
+
+      {product && (
+        <SimilarProducts 
+          products={similarProducts} 
+          currentProductId={product._id} 
+          categorySlug={product.category} 
+        />
+      )}
 
       <BottomNav />
       <WhatsAppButton />

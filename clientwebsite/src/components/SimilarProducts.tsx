@@ -1,6 +1,15 @@
 import { Link } from "react-router-dom";
 import { Product } from "@/data/categoryProducts";
 
+interface Product {
+  _id: string;
+  name: string;
+  price: number;
+  originalPrice?: number;
+  discount?: string;
+  image: string;
+}
+
 interface SimilarProductsProps {
   products: Product[];
   currentProductId: string;
@@ -10,8 +19,8 @@ interface SimilarProductsProps {
 const SimilarProducts = ({ products, currentProductId, categorySlug }: SimilarProductsProps) => {
   // Filter out the current product and take only first 6 similar ones
   const similarOnes = products
-    .filter((p) => p.id !== currentProductId)
-    .slice(0, 6);
+    .filter((p) => p._id !== currentProductId)
+    .slice(0, 4); // Show 4 for cleaner grid
 
   if (similarOnes.length === 0) return null;
 
@@ -25,38 +34,30 @@ const SimilarProducts = ({ products, currentProductId, categorySlug }: SimilarPr
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
           {similarOnes.map((product) => (
             <Link
-              key={product.id}
-              to={`/category/${categorySlug}/product/${product.id}`}
+              key={product._id}
+              to={`/category/${categorySlug}/product/${product._id}`}
               className="group"
               onClick={() => window.scrollTo(0, 0)}
             >
-              <div className="relative aspect-[3/4] overflow-hidden rounded-lg mb-3">
+              <div className="relative aspect-[3/4] overflow-hidden rounded-lg mb-3 shadow-sm border border-black/5">
                 <img
-                  src={product.images[0]}
+                  src={product.image}
                   alt={product.name}
                   className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-                  onClick={(e) => {
-                    window.dispatchEvent(new CustomEvent('openPromoModal', { detail: { src: product.images[0] } }));
-                  }}
                 />
-                {product.badge && (
-                  <span className="absolute top-2 left-2 bg-white text-[10px] font-bold px-2 py-1 rounded shadow-sm">
-                    {product.badge}
-                  </span>
-                )}
+                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/5 transition-colors duration-300" />
               </div>
               <div className="space-y-1">
-                <h3 className="text-xs md:text-sm font-medium line-clamp-1 group-hover:text-accent transition-colors">
+                <h3 className="text-[11px] font-bold tracking-widest uppercase line-clamp-1 group-hover:text-[#8b231a] transition-colors">
                   {product.name}
                 </h3>
                 <div className="flex items-center gap-2">
-                  <span className="text-sm font-bold">₹{product.price.toLocaleString()}</span>
-                  <span className="text-xs text-muted-foreground line-through">
-                    ₹{product.originalPrice.toLocaleString()}
-                  </span>
-                  <span className="text-[10px] font-semibold text-red-500">
-                    ({product.discount}% OFF)
-                  </span>
+                  <span className="text-sm font-bold text-[#1a1a1a]">₹{product.price.toLocaleString()}</span>
+                  {product.originalPrice && (
+                    <span className="text-xs text-gray-400 line-through">
+                      ₹{product.originalPrice.toLocaleString()}
+                    </span>
+                  )}
                 </div>
               </div>
             </Link>
