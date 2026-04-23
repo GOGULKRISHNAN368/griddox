@@ -36,7 +36,7 @@ const HeroCarousel = () => {
           const data = await response.json();
           if (data && data.length > 0) {
             setSlides(data);
-            
+
             // 🔥 Dynamic Preload (Best Practice #6)
             // Preload the very first banner image as soon as we know the URL
             const preloadLink = document.createElement("link");
@@ -146,6 +146,19 @@ const HeroCarousel = () => {
             aria-label={`Slide ${i + 1}`}
           />
         ))}
+      </div>
+
+      {/* Decorative Brand Text for Mobile Empty Space */}
+      <div className="md:hidden absolute bottom-12 left-1/2 -translate-x-1/2 z-0 pointer-events-none text-center w-full">
+        <span 
+          style={{ 
+            fontFamily: "'Great Vibes', cursive",
+            textShadow: '0 0 10px rgba(255,255,255,0.8), 0 0 20px rgba(0,0,0,0.05)'
+          }}
+          className="text-5xl text-black/40"
+        >
+          Gridox
+        </span>
       </div>
     </div>
   );

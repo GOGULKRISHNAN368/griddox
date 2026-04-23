@@ -30,21 +30,12 @@ const Index = () => {
         <meta name="keywords" content="women fashion Coimbatore, designer clothing Tirupur, premium ethnic wear Coimbatore, peplum co-ords Tirupur, cotton kurti sets Coimbatore, fashion store Tamil Nadu, Gridox Coimbatore" />
         <link rel="canonical" href={window.location.origin} />
       </Helmet>
-      
+
+      <AnnouncementBar />
       <Header />
-      
-      {/* Announcement Bar - Desktop Top (Above Carousel) */}
-      <div className="hidden md:block">
-        <AnnouncementBar />
-      </div>
 
       <div className="animate-in fade-in duration-700 ease-out fill-mode-both">
         <HeroCarousel />
-      </div>
-
-      {/* Announcement Bar - Mobile Bottom (Below Carousel) */}
-      <div className="md:hidden">
-        <AnnouncementBar />
       </div>
 
       <Suspense fallback={<SectionSkeleton />}>
