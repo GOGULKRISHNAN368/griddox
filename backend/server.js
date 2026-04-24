@@ -16,6 +16,10 @@ const corsOptions = {
     origin: [
         'http://localhost:8080',
         'http://127.0.0.1:8080',
+        'http://localhost:5173',
+        'http://localhost:5174',
+        'http://127.0.0.1:5173',
+        'http://127.0.0.1:5174',
         'https://gridox-store.vercel.app',
         'https://gridox-owner.vercel.app',
         'https://griddox.vercel.app',
@@ -33,6 +37,11 @@ app.use(cookieParser());
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ limit: '50mb', extended: true }));
 app.use(passport.initialize());
+
+app.use((req, res, next) => {
+  console.log(`[${new Date().toISOString()}] ${req.method} ${req.url}`);
+  next();
+});
 
 const PORT = process.env.PORT || 3001;
 
@@ -146,6 +155,47 @@ const { verifyToken } = require('./middleware/auth');
 const User = require('./models/User');
 
 app.use('/api/auth', authRoutes);
+
+// Direct Admin Login Route in server.js for reliability
+app.post('/api/auth/admin-login', async (req, res) => {
+  console.log('--- DIRECT ADMIN LOGIN ATTEMPT ---', req.body.username);
+  try {
+    const { username, password } = req.body;
+    const user = await User.findOne({ name: new RegExp(`^${username}$`, 'i') });
+
+    if (!user) {
+      return res.status(404).json({ message: 'Invalid credentials' });
+    }
+
+    if (!(await user.comparePassword(password))) {
+      return res.status(401).json({ message: 'Incorrect password' });
+    }
+
+    // Reuse generateTokens if it was defined, otherwise we might need to copy it or import it
+    // Wait, generateTokens is in auth.js. I should probably just import it or define it here.
+    const jwt = require('jsonwebtoken');
+    const accessToken = jwt.sign(
+      { userId: user._id, email: user.email },
+      process.env.JWT_SECRET,
+      { expiresIn: '15m' }
+    );
+    const refreshToken = jwt.sign(
+      { userId: user._id },
+      process.env.REFRESH_TOKEN_SECRET,
+      { expiresIn: '7d' }
+    );
+
+    user.refreshToken = refreshToken;
+    await user.save();
+
+    res.cookie('accessToken', accessToken, { httpOnly: true, secure: true, sameSite: 'none', maxAge: 15 * 60 * 1000 });
+    res.cookie('refreshToken', refreshToken, { httpOnly: true, secure: true, sameSite: 'none', maxAge: 7 * 24 * 60 * 60 * 1000 });
+
+    res.status(200).json({ message: 'Admin login successful', user: { name: user.name, email: user.email } });
+  } catch (error) {
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+});
 
 // Auth Status Check for debugging
 app.get('/api/auth/status', (req, res) => {
