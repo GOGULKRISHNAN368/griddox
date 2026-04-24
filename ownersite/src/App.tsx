@@ -637,23 +637,6 @@ const App = () => {
     });
     setCategoryForm({ name: '', description: '', fullImage: '', thumbnailImage: '' });
     setReelForm({ videoUrl: '', productId: '', category: '' });
-    setReelSearchTerm('');
-  };
-
-  const [reelSearchTerm, setReelSearchTerm] = useState('');
-
-  const handlePasteProductUrl = (url: string) => {
-    // Try to extract ID from URL like .../product/ID
-    const match = url.match(/\/product\/([a-f0-9]{24})/i);
-    if (match && match[1]) {
-      const foundProduct = products.find(p => p._id === match[1]);
-      if (foundProduct) {
-        setReelForm(prev => ({ ...prev, productId: foundProduct._id, category: foundProduct.category }));
-        showStatus(`Linked: ${foundProduct.name}`);
-      } else {
-        showStatus('Product not found in database.', 'error');
-      }
-    }
   };
 
   return (
@@ -661,8 +644,8 @@ const App = () => {
       {/* Mobile Header */}
       <header className="mobile-header">
         <div className="logo" style={{fontSize: '18px'}}>GRIDOX</div>
-        <button className="menu-toggle" onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}>
-          {isMobileMenuOpen ? '✕' : '☰'}
+        <button className="menu-toggle" onClick={() => setIsMobileMenuOpen(true)}>
+          ☰
         </button>
       </header>
 
@@ -672,30 +655,35 @@ const App = () => {
       {/* Sidebar */}
       <aside className={`sidebar ${isMobileMenuOpen ? 'open' : ''}`}>
         <div className="sidebar-header">
-          <div className="logo">
-            GRIDOX
-            <span>OWNER PORTAL</span>
+          <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
+            <div className="logo">
+              GRIDOX
+              <span>OWNER PORTAL</span>
+            </div>
+            {isMobileMenuOpen && (
+              <button className="menu-toggle" style={{background: 'transparent'}} onClick={() => setIsMobileMenuOpen(false)}>✕</button>
+            )}
           </div>
         </div>
         
         <nav className="nav-menu">
           <ul>
-            <li className={activeTab === 'banners' ? 'active' : ''} onClick={() => { setActiveTab('banners'); resetForms(); }}>
+            <li className={activeTab === 'banners' ? 'active' : ''} onClick={() => { setActiveTab('banners'); resetForms(); setIsMobileMenuOpen(false); }}>
               <span className="icon">🖼️</span> Banners
             </li>
-            <li className={activeTab === 'categories' ? 'active' : ''} onClick={() => { setActiveTab('categories'); resetForms(); }}>
+            <li className={activeTab === 'categories' ? 'active' : ''} onClick={() => { setActiveTab('categories'); resetForms(); setIsMobileMenuOpen(false); }}>
               <span className="icon">📂</span> Categories
             </li>
-            <li className={activeTab === 'dresses' ? 'active' : ''} onClick={() => { setActiveTab('dresses'); resetForms(); }}>
+            <li className={activeTab === 'dresses' ? 'active' : ''} onClick={() => { setActiveTab('dresses'); resetForms(); setIsMobileMenuOpen(false); }}>
               <span className="icon">👗</span> Dresses
             </li>
-            <li className={activeTab === 'reels' ? 'active' : ''} onClick={() => { setActiveTab('reels'); resetForms(); }}>
+            <li className={activeTab === 'reels' ? 'active' : ''} onClick={() => { setActiveTab('reels'); resetForms(); setIsMobileMenuOpen(false); }}>
               <span className="icon">🎬</span> Reels
             </li>
-            <li className={activeTab === 'instagram' ? 'active' : ''} onClick={() => { setActiveTab('instagram'); resetForms(); }}>
+            <li className={activeTab === 'instagram' ? 'active' : ''} onClick={() => { setActiveTab('instagram'); resetForms(); setIsMobileMenuOpen(false); }}>
               <span className="icon">📸</span> Instagram
             </li>
-            <li className={activeTab === 'leads' ? 'active' : ''} onClick={() => { setActiveTab('leads'); resetForms(); }}>
+            <li className={activeTab === 'leads' ? 'active' : ''} onClick={() => { setActiveTab('leads'); resetForms(); setIsMobileMenuOpen(false); }}>
               <span className="icon">📋</span> Leads
             </li>
           </ul>
@@ -704,7 +692,10 @@ const App = () => {
         <div className="sidebar-footer">
           <div className="user-info">
             <div className="avatar">👤</div>
-            <span>Admin Control</span>
+            <div style={{display: 'flex', flexDirection: 'column'}}>
+              <span style={{fontSize: '13px', fontWeight: '600'}}>Admin Control</span>
+              <span style={{fontSize: '10px', color: '#94a3b8'}}>v2.0.4</span>
+            </div>
           </div>
         </div>
       </aside>
@@ -864,13 +855,18 @@ const App = () => {
                                 <label>Sizes</label>
                                 <div className="size-pills-container">
                                     {['XS','S','M','L','XL','XXL','3XL'].map(sz => (
-                                        <label key={sz} className="size-pill">
-                                            <input type="checkbox" checked={productForm.sizes.includes(sz)} onChange={e => {
-                                                const newSizes = e.target.checked ? [...productForm.sizes, sz] : productForm.sizes.filter(s => s !== sz);
-                                                setProductForm({...productForm, sizes: newSizes});
-                                            }} />
-                                            <label>{sz}</label>
-                                        </label>
+                                        <div key={sz} className="size-pill">
+                                            <input 
+                                                type="checkbox" 
+                                                id={`size-${sz}`}
+                                                checked={productForm.sizes.includes(sz)} 
+                                                onChange={e => {
+                                                    const newSizes = e.target.checked ? [...productForm.sizes, sz] : productForm.sizes.filter(s => s !== sz);
+                                                    setProductForm({...productForm, sizes: newSizes});
+                                                }} 
+                                            />
+                                            <label htmlFor={`size-${sz}`}>{sz}</label>
+                                        </div>
                                     ))}
                                 </div>
                             </div>
@@ -953,37 +949,25 @@ const App = () => {
                   <div className="form-controls">
                     <div className="form-group">
                       <label>Select Category</label>
-                      <select className="select-styled" value={reelForm.category} onChange={e => setReelForm({...reelForm, category: e.target.value})} required>
+                      <select className="select-styled" value={reelForm.category} onChange={e => setReelForm({...reelForm, category: e.target.value, productId: ''})} required>
                         <option value="">Choose category</option>
                         {categories.map(c => <option key={c._id} value={c.slug}>{c.name}</option>)}
                       </select>
                     </div>
                     <div className="form-group">
-                      <label>Link Dress (Search or Paste Link)</label>
-                      <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                        <input 
-                          type="text" 
-                          className="input-styled" 
-                          placeholder="Search dress name or paste website link..." 
-                          value={reelSearchTerm}
-                          onChange={(e) => {
-                            const val = e.target.value;
-                            setReelSearchTerm(val);
-                            if (val.includes('/product/')) handlePasteProductUrl(val);
-                          }}
-                        />
-                        <select className="select-styled" value={reelForm.productId} onChange={e => setReelForm({...reelForm, productId: e.target.value})} required>
-                          <option value="">{reelForm.productId ? 'Linked Product Selected' : 'Choose dress from results'}</option>
-                          {products
-                            .filter(p => {
-                              const matchesSearch = p.name.toLowerCase().includes(reelSearchTerm.toLowerCase());
-                              const matchesCategory = !reelForm.category || p.category === reelForm.category;
-                              return matchesSearch && matchesCategory;
-                            })
-                            .map(p => <option key={p._id} value={p._id}>{p.name} (Rs. {p.price})</option>)
-                          }
-                        </select>
-                      </div>
+                      <label>Link Dress</label>
+                      <select 
+                        className="select-styled" 
+                        value={reelForm.productId} 
+                        onChange={e => setReelForm({...reelForm, productId: e.target.value})} 
+                        required
+                      >
+                        <option value="">{reelForm.category ? 'Select a dress...' : 'Choose category first'}</option>
+                        {products
+                          .filter(p => !reelForm.category || p.category === reelForm.category)
+                          .map(p => <option key={p._id} value={p._id}>{p.name} (Rs. {p.price})</option>)
+                        }
+                      </select>
                     </div>
                     <button type="submit" disabled={isLoading || !reelForm.videoUrl} className="primary-btn">
                       Publish Reel
@@ -1032,21 +1016,25 @@ const App = () => {
 
         {activeTab === 'leads' && (
           <div className="fade-in">
-             <div className="glass-card" style={{padding: '20px'}}>
-                 <h2 className="form-section-title">Collected Customer Leads</h2>
-                 <p style={{color: '#64748b', fontSize: '14px', marginBottom: '20px'}}>
-                    When customers verify their OTP, their contact data is stored here securely.
+             <div className="glass-card">
+                 <h2 className="form-section-title">Customer Leads</h2>
+                 <p style={{color: 'var(--text-muted)', fontSize: '14px', marginBottom: '24px'}}>
+                    Verified customer contacts captured via OTP.
                  </p>
-                 <div style={{display: 'flex', flexDirection: 'column', gap: '15px'}}>
-                    {leads.length === 0 ? <p style={{textAlign: 'center', opacity: 0.5}}>No leads captured yet.</p> : leads.map(lead => (
-                        <div key={lead._id} style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', backgroundColor: '#f8fafc', padding: '15px 20px', borderRadius: '8px', border: '1px solid #e2e8f0'}}>
-                            <div>
-                                <h3 style={{margin: '0 0 5px 0', fontSize: '18px'}}>{lead.email}</h3>
-                                <p style={{margin: 0, color: '#475569', fontSize: '14px'}}>📞 {lead.phone || 'No phone provided'}</p>
-                                <p style={{margin: '5px 0 0 0', color: '#94a3b8', fontSize: '12px'}}>🕒 {new Date(lead.createdAt).toLocaleString()}</p>
+                 <div style={{display: 'flex', flexDirection: 'column', gap: '12px'}}>
+                    {leads.length === 0 ? (
+                        <div style={{textAlign: 'center', padding: '40px', opacity: 0.5}}>
+                            <p>No leads captured yet.</p>
+                        </div>
+                    ) : leads.map(lead => (
+                        <div key={lead._id} className="lead-item">
+                            <div className="lead-info">
+                                <h3>{lead.email}</h3>
+                                <p>📞 {lead.phone || 'No phone provided'}</p>
+                                <div className="lead-meta">🕒 {new Date(lead.createdAt).toLocaleString()}</div>
                             </div>
-                            <button className="primary-btn" style={{padding: '8px 16px', width: 'auto'}} onClick={() => handleDeleteLead(lead._id)}>
-                                ✅ Verified
+                            <button className="primary-btn" style={{width: 'auto', padding: '8px 16px'}} onClick={() => handleDeleteLead(lead._id)}>
+                                Mark Verified
                             </button>
                         </div>
                     ))}
