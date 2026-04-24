@@ -1,6 +1,7 @@
 .curated-looks-section {
   padding: 80px 0;
-  background-color: #F8F9FA; /* Smooth light gray like Pantaloons */
+  background-color: #F8F9FA;
+  /* Smooth light gray like Pantaloons */
   overflow: hidden;
   position: relative;
 }
@@ -27,38 +28,39 @@
   width: 100%;
   padding-top: 40px;
   padding-bottom: 60px;
-  overflow: visible !important; /* Crucial for overlap */
+  overflow: visible !important;
+  /* Crucial for overlap */
 }
 
 .curated-slide {
-  width: 320px;
-  height: 480px; 
+  width: 400px;
+  height: 533px;
   transition: all 0.6s cubic-bezier(0.165, 0.84, 0.44, 1);
   z-index: 1;
-  opacity: 0.2 !important; /* Level 3: Very faded and tucked behind */
+  opacity: 0.4 !important;
 }
 
 .swiper-slide-prev,
 .swiper-slide-next {
-  opacity: 0.6 !important; /* Level 2 Cards */
+  opacity: 0.6 !important;
   z-index: 5 !important;
 }
- 
+
 .swiper-slide-active {
   z-index: 20 !important;
   opacity: 1 !important;
-  transform: scale(1.1) !important; /* Balanced scale for desktop */
+  transform: scale(1.1) !important;
 }
 
 .look-card {
   width: 100%;
   height: 100%;
   position: relative;
-  border-radius: 12px; /* Pantaloons uses slightly sharper corners than I had */
+  border-radius: 12px;
   overflow: hidden;
   background-color: #fff;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.08);
-  border: 8px solid #fff; /* Very thick white border like common frames */
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+  border: 8px solid #fff;
   cursor: pointer;
 }
 
@@ -72,7 +74,7 @@
 .look-overlay {
   position: absolute;
   inset: 0;
-  background: linear-gradient(to top, rgba(0,0,0,0.6) 0%, transparent 60%);
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.6) 0%, transparent 60%);
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
@@ -93,7 +95,7 @@
 }
 
 .look-price {
-  color: rgba(255,255,255,0.9);
+  color: rgba(255, 255, 255, 0.9);
   font-size: 1rem;
 }
 
@@ -104,20 +106,21 @@
   background-color: #fff;
   color: #1a1a1a;
   padding: 8px 16px;
-  border-radius: 8px; /* Square with slight roundness like Pantaloons */
+  border-radius: 8px;
+  /* Square with slight roundness like Pantaloons */
   font-size: 0.75rem;
   font-weight: 600;
   display: flex;
   align-items: center;
   gap: 6px;
   border: 1px solid #e0e0e0;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
   z-index: 10;
   transition: all 0.2s ease;
 }
 
 .look-shop-btn span {
-    font-size: 11px;
+  font-size: 11px;
 }
 
 .look-shop-btn:hover {
@@ -138,8 +141,9 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #999; /* Light gray arrow */
-  box-shadow: 0 2px 10px rgba(0,0,0,0.12);
+  color: #999;
+  /* Light gray arrow */
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.12);
   border: none;
   cursor: pointer;
   z-index: 30;
@@ -170,24 +174,26 @@
   .curated-looks-section {
     padding: 40px 0;
   }
-  
+
   .curated-title {
     font-size: 1.5rem;
     margin-bottom: 1.5rem;
     padding: 0 20px;
   }
-  
+
   .curated-slide {
     width: 240px !important;
     height: 360px !important;
   }
-  
+
   .look-card {
-    border: 5px solid #fff; /* Slightly thinner on mobile */
+    border: 5px solid #fff;
+    /* Slightly thinner on mobile */
   }
 
   .curated-nav-btn {
-    display: none; /* Swipe on mobile */
+    display: none;
+    /* Swipe on mobile */
   }
 
   .look-shop-btn {
@@ -198,7 +204,7 @@
 }
 
 .skeleton-looks {
-    background: linear-gradient(90deg, #f0f0f0 25%, #f8f8f8 50%, #f0f0f0 75%);
-    background-size: 200% 100%;
-    animation: shimmer 1.5s infinite linear;
+  background: linear-gradient(90deg, #f0f0f0 25%, #f8f8f8 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite linear;
 }

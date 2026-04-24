@@ -53,7 +53,7 @@ const CuratedLooks: React.FC = () => {
       </div>
     </div>
   );
-  
+
   if (!loading && looks.length === 0) return null;
 
   return (
@@ -71,11 +71,10 @@ const CuratedLooks: React.FC = () => {
           slidesPerView={1.4} // Show 1.4 slides to see peeks on mobile
           breakpoints={{
             640: { slidesPerView: 3 },
-            1024: { slidesPerView: 5 }
+            1024: { slidesPerView: 'auto' } // Use 'auto' to allow our 480px width to work
           }}
-          initialSlide={2}
+          initialSlide={3}
           loop={true}
-          loopedSlides={2}
           watchSlidesProgress={true}
           speed={800}
           autoplay={{
@@ -84,9 +83,9 @@ const CuratedLooks: React.FC = () => {
           }}
           coverflowEffect={{
             rotate: 0,
-            stretch: -30, // Balanced overlap
-            depth: 400,   // Dramatic height scaling (Pyramid)
-            modifier: 1, 
+            stretch: -10, // Reduced overlap so side images are more visible
+            depth: 350,   // Smooth pyramid height
+            modifier: 1,
             slideShadows: false,
           }}
           navigation={{
@@ -101,17 +100,17 @@ const CuratedLooks: React.FC = () => {
               <div className="look-card" onClick={() => navigate(`/category/${look.category}/product/${look._id}`)}>
                 <img src={look.image} alt={look.name} className="look-image" />
                 <div className="look-overlay">
-                    <div className="look-info">
-                        <h3 className="look-name">{look.name}</h3>
-                        <p className="look-price">Rs. {look.price.toLocaleString()}</p>
-                    </div>
+                  <div className="look-info">
+                    <h3 className="look-name">{look.name}</h3>
+                    <p className="look-price">Rs. {look.price.toLocaleString()}</p>
+                  </div>
                 </div>
                 <button className="look-shop-btn" onClick={(e) => {
-                    e.stopPropagation();
-                    navigate(`/category/${look.category}/product/${look._id}`);
+                  e.stopPropagation();
+                  navigate(`/category/${look.category}/product/${look._id}`);
                 }}>
-                    <ShoppingBag size={14} />
-                    <span>Shop All</span>
+                  <ShoppingBag size={14} />
+                  <span>Shop All</span>
                 </button>
               </div>
             </SwiperSlide>

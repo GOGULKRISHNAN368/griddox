@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { Product } from "@/data/categoryProducts";
+
 
 interface Product {
   _id: string;

@@ -61,15 +61,6 @@ const uploadToCloudinary = async (base64Data, folder = 'gridox', resourceType = 
 // MongoDB Connection
 let MONGODB_URI = process.env.MONGODB_URI;
 
-// FORCE test database
-if (MONGODB_URI) {
-  if (MONGODB_URI.includes('.net/')) {
-    const base = MONGODB_URI.split('.net/')[0];
-    const params = MONGODB_URI.split('?')[1] || '';
-    MONGODB_URI = `${base}.net/test?${params}`;
-  }
-}
-
 console.log('Connecting to MongoDB...');
 // Log URI with password masked for safety
 const maskedURI = MONGODB_URI ? MONGODB_URI.replace(/:([^@]+)@/, ':****@') : 'MISSING';
