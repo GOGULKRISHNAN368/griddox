@@ -158,10 +158,14 @@ app.use('/api/auth', authRoutes);
 
 // Direct Admin Login Route in server.js for reliability
 app.post('/api/auth/admin-login', async (req, res) => {
-  console.log('--- DIRECT ADMIN LOGIN ATTEMPT ---', req.body.username);
+  console.log('--- ADMIN LOGIN ATTEMPT ---');
+  console.log('Received Username:', req.body.username);
   try {
     const { username, password } = req.body;
-    const user = await User.findOne({ name: new RegExp(`^${username}$`, 'i') });
+    const user = await User.findOne({ name: new RegExp(`^${username.trim()}$`, 'i') });
+    
+    console.log('User found in DB:', user ? 'YES' : 'NO');
+    if (user) console.log('Actual DB Name:', user.name);
 
     if (!user) {
       return res.status(404).json({ message: 'Invalid credentials' });
