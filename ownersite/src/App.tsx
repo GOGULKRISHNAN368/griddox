@@ -55,6 +55,7 @@ const App = () => {
   const [status, setStatus] = useState<{ message: string, type: 'success' | 'error' } | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isAuthorized, setIsAuthorized] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const [authForm, setAuthForm] = useState({ username: '', password: '' });
   
   const [banners, setBanners] = useState<Banner[]>([]);
@@ -704,14 +705,23 @@ const App = () => {
               </div>
               <div className="form-group">
                 <label>Password</label>
-                <input 
-                  type="password" 
-                  className="input-styled" 
-                  value={authForm.password} 
-                  onChange={e => setAuthForm({...authForm, password: e.target.value})}
-                  placeholder="••••••••"
-                  required 
-                />
+                <div className="password-input-wrapper">
+                  <input 
+                    type={showPassword ? "text" : "password"} 
+                    className="input-styled" 
+                    value={authForm.password} 
+                    onChange={e => setAuthForm({...authForm, password: e.target.value})}
+                    placeholder="••••••••"
+                    required 
+                  />
+                  <button 
+                    type="button" 
+                    className="password-toggle" 
+                    onClick={() => setShowPassword(!showPassword)}
+                  >
+                    {showPassword ? '🙈' : '👁️'}
+                  </button>
+                </div>
               </div>
               <button type="submit" disabled={isLoading} className="primary-btn">
                 {isLoading ? 'Verifying...' : 'Access Portal'}
