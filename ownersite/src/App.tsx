@@ -54,9 +54,7 @@ const App = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [status, setStatus] = useState<{ message: string, type: 'success' | 'error' } | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-  const [isAuthorized, setIsAuthorized] = useState(false);
-  const [showPassword, setShowPassword] = useState(false);
-  const [authForm, setAuthForm] = useState({ username: '', password: '' });
+
   
   const [banners, setBanners] = useState<Banner[]>([]);
   const [products, setProducts] = useState<Product[]>([]);
@@ -65,43 +63,7 @@ const App = () => {
   const [leads, setLeads] = useState<Lead[]>([]);
   const [editingId, setEditingId] = useState<string | null>(null);
 
-  useEffect(() => {
-    checkAuth();
-  }, []);
 
-  const checkAuth = async () => {
-    try {
-      const res = await fetch('/api/check-auth');
-      if (res.ok) {
-        setIsAuthorized(true);
-      }
-    } catch (e) {
-      console.log('Not authorized');
-    }
-  };
-
-  const handleAdminLogin = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsLoading(true);
-    try {
-      const res = await fetch('/api/auth/admin-login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(authForm)
-      });
-      if (res.ok) {
-        setIsAuthorized(true);
-        showStatus('Welcome back, Admin!');
-      } else {
-        const data = await res.json();
-        showStatus(data.message || 'Login failed', 'error');
-      }
-    } catch (e) {
-      showStatus('Server connection error', 'error');
-    } finally {
-      setIsLoading(false);
-    }
-  };
   
   // Product Form State
   const [productForm, setProductForm] = useState({
@@ -683,62 +645,6 @@ const App = () => {
 
   return (
     <div className="admin-container">
-      {!isAuthorized ? (
-        <div className="login-overlay">
-          <div className="login-card fade-in">
-            <div className="login-header">
-              <div className="logo">GRIDOX <span>OWNER</span></div>
-              <h1>Welcome Back</h1>
-              <p>Please enter your administrative credentials.</p>
-            </div>
-            <form onSubmit={handleAdminLogin} className="login-form">
-              <div className="form-group">
-                <label>Admin ID</label>
-                <input 
-                  type="text" 
-                  className="input-styled" 
-                  value={authForm.username} 
-                  onChange={e => setAuthForm({...authForm, username: e.target.value})}
-                  placeholder="Username"
-                  required 
-                />
-              </div>
-              <div className="form-group">
-                <label>Password</label>
-                <div className="password-input-wrapper">
-                  <input 
-                    type={showPassword ? "text" : "password"} 
-                    className="input-styled" 
-                    value={authForm.password} 
-                    onChange={e => setAuthForm({...authForm, password: e.target.value})}
-                    placeholder="••••••••"
-                    required 
-                  />
-                  <button 
-                    type="button" 
-                    className="password-toggle" 
-                    onClick={() => setShowPassword(!showPassword)}
-                  >
-                    {showPassword ? '🙈' : '👁️'}
-                  </button>
-                </div>
-              </div>
-              <button type="submit" disabled={isLoading} className="primary-btn">
-                {isLoading ? 'Verifying...' : 'Access Portal'}
-              </button>
-            </form>
-            <div className="login-footer">
-              Secure Administrative Access Only
-            </div>
-          </div>
-          {status && (
-            <div className={`status-toast ${status.type}`}>
-              {status.type === 'success' ? '✅' : '❌'} {status.message}
-            </div>
-          )}
-        </div>
-      ) : (
-        <>
       {/* Mobile Header */}
       <header className="mobile-header">
         <div className="logo" style={{fontSize: '18px'}}>GRIDOX</div>
@@ -795,17 +701,7 @@ const App = () => {
               <span style={{fontSize: '10px', color: '#94a3b8'}}>v2.0.4</span>
             </div>
           </div>
-          <button 
-            className="secondary-btn" 
-            style={{marginTop: '15px', background: 'rgba(255,255,255,0.05)', color: '#fff', borderColor: 'rgba(255,255,255,0.1)'}}
-            onClick={async () => {
-              await fetch('/api/auth/logout', { method: 'POST' });
-              setIsAuthorized(false);
-              showStatus('Logged out safely');
-            }}
-          >
-            Logout
-          </button>
+
         </div>
       </aside>
 
@@ -1159,8 +1055,6 @@ const App = () => {
           </div>
         )}
       </main>
-      </>
-      )}
       <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
     </div>
   )
