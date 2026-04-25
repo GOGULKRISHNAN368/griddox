@@ -5,6 +5,7 @@ interface Banner {
   _id: string;
   title: string;
   imageUrl: string;
+  mobileImageUrl?: string;
   link: string;
   createdAt: string;
 }
