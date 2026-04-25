@@ -6,6 +6,7 @@ interface OptimizedImageProps extends React.ImgHTMLAttributes<HTMLImageElement> 
   className?: string;
   priority?: boolean;
   isProductImage?: boolean;
+  isBanner?: boolean;
 }
 
 /**
@@ -22,6 +23,7 @@ const OptimizedImage: React.FC<OptimizedImageProps> = ({
   className,
   priority = false,
   isProductImage = false,
+  isBanner = false,
   onClick,
   ...props
 }) => {
@@ -36,9 +38,12 @@ const OptimizedImage: React.FC<OptimizedImageProps> = ({
   // Apply Cloudinary transformations if it's a Cloudinary URL
   let optimizedSrc = src;
   if (src && src.includes('cloudinary.com')) {
-    // Inject f_auto (format), q_80 (requested quality range 75-85), and resolution
-    const width = priority ? '1920' : '800';
-    optimizedSrc = src.replace('/upload/', `/upload/f_auto,q_80,w_${width}/`);
+    // For Hero banners or priority images, we use q_100 and original resolution to prevent pixel dropping
+    if (priority || isBanner) {
+      optimizedSrc = src.replace('/upload/', '/upload/f_auto,q_100/');
+    } else {
+      optimizedSrc = src.replace('/upload/', '/upload/f_auto,q_80,w_800/');
+    }
   }
 
   // Create a tiny blur placeholder URL
@@ -56,7 +61,6 @@ const OptimizedImage: React.FC<OptimizedImageProps> = ({
       fetchPriority={priority ? "high" : "auto"}
       onClick={handleClick}
       style={{ 
-        imageRendering: '-webkit-optimize-contrast',
         backgroundImage: `url(${lowResSrc})`,
         backgroundSize: 'cover',
         backgroundPosition: 'center',

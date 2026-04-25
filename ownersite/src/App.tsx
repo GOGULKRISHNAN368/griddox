@@ -288,26 +288,28 @@ const App = () => {
     });
   };
 
-  const handleBannerUpload = async (event: React.ChangeEvent<HTMLInputElement>, id?: string) => {
+  const handleBannerUpload = async (event: React.ChangeEvent<HTMLInputElement>, type: 'imageUrl' | 'mobileImageUrl', id?: string) => {
     const file = event.target.files?.[0];
     if (!file) return;
 
     setIsLoading(true);
-    showStatus(id ? 'Updating banner...' : 'Uploading new banner...', 'success');
+    showStatus(id ? `Updating ${type === 'imageUrl' ? 'Desktop' : 'Mobile'} image...` : 'Uploading new banner...', 'success');
 
     try {
-      const base64 = await optimizeImage(file);
+      const base64 = await optimizeImage(file, type === 'imageUrl' ? 1920 : 1080);
       const url = id ? `${API_BASE}/api/banners/${id}` : `${API_BASE}/api/add-banner`;
       const method = id ? 'PUT' : 'POST';
+
+      const bodyData: any = { title: `Banner - ${file.name}`, [type]: base64, link: '#' };
 
       const response = await fetch(url, {
         method: method,
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ title: `Banner - ${file.name}`, imageUrl: base64, link: '#' }),
+        body: JSON.stringify(bodyData),
       });
 
       if (response.ok) {
-        showStatus(id ? 'Banner updated successfully!' : 'New banner added!');
+        showStatus(id ? 'Updated successfully!' : 'New banner created!');
         fetchBanners();
       } else {
         showStatus('Failed to process banner.', 'error');
@@ -719,31 +721,58 @@ const App = () => {
         {activeTab === 'banners' && (
           <div className="fade-in">
              <div className="content-grid">
-                <div className="upload-zone" onClick={() => {
-                   const input = document.createElement('input');
-                   input.type = 'file';
-                   input.accept = 'image/*';
-                   input.onchange = (e) => handleBannerUpload(e as any);
-                   input.click();
-                }}>
-                    <div className="upload-placeholder">
-                        <span className="icon">➕</span>
-                        <p>Upload New Banner</p>
-                        <p className="upload-hint">(Recommended: 1920x800)</p>
+                <div className="upload-options-card">
+                    <div className="upload-option" onClick={() => {
+                       const input = document.createElement('input');
+                       input.type = 'file';
+                       input.accept = 'image/*';
+                       input.onchange = (e) => handleBannerUpload(e as any, 'imageUrl');
+                       input.click();
+                    }}>
+                        <span className="icon">💻</span>
+                        <p>New Desktop Banner</p>
+                        <span className="size-hint">1920 x 800 px</span>
+                    </div>
+                    <div className="upload-option mobile" onClick={() => {
+                       const input = document.createElement('input');
+                       input.type = 'file';
+                       input.accept = 'image/*';
+                       input.onchange = (e) => handleBannerUpload(e as any, 'mobileImageUrl');
+                       input.click();
+                    }}>
+                        <span className="icon">📱</span>
+                        <p>New Mobile Banner</p>
+                        <span className="size-hint">1080 x 1440 px</span>
                     </div>
                 </div>
                 {banners.map(banner => (
-                    <div key={banner._id} className="item-card">
-                        <div className="item-image" style={{backgroundImage: `url("${banner.imageUrl}")`}}></div>
-                        <div className="card-actions">
-                            <button className="btn-icon edit" onClick={() => {
+                    <div key={banner._id} className="item-card banner-card">
+                        <div className="banner-split-view">
+                          <div className="view-half">
+                            <div className="item-image" style={{backgroundImage: `url("${banner.imageUrl}")`}}></div>
+                            <div className="view-label">DESKTOP</div>
+                            <button className="change-btn" onClick={() => {
                                 const input = document.createElement('input');
                                 input.type = 'file';
                                 input.accept = 'image/*';
-                                input.onchange = (e) => handleBannerUpload(e as any, banner._id);
+                                input.onchange = (e) => handleBannerUpload(e as any, 'imageUrl', banner._id);
                                 input.click();
                             }}>Change</button>
-                            <button className="btn-icon delete" onClick={() => handleDeleteBanner(banner._id)}>Remove</button>
+                          </div>
+                          <div className="view-half">
+                            <div className="item-image mobile" style={{backgroundImage: `url("${banner.mobileImageUrl || banner.imageUrl}")`}}></div>
+                            <div className="view-label">MOBILE</div>
+                            <button className="change-btn" onClick={() => {
+                                const input = document.createElement('input');
+                                input.type = 'file';
+                                input.accept = 'image/*';
+                                input.onchange = (e) => handleBannerUpload(e as any, 'mobileImageUrl', banner._id);
+                                input.click();
+                            }}>Change</button>
+                          </div>
+                        </div>
+                        <div className="card-actions" style={{marginTop: 'auto', borderTop: '1px solid #f1f5f9'}}>
+                            <button className="btn-icon delete" onClick={() => handleDeleteBanner(banner._id)}>Remove Banner</button>
                         </div>
                     </div>
                 ))}

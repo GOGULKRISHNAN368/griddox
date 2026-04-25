@@ -87,7 +87,8 @@ mongoose.connect(MONGODB_URI, {
 // Schema
 const BannerSchema = new mongoose.Schema({
   title: String,
-  imageUrl: String,
+  imageUrl: String, // Desktop
+  mobileImageUrl: String, // Mobile
   link: String,
   createdAt: { type: Date, default: Date.now }
 });
@@ -227,10 +228,17 @@ app.get('/api/check-auth', verifyToken, (req, res) => {
 
 app.post('/api/add-banner', async (req, res) => {
   try {
-    const { title, imageUrl, link } = req.body;
+    const { title, imageUrl, mobileImageUrl, link } = req.body;
+    
     const cloudUrl = await uploadToCloudinary(imageUrl, 'gridox_banners');
+    const mobileCloudUrl = await uploadToCloudinary(mobileImageUrl, 'gridox_banners');
 
-    const newBanner = new Banner({ title, imageUrl: cloudUrl, link });
+    const newBanner = new Banner({ 
+      title, 
+      imageUrl: cloudUrl, 
+      mobileImageUrl: mobileCloudUrl || cloudUrl, // Fallback to desktop if mobile not provided
+      link 
+    });
     const savedBanner = await newBanner.save();
 
     res.status(201).send({ message: 'Banner added successfully', data: savedBanner });
@@ -265,9 +273,23 @@ app.delete('/api/banners/:id', async (req, res) => {
 app.put('/api/banners/:id', async (req, res) => {
   try {
     const { id } = req.params;
-    const { title, imageUrl, link } = req.body;
-    const cloudUrl = await uploadToCloudinary(imageUrl, 'gridox_banners');
-    const updated = await Banner.findByIdAndUpdate(id, { title, imageUrl: cloudUrl, link }, { new: true });
+    const { title, imageUrl, mobileImageUrl, link } = req.body;
+    
+    const updateData = { title, link };
+    
+    if (imageUrl && imageUrl.startsWith('data:')) {
+      updateData.imageUrl = await uploadToCloudinary(imageUrl, 'gridox_banners');
+    } else if (imageUrl) {
+      updateData.imageUrl = imageUrl;
+    }
+
+    if (mobileImageUrl && mobileImageUrl.startsWith('data:')) {
+      updateData.mobileImageUrl = await uploadToCloudinary(mobileImageUrl, 'gridox_banners');
+    } else if (mobileImageUrl) {
+      updateData.mobileImageUrl = mobileImageUrl;
+    }
+
+    const updated = await Banner.findByIdAndUpdate(id, updateData, { new: true });
     res.status(200).send({ message: 'Banner updated successfully', data: updated });
   } catch (error) {
     res.status(500).send({ message: 'Error updating banner', error: error.message });

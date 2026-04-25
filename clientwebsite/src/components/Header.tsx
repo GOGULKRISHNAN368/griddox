@@ -46,7 +46,7 @@ const Header = () => {
           const items = JSON.parse(saved);
           const count = items.reduce((sum: number, item: any) => sum + item.quantity, 0);
           setCartCount(count);
-        } catch (e) {}
+        } catch (e) { }
       } else {
         setCartCount(0);
       }
@@ -54,7 +54,7 @@ const Header = () => {
 
     updateCartCount();
     window.addEventListener('cartUpdated', updateCartCount);
-    
+
     const handleOpenMenu = () => setMenuOpen(true);
     window.addEventListener('openMobileMenu', handleOpenMenu);
 
@@ -130,9 +130,9 @@ const Header = () => {
 
         {/* Icons */}
         <div className="flex items-center gap-4">
-          <button 
-            aria-label="Search" 
-            onClick={() => setSearchOpen(true)} 
+          <button
+            aria-label="Search"
+            onClick={() => setSearchOpen(true)}
             className="hidden md:block text-foreground hover:text-accent transition-colors"
           >
             <Search size={20} />
@@ -209,14 +209,14 @@ const Header = () => {
           {navLinks
             .filter(link => link.name !== "ADDRESS")
             .map((link) => (
-            <button
-              key={link.name}
-              onClick={() => { handleNavClick(link.name, navigate); setMenuOpen(false); }} // fix: nav scroll links
-              className="block w-full text-left py-3 text-sm font-medium tracking-wider text-foreground hover:text-accent border-b border-border last:border-b-0 bg-transparent cursor-pointer"
-            >
-              {link.name}
-            </button>
-          ))}
+              <button
+                key={link.name}
+                onClick={() => { handleNavClick(link.name, navigate); setMenuOpen(false); }} // fix: nav scroll links
+                className="block w-full text-left py-3 text-sm font-medium tracking-wider text-foreground hover:text-accent border-b border-border last:border-b-0 bg-transparent cursor-pointer"
+              >
+                {link.name}
+              </button>
+            ))}
         </nav>
       )}
 
