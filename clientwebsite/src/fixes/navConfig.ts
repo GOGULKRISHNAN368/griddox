@@ -1,7 +1,7 @@
 // ─── NAV SCROLL / ROUTE CONFIG ────────────────────────────────────────────────
 export const NAV_TARGETS: Record<string, { type: "hash" | "path"; value: string }> = {
   HOME: { type: "path", value: "/" },
-  NEW: { type: "hash", value: "new-arrivals" },
+  CATEGORIES: { type: "hash", value: "categories" },
   ADDRESS: { type: "path", value: "/store-locator" },
   "BULK QUERIES": { type: "hash", value: "bulk-queries" },
   "ABOUT US": { type: "hash", value: "about" },

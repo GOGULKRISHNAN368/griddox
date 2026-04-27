@@ -26,6 +26,7 @@ interface Order {
     addressLine: string;
     pincode: string;
   };
+  paymentMethod: string;
 }
 
 const OrdersPage = () => {
@@ -90,9 +91,9 @@ const OrdersPage = () => {
         <div className="p-4 md:px-6 flex flex-col md:flex-row gap-3 border-b border-gray-50">
           <div className="flex-1 relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
-            <input 
-              type="text" 
-              placeholder="Search your orders..." 
+            <input
+              type="text"
+              placeholder="Search your orders..."
               className="w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
             />
           </div>
@@ -118,10 +119,10 @@ const OrdersPage = () => {
           </div>
         ) : (
           <div className="flex flex-col">
-            {orders.map((order) => 
+            {orders.map((order) =>
               order.items.map((item, index) => (
                 <div key={`${order._id}-${index}`} className="group hover:bg-gray-50 transition-colors border-b border-gray-100 last:border-0">
-                  <div 
+                  <div
                     className="p-4 md:p-6 flex gap-4 md:gap-6 items-center cursor-pointer"
                     onClick={() => setSelectedOrder(order)}
                   >
@@ -131,14 +132,13 @@ const OrdersPage = () => {
                     <div className="flex-1 min-w-0">
                       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-1">
                         <h3 className="font-bold text-gray-900 text-base md:text-lg truncate">{item.name}</h3>
-                        <span className={`text-[11px] md:text-xs font-bold px-2 py-1 rounded-full w-fit ${
-                          order.status === 'Pending' ? 'bg-amber-100 text-amber-700' : 'bg-green-100 text-green-700'
-                        }`}>
+                        <span className={`text-[11px] md:text-xs font-bold px-2 py-1 rounded-full w-fit ${order.status === 'Pending' ? 'bg-amber-100 text-amber-700' : 'bg-green-100 text-green-700'
+                          }`}>
                           {order.status.toUpperCase()}
                         </span>
                       </div>
                       <p className="text-sm text-gray-500 mt-1">
-                         {order.status === 'Pending' ? 'Ordered on' : order.status + ' on'} {new Date(order.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                        {order.status === 'Pending' ? 'Ordered on' : order.status + ' on'} {new Date(order.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
                       </p>
                       <div className="mt-2 flex items-center gap-3">
                         <span className="text-sm font-bold text-gray-900">₹{item.price.toLocaleString()}</span>
@@ -148,12 +148,12 @@ const OrdersPage = () => {
                     </div>
                     <ChevronRight size={20} className="text-gray-300 group-hover:text-primary transition-colors shrink-0" />
                   </div>
-                  
+
                   {/* Desktop Quick Actions */}
                   <div className="px-4 pb-4 md:px-6 md:pb-6 flex items-center justify-between">
                     <div className="flex gap-4">
-                       <button className="text-xs font-bold text-primary hover:underline">Track Order</button>
-                       <button className="text-xs font-bold text-gray-500 hover:underline">Need Help?</button>
+                      <button className="text-xs font-bold text-primary hover:underline">Track Order</button>
+                      <button className="text-xs font-bold text-gray-500 hover:underline">Need Help?</button>
                     </div>
                     {order.status !== 'Pending' && (
                       <div className="flex items-center gap-2">
@@ -179,7 +179,7 @@ const OrdersPage = () => {
   const renderDetails = () => {
     if (!selectedOrder) return null;
     const orderDate = new Date(selectedOrder.createdAt);
-    
+
     return (
       <div className="min-h-screen bg-gray-100 pb-20 md:pb-8">
         <Header />
@@ -190,7 +190,7 @@ const OrdersPage = () => {
             </button>
             <h1 className="flex-1 text-lg md:text-xl font-bold text-gray-800">Order Details</h1>
             <div className="flex gap-3">
-              <button className="hidden md:flex items-center gap-2 border border-gray-200 px-4 py-2 rounded-xl text-sm font-bold hover:bg-gray-50 transition-all shadow-sm"><HelpCircle size={16}/> Help Center</button>
+              <button className="hidden md:flex items-center gap-2 border border-gray-200 px-4 py-2 rounded-xl text-sm font-bold hover:bg-gray-50 transition-all shadow-sm"><HelpCircle size={16} /> Help Center</button>
               <button className="p-2 hover:bg-gray-100 rounded-full transition-colors"><Share2 size={20} className="text-gray-600" /></button>
             </div>
           </div>
@@ -238,7 +238,7 @@ const OrdersPage = () => {
                 <div className="relative mt-4 mb-4 ml-2">
                   <div className="absolute left-[9px] top-0 bottom-0 w-[2px] bg-gray-100"></div>
                   <div className="absolute left-[9px] top-0 h-[50%] w-[2px] bg-green-500"></div>
-                  
+
                   <div className="relative flex items-start gap-4 mb-10">
                     <div className="bg-white ring-4 ring-white z-10"><CheckCircle2 size={20} className="text-green-500 fill-white" /></div>
                     <div className="flex-1 -mt-0.5">
@@ -261,11 +261,11 @@ const OrdersPage = () => {
                     <div className="bg-white ring-4 ring-white z-10"><Circle size={20} className="text-gray-100 fill-white" /></div>
                     <div className="flex-1 -mt-0.5">
                       <p className="text-sm font-bold text-gray-400">Delivery</p>
-                      <p className="text-xs text-gray-300 mt-0.5">Estimated by {new Date(orderDate.getTime() + 5*24*60*60*1000).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</p>
+                      <p className="text-xs text-gray-300 mt-0.5">Estimated by {new Date(orderDate.getTime() + 5 * 24 * 60 * 60 * 1000).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</p>
                     </div>
                   </div>
                 </div>
-                
+
                 <div className="mt-8 p-4 bg-primary/5 rounded-2xl flex gap-3 items-start border border-primary/10">
                   <Package size={20} className="text-primary shrink-0" />
                   <div>
@@ -280,8 +280,8 @@ const OrdersPage = () => {
               {/* Shipping Details */}
               <div className="bg-white rounded-2xl border border-gray-100 p-6 shadow-sm">
                 <div className="flex items-center gap-2 mb-4">
-                   <MapPin size={18} className="text-gray-400" />
-                   <h3 className="font-bold text-gray-900">Shipping Address</h3>
+                  <MapPin size={18} className="text-gray-400" />
+                  <h3 className="font-bold text-gray-900">Shipping Address</h3>
                 </div>
                 <div className="text-sm text-gray-600 space-y-1">
                   <p className="font-black text-gray-900 mb-2">{selectedOrder.address.name}</p>
@@ -321,8 +321,8 @@ const OrdersPage = () => {
               </div>
 
               <div className="flex flex-col gap-3">
-                 <button className="w-full py-4 bg-gray-900 text-white rounded-2xl font-bold hover:bg-black transition-all shadow-lg shadow-gray-200">Download Invoice</button>
-                 <button className="w-full py-4 bg-white text-gray-900 border-2 border-gray-900 rounded-2xl font-bold hover:bg-gray-50 transition-all">Cancel Order</button>
+                <button className="w-full py-4 bg-gray-900 text-white rounded-2xl font-bold hover:bg-black transition-all shadow-lg shadow-gray-200">Download Invoice</button>
+                <button className="w-full py-4 bg-white text-gray-900 border-2 border-gray-900 rounded-2xl font-bold hover:bg-gray-50 transition-all">Cancel Order</button>
               </div>
             </div>
           </div>
@@ -333,11 +333,6 @@ const OrdersPage = () => {
       </div>
     );
   };
-
-  return selectedOrder ? renderDetails() : renderList();
-};
-
-export default OrdersPage;
 
   return selectedOrder ? renderDetails() : renderList();
 };

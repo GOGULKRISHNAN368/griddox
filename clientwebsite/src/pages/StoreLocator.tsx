@@ -74,7 +74,7 @@ const StoreLocator = () => {
                       </div>
                       <div className="space-y-1">
                         <p className="text-[10px] uppercase tracking-[0.2em] font-bold text-gray-400">Call</p>
-                        <p className="text-[#1a1a1a] text-sm md:text-base font-semibold">+91 98765 43210</p>
+                        <a href="tel:+918110911118" className="text-[#1a1a1a] text-sm md:text-base font-semibold hover:text-[#8b231a] transition-colors">+91 81109 11118</a>
                       </div>
                     </div>
                     <div className="group flex gap-4 md:gap-6">
@@ -83,7 +83,7 @@ const StoreLocator = () => {
                       </div>
                       <div className="space-y-1">
                         <p className="text-[10px] uppercase tracking-[0.2em] font-bold text-gray-400">Email</p>
-                        <p className="text-[#1a1a1a] text-sm md:text-base font-semibold">hello@gridox.com</p>
+                        <a href="mailto:gridoxclothing@gmail.com" className="text-[#1a1a1a] text-sm md:text-base font-semibold hover:text-[#8b231a] transition-colors">gridoxclothing@gmail.com</a>
                       </div>
                     </div>
                   </div>

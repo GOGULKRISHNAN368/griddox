@@ -7,7 +7,7 @@ import SearchModal from "./SearchModal";
 
 const navLinks = [
   { name: "HOME" },
-  { name: "NEW" },
+  { name: "CATEGORIES" },
   { name: "ADDRESS" },
   { name: "BULK QUERIES" },
   { name: "ABOUT US" },
@@ -44,7 +44,7 @@ const Header = () => {
       if (saved) {
         try {
           const items = JSON.parse(saved);
-          const count = items.reduce((sum: number, item: any) => sum + item.quantity, 0);
+          const count = items.length;
           setCartCount(count);
         } catch (e) { }
       } else {
