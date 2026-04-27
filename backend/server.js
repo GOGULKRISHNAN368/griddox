@@ -183,7 +183,7 @@ app.post('/api/auth/admin-login', async (req, res) => {
     const accessToken = jwt.sign(
       { userId: user._id, email: user.email },
       process.env.JWT_SECRET,
-      { expiresIn: '15m' }
+      { expiresIn: '7d' }
     );
     const refreshToken = jwt.sign(
       { userId: user._id },
@@ -194,7 +194,7 @@ app.post('/api/auth/admin-login', async (req, res) => {
     user.refreshToken = refreshToken;
     await user.save();
 
-    res.cookie('accessToken', accessToken, { httpOnly: true, secure: true, sameSite: 'none', maxAge: 15 * 60 * 1000 });
+    res.cookie('accessToken', accessToken, { httpOnly: true, secure: true, sameSite: 'none', maxAge: 7 * 24 * 60 * 60 * 1000 });
     res.cookie('refreshToken', refreshToken, { httpOnly: true, secure: true, sameSite: 'none', maxAge: 7 * 24 * 60 * 60 * 1000 });
 
     res.status(200).json({ message: 'Admin login successful', user: { name: user.name, email: user.email } });
