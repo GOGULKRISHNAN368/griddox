@@ -106,7 +106,7 @@ router.post('/send-otp', async (req, res) => {
 router.post('/signup', async (req, res) => {
   try {
     const { name, email, password, otp } = req.body;
-    
+
     if (!otp) return res.status(400).json({ message: 'OTP is required' });
 
     // Verify OTP
@@ -121,23 +121,23 @@ router.post('/signup', async (req, res) => {
     user = new User({ name, email, password });
     const tokens = generateTokens(user);
     user.refreshToken = tokens.refreshToken;
-    
+
     await user.save();
-    
+
     // Delete OTP after successful signup
     await OTP.deleteOne({ email });
 
     res.cookie('accessToken', tokens.accessToken, {
       httpOnly: true,
-      secure: true,
-      sameSite: 'none',
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
       maxAge: 15 * 60 * 1000
     });
 
     res.cookie('refreshToken', tokens.refreshToken, {
       httpOnly: true,
-      secure: true,
-      sameSite: 'none',
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
       maxAge: 7 * 24 * 60 * 60 * 1000
     });
 
@@ -192,15 +192,15 @@ router.post('/login', async (req, res) => {
 
     res.cookie('accessToken', tokens.accessToken, {
       httpOnly: true,
-      secure: true,
-      sameSite: 'none',
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
       maxAge: 15 * 60 * 1000
     });
 
     res.cookie('refreshToken', tokens.refreshToken, {
       httpOnly: true,
-      secure: true,
-      sameSite: 'none',
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
       maxAge: 7 * 24 * 60 * 60 * 1000
     });
 
@@ -213,36 +213,63 @@ router.post('/login', async (req, res) => {
 /* --- GOOGLE OAUTH ROUTES --- */
 
 router.get('/google', (req, res, next) => {
-  // Determine which frontend the user came from for redirection
   const referer = req.headers.referer || '';
-  let targetFrontend = process.env.FRONTEND_URL;
+  let targetFrontend = process.env.FRONTEND_URL || 'https://griddox.vercel.app';
   
-  if (referer.includes('ownersite') || referer.includes('owner')) {
+  if (referer.includes('localhost') || referer.includes('127.0.0.1')) {
+    try {
+      const refUrl = new URL(referer);
+      targetFrontend = `${refUrl.protocol}//${refUrl.host}`;
+    } catch (e) {
+      targetFrontend = 'http://localhost:8080';
+    }
+  } else if (referer.includes('ownersite') || referer.includes('owner')) {
     targetFrontend = 'https://ownersite-psi.vercel.app';
   }
 
-  // Save the target frontend in a short-lived cookie
+  const redirectPath = req.query.redirect || '';
+  
   res.cookie('auth_redirect_to', targetFrontend, { 
     httpOnly: true, 
-    secure: true, 
-    sameSite: 'none', 
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
     maxAge: 5 * 60 * 1000 // 5 minutes
   });
 
-  // Start Passport Auth with account selection forced
+  if (redirectPath) {
+    res.cookie('auth_final_redirect', redirectPath, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+      maxAge: 5 * 60 * 1000
+    });
+  }
+
+  let host = req.get('host');
+  if (host.includes('127.0.0.1')) {
+    host = host.replace('127.0.0.1', 'localhost');
+  }
+  const callbackURL = process.env.GOOGLE_CALLBACK_URL || `${req.protocol}://${host}/api/auth/google/callback`;
+
   passport.authenticate('google', { 
     scope: ['profile', 'email'],
-    state: true,
-    prompt: 'select_account' // <--- This forces Google to show the account list
+    prompt: 'select_account',
+    callbackURL
   })(req, res, next);
 });
 
 router.get('/google/callback', (req, res, next) => {
   console.log('--- GOOGLE AUTH CALLBACK RECEIVED ---');
+  let host = req.get('host');
+  if (host.includes('127.0.0.1')) {
+    host = host.replace('127.0.0.1', 'localhost');
+  }
+  const callbackURL = process.env.GOOGLE_CALLBACK_URL || `${req.protocol}://${host}/api/auth/google/callback`;
 
   passport.authenticate('google', { 
-    failureRedirect: `${process.env.FRONTEND_URL}/auth?error=google_failed`, 
-    session: false
+    failureRedirect: `${process.env.FRONTEND_URL || 'http://localhost:8080'}/auth?error=google_failed`, 
+    session: false,
+    callbackURL
   })(req, res, next);
 }, async (req, res) => {
   try {
@@ -267,8 +294,20 @@ router.get('/google/callback', (req, res, next) => {
     });
 
     console.log(`Redirecting to frontend with google_otp=true for ${userEmail}`);
-    const redirectTo = req.cookies.auth_redirect_to || process.env.FRONTEND_URL;
-    res.redirect(`${redirectTo}/auth?google_otp=true&email=${encodeURIComponent(userEmail)}`);
+    const redirectTo = req.cookies.auth_redirect_to || process.env.FRONTEND_URL || 'http://localhost:8080';
+    const finalRedirect = req.cookies.auth_final_redirect || '';
+    
+    let url = `${redirectTo}/auth?google_otp=true&email=${encodeURIComponent(userEmail)}`;
+    if (finalRedirect) {
+      url += `&redirect=${encodeURIComponent(finalRedirect)}`;
+    }
+
+    res.clearCookie('auth_final_redirect', { 
+      secure: process.env.NODE_ENV === 'production', 
+      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax' 
+    });
+
+    res.redirect(url);
   } catch (error) {
     console.error('GOOGLE CALLBACK ERROR:', error);
     const fallback = req.cookies.auth_redirect_to || process.env.FRONTEND_URL;
@@ -281,7 +320,7 @@ router.post('/google/verify-otp', async (req, res) => {
   try {
     const { otp, email: emailFromBody } = req.body;
     const email = req.cookies.pending_google_email || emailFromBody;
-    
+
     console.log(`Verifying Google OTP for ${email}: ${otp}`);
 
     if (!email) {
@@ -294,9 +333,14 @@ router.post('/google/verify-otp', async (req, res) => {
       return res.status(400).json({ message: 'Invalid or expired OTP' });
     }
 
-    const user = await User.findOne({ email });
+    let user = await User.findOne({ email });
     if (!user) {
-      return res.status(404).json({ message: 'User not found' });
+      // Auto-create user for Google sign-in if they don't exist
+      user = new User({ 
+        email, 
+        name: email.split('@')[0], // Fallback name
+        password: Math.random().toString(36).slice(-10) // Random password
+      });
     }
 
     const tokens = generateTokens(user);
@@ -309,15 +353,15 @@ router.post('/google/verify-otp', async (req, res) => {
 
     res.cookie('accessToken', tokens.accessToken, {
       httpOnly: true,
-      secure: true,
-      sameSite: 'none',
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
       maxAge: 15 * 60 * 1000
     });
 
     res.cookie('refreshToken', tokens.refreshToken, {
       httpOnly: true,
-      secure: true,
-      sameSite: 'none',
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
       maxAge: 7 * 24 * 60 * 60 * 1000
     });
 
@@ -339,7 +383,7 @@ router.post('/admin-login', async (req, res) => {
   console.log('--- ADMIN LOGIN ATTEMPT ---', req.body.username);
   try {
     const { username, password } = req.body;
-    
+
     // Find user by name (case-insensitive)
     const user = await User.findOne({ name: new RegExp(`^${username}$`, 'i') });
 
@@ -357,21 +401,21 @@ router.post('/admin-login', async (req, res) => {
 
     res.cookie('accessToken', tokens.accessToken, {
       httpOnly: true,
-      secure: true,
-      sameSite: 'none',
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
       maxAge: 15 * 60 * 1000
     });
 
     res.cookie('refreshToken', tokens.refreshToken, {
       httpOnly: true,
-      secure: true,
-      sameSite: 'none',
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
       maxAge: 7 * 24 * 60 * 60 * 1000
     });
 
-    res.status(200).json({ 
-      message: 'Admin login successful', 
-      user: { name: user.name, email: user.email } 
+    res.status(200).json({
+      message: 'Admin login successful',
+      user: { name: user.name, email: user.email }
     });
   } catch (error) {
     res.status(500).json({ message: 'Server error', error: error.message });

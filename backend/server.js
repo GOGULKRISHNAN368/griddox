@@ -13,21 +13,21 @@ const app = express();
 app.set('trust proxy', 1);
 // CORS Configuration - Ensure Vercel can talk to Render
 const corsOptions = {
-    origin: [
-        'http://localhost:8080',
-        'http://127.0.0.1:8080',
-        'http://localhost:5173',
-        'http://localhost:5174',
-        'http://127.0.0.1:5173',
-        'http://127.0.0.1:5174',
-        'https://gridox-store.vercel.app',
-        'https://gridox-owner.vercel.app',
-        'https://griddox.vercel.app',
-        'https://ownersite-psi.vercel.app'
-    ],
-    credentials: true,
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization', 'x-request-with']
+  origin: [
+    'http://localhost:8080',
+    'http://127.0.0.1:8080',
+    'http://localhost:5173',
+    'http://localhost:5174',
+    'http://127.0.0.1:5173',
+    'http://127.0.0.1:5174',
+    'https://gridox-store.vercel.app',
+    'https://gridox-owner.vercel.app',
+    'https://griddox.vercel.app',
+    'https://ownersite-psi.vercel.app'
+  ],
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'x-request-with']
 };
 
 app.use(cors(corsOptions));
@@ -164,7 +164,7 @@ app.post('/api/auth/admin-login', async (req, res) => {
   try {
     const { username, password } = req.body;
     const user = await User.findOne({ name: new RegExp(`^${username.trim()}$`, 'i') });
-    
+
     console.log('User found in DB:', user ? 'YES' : 'NO');
     if (user) console.log('Actual DB Name:', user.name);
 
@@ -229,15 +229,15 @@ app.get('/api/check-auth', verifyToken, (req, res) => {
 app.post('/api/add-banner', async (req, res) => {
   try {
     const { title, imageUrl, mobileImageUrl, link } = req.body;
-    
+
     const cloudUrl = await uploadToCloudinary(imageUrl, 'gridox_banners');
     const mobileCloudUrl = await uploadToCloudinary(mobileImageUrl, 'gridox_banners');
 
-    const newBanner = new Banner({ 
-      title, 
-      imageUrl: cloudUrl, 
+    const newBanner = new Banner({
+      title,
+      imageUrl: cloudUrl,
       mobileImageUrl: mobileCloudUrl || cloudUrl, // Fallback to desktop if mobile not provided
-      link 
+      link
     });
     const savedBanner = await newBanner.save();
 
@@ -274,9 +274,9 @@ app.put('/api/banners/:id', async (req, res) => {
   try {
     const { id } = req.params;
     const { title, imageUrl, mobileImageUrl, link } = req.body;
-    
+
     const updateData = { title, link };
-    
+
     if (imageUrl && imageUrl.startsWith('data:')) {
       updateData.imageUrl = await uploadToCloudinary(imageUrl, 'gridox_banners');
     } else if (imageUrl) {
@@ -562,7 +562,7 @@ app.post('/api/send-otp', async (req, res) => {
     if (email) {
       const smtpUser = process.env.SMTP_EMAIL;
       const smtpPass = process.env.SMTP_PASSWORD;
-      
+
       if (smtpUser && smtpPass) {
         const transporter = nodemailer.createTransport({
           service: 'gmail', // Standard fallback, can configure different host depending on provider
@@ -586,7 +586,7 @@ app.post('/api/send-otp', async (req, res) => {
                  </div>`
         }).then(() => console.log(`OTP emailed successfully to ${email}`))
           .catch(err => console.error("OTP email failed:", err));
-          
+
         messagesSent.push('email');
       } else {
         console.log(`SMTP keys missing! (mocking OTP dispatch): EMAIL to ${email} -> OTP: ${otp}`);
@@ -597,8 +597,8 @@ app.post('/api/send-otp', async (req, res) => {
       return res.status(400).send({ message: 'Email is required' });
     }
 
-    res.status(200).send({ 
-      success: true, 
+    res.status(200).send({
+      success: true,
       message: isMock ? 'Mock OTP sent (Keys missing)' : 'OTP sent successfully',
       dispatchedVia: messagesSent
     });
@@ -620,7 +620,7 @@ app.post('/api/leads', async (req, res) => {
     const newLead = new Lead({ email, phone });
     const saved = await newLead.save();
     console.log(`Lead Captured Successfully: ${email} | ${phone || 'No Phone'}`);
-    
+
     // Setup Lead Notification Email
     const smtpUser = process.env.SMTP_EMAIL;
     const smtpPass = process.env.SMTP_PASSWORD;
@@ -649,7 +649,7 @@ app.post('/api/leads', async (req, res) => {
                </div>`
       }).catch(err => console.error("Lead alert email failed:", err)); // Fail silently if mail errors out
     }
-    
+
     res.status(201).send({ message: 'Lead created successfully', data: saved });
   } catch (error) {
     console.error('Error creating lead:', error);
@@ -683,5 +683,5 @@ app.get('/', (req, res) => {
 });
 
 app.listen(process.env.PORT || 3001, '0.0.0.0', () => {
-    console.log(`Server running on port ${process.env.PORT || 3001}`);
+  console.log(`Server running on port ${process.env.PORT || 3001}`);
 });

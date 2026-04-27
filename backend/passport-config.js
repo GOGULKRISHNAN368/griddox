@@ -3,22 +3,22 @@ const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const User = require('./models/User');
 
 passport.use(new GoogleStrategy({
-    clientID: (process.env.GOOGLE_CLIENT_ID || "").trim(),
-    clientSecret: (process.env.GOOGLE_CLIENT_SECRET || "").trim(),
-    callbackURL: "https://griddox.vercel.app/api/auth/google/callback",
-    proxy: true 
-  },
+  clientID: (process.env.GOOGLE_CLIENT_ID || "").trim(),
+  clientSecret: (process.env.GOOGLE_CLIENT_SECRET || "").trim(),
+  callbackURL: "https://griddox.vercel.app/api/auth/google/callback",
+  proxy: true
+},
   async (accessToken, refreshToken, profile, done) => {
     try {
       const email = profile.emails[0].value;
-      
+
       // 1. Check for existing user by Google ID
       let user = await User.findOne({ googleId: profile.id });
-      
+
       if (!user) {
         // 2. Check for existing user by Email (to prevent duplicates)
         user = await User.findOne({ email });
-        
+
         if (user) {
           // Link Google account to existing email account
           user.googleId = profile.id;

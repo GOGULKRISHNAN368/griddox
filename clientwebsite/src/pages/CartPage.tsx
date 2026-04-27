@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Trash2, ShoppingBag } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { toast } from "sonner";
 import Header from "@/components/Header";
 import BottomNav from "@/components/BottomNav";
 
@@ -43,6 +44,19 @@ const CartPage = () => {
   };
 
   const subtotal = items.reduce((sum, i) => sum + i.price * i.quantity, 0);
+
+  const handleCheckoutClick = async () => {
+    try {
+      const response = await fetch('/api/dashboard', { credentials: 'include' });
+      if (response.ok) {
+        navigate('/checkout');
+      } else {
+        toast.error("Please login first to place an order");
+      }
+    } catch (e) {
+      toast.error("Please login first to place an order");
+    }
+  };
 
   return (
     <div className="min-h-screen bg-background pb-16 md:pb-0">
@@ -110,7 +124,10 @@ const CartPage = () => {
                 <span>Total</span>
                 <span>₹{subtotal.toLocaleString()}</span>
               </div>
-              <button className="w-full py-3 bg-primary text-primary-foreground text-sm font-medium tracking-wider hover:opacity-80 transition-opacity">
+              <button 
+                onClick={handleCheckoutClick}
+                className="w-full py-3 bg-black text-white text-sm font-medium tracking-wider hover:opacity-80 transition-opacity"
+              >
                 PROCEED TO CHECKOUT
               </button>
             </div>

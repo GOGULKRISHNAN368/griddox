@@ -27,14 +27,28 @@ const AuthPage = () => {
   });
 
   useEffect(() => {
-    if (searchParams.get('google_otp') === 'true') {
+    const checkExistingAuth = async () => {
+      try {
+        const response = await fetch('/api/dashboard', { credentials: 'include' });
+        if (response.ok) {
+          let redirectPath = searchParams.get('redirect') || '/';
+          navigate(redirectPath);
+        }
+      } catch (error) {
+        // Not logged in, stay on auth page
+      }
+    };
+
+    if (searchParams.get('google_otp') !== 'true') {
+      checkExistingAuth();
+    } else {
       setShowOtp(true);
       setIsGoogleOtp(true);
       if (searchParams.get('email')) {
         setFormData(prev => ({ ...prev, email: searchParams.get('email') || '' }));
       }
     }
-  }, [searchParams]);
+  }, [navigate, searchParams]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.id]: e.target.value });
@@ -56,8 +70,8 @@ const AuthPage = () => {
       if (!showOtp) {
         // Step 1: Send OTP
         const endpoint = isLogin ? '/auth/login' : '/auth/send-otp';
-        const payload = isLogin 
-          ? { email: formData.email, password: formData.password } 
+        const payload = isLogin
+          ? { email: formData.email, password: formData.password }
           : { email: formData.email, type: 'signup' };
 
         const response = await fetch(`${API_URL}${endpoint}`, {
@@ -79,17 +93,18 @@ const AuthPage = () => {
           } else {
             // Already logged in? (Shouldn't happen with the new logic but good to handle)
             toast.success(data.message);
-            navigate('/');
+            let redirectPath = searchParams.get('redirect') || '/';
+            navigate(redirectPath);
           }
         } else {
           toast.error(data.message || 'Error sending OTP');
         }
       } else {
         // Step 2: Verify OTP and Login/Signup
-        const endpoint = isGoogleOtp 
-          ? '/auth/google/verify-otp' 
+        const endpoint = isGoogleOtp
+          ? '/auth/google/verify-otp'
           : (isLogin ? '/auth/login' : '/auth/signup');
-          
+
         const payload = { ...formData, otp };
 
         const response = await fetch(`${API_URL}${endpoint}`, {
@@ -105,7 +120,8 @@ const AuthPage = () => {
           toast.success(data.message, {
             icon: <CheckCircle2 className="text-green-500" />,
           });
-          navigate('/');
+          let redirectPath = searchParams.get('redirect') || '/';
+          navigate(redirectPath);
         } else {
           toast.error(data.message || 'Verification failed');
         }
@@ -118,7 +134,8 @@ const AuthPage = () => {
   };
 
   const handleGoogleLogin = () => {
-    window.location.href = `${API_URL}/auth/google`;
+    const redirect = searchParams.get('redirect');
+    window.location.href = `${API_URL}/auth/google${redirect ? `?redirect=${encodeURIComponent(redirect)}` : ''}`;
   };
 
   return (
@@ -140,9 +157,9 @@ const AuthPage = () => {
                 <Label htmlFor="name">Full Name</Label>
                 <div className="relative group">
                   <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 group-focus-within:text-[#8b231a] transition-colors" />
-                  <Input 
-                    id="name" 
-                    placeholder="John Doe" 
+                  <Input
+                    id="name"
+                    placeholder="John Doe"
                     className="pl-10 h-12 rounded-xl border-gray-200 focus:ring-2 focus:ring-[#8b231a]/10 focus:border-[#8b231a] transition-all"
                     value={formData.name}
                     onChange={handleChange}
@@ -157,10 +174,10 @@ const AuthPage = () => {
               <Label htmlFor="email">Email Address</Label>
               <div className="relative group">
                 <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 group-focus-within:text-[#8b231a] transition-colors" />
-                <Input 
-                  id="email" 
-                  type="email" 
-                  placeholder="name@example.com" 
+                <Input
+                  id="email"
+                  type="email"
+                  placeholder="name@example.com"
                   className="pl-10 h-12 rounded-xl border-gray-200 focus:ring-2 focus:ring-[#8b231a]/10 focus:border-[#8b231a] transition-all"
                   value={formData.email}
                   onChange={handleChange}
@@ -182,10 +199,10 @@ const AuthPage = () => {
                 </div>
                 <div className="relative group">
                   <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 group-focus-within:text-[#8b231a] transition-colors" />
-                  <Input 
-                    id="password" 
-                    type={showPassword ? "text" : "password"} 
-                    placeholder="••••••••" 
+                  <Input
+                    id="password"
+                    type={showPassword ? "text" : "password"}
+                    placeholder="••••••••"
                     className="pl-10 pr-10 h-12 rounded-xl border-gray-200 focus:ring-2 focus:ring-[#8b231a]/10 focus:border-[#8b231a] transition-all"
                     value={formData.password}
                     onChange={handleChange}
@@ -209,10 +226,10 @@ const AuthPage = () => {
                 <Label htmlFor="confirmPassword">Confirm Password</Label>
                 <div className="relative group">
                   <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 group-focus-within:text-[#8b231a] transition-colors" />
-                  <Input 
-                    id="confirmPassword" 
-                    type={showPassword ? "text" : "password"} 
-                    placeholder="••••••••" 
+                  <Input
+                    id="confirmPassword"
+                    type={showPassword ? "text" : "password"}
+                    placeholder="••••••••"
                     className="pl-10 h-12 rounded-xl border-gray-200 focus:ring-2 focus:ring-[#8b231a]/10 focus:border-[#8b231a] transition-all"
                     value={formData.confirmPassword}
                     onChange={handleChange}
@@ -228,9 +245,9 @@ const AuthPage = () => {
                 <Label htmlFor="otp">Verification Code (OTP)</Label>
                 <div className="relative group">
                   <CheckCircle2 className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 group-focus-within:text-[#8b231a] transition-colors" />
-                  <Input 
-                    id="otp" 
-                    placeholder="123456" 
+                  <Input
+                    id="otp"
+                    placeholder="123456"
                     className="pl-10 h-12 rounded-xl border-gray-200 focus:ring-2 focus:ring-[#8b231a]/10 focus:border-[#8b231a] transition-all text-center tracking-[0.5em] font-bold text-lg"
                     value={otp}
                     onChange={(e) => setOtp(e.target.value)}
@@ -244,10 +261,10 @@ const AuthPage = () => {
               </div>
             )}
 
-            <Button 
-                type="submit" 
-                className="w-full h-12 rounded-xl bg-[#8b231a] hover:bg-[#6e1c14] text-white font-semibold transition-all flex items-center justify-center gap-2 group shadow-lg shadow-rose-900/20"
-                disabled={loading}
+            <Button
+              type="submit"
+              className="w-full h-12 rounded-xl bg-[#8b231a] hover:bg-[#6e1c14] text-white font-semibold transition-all flex items-center justify-center gap-2 group shadow-lg shadow-rose-900/20"
+              disabled={loading}
             >
               {loading ? (
                 <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
@@ -272,11 +289,11 @@ const AuthPage = () => {
               </div>
 
               <div className="grid grid-cols-1 gap-3">
-                <Button 
-                    variant="outline" 
-                    type="button" 
-                    className="h-12 rounded-xl border-gray-200 hover:bg-gray-50 flex items-center justify-center gap-3 transition-all"
-                    onClick={handleGoogleLogin}
+                <Button
+                  variant="outline"
+                  type="button"
+                  className="h-12 rounded-xl border-gray-200 hover:bg-gray-50 flex items-center justify-center gap-3 transition-all"
+                  onClick={handleGoogleLogin}
                 >
                   <Chrome className="w-5 h-5 text-blue-500" />
                   <span className="font-medium text-gray-700">Google Account</span>
@@ -288,7 +305,7 @@ const AuthPage = () => {
           <div className="mt-8 text-center">
             <p className="text-gray-500 text-sm">
               {isLogin ? "Don't have an account?" : "Already have an account?"}{' '}
-              <button 
+              <button
                 onClick={() => {
                   setIsLogin(!isLogin);
                   setShowOtp(false);
