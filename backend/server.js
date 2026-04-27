@@ -243,10 +243,10 @@ app.post('/api/orders', verifyToken, async (req, res) => {
         }
       });
       const mailOptions = {
-        from: process.env.SMTP_EMAIL,
-        to: process.env.SMTP_EMAIL, // Send copy to owner
-        subject: `New Order from ${address.name} (Gridox)`,
-        text: `New order placed by ${userEmail}.\nPhone: ${address.phone}\nAddress: ${address.addressLine}, ${address.pincode}\nTotal: ₹${totalAmount}\nItems: ${items.map(i => `${i.name} (Qty: ${i.quantity})`).join(', ')}`
+        from: `"Gridox Fashion" <${process.env.SMTP_EMAIL}>`,
+        to: `${userEmail}, ${process.env.SMTP_EMAIL}`, // Send to BOTH customer and owner
+        subject: `Order Confirmation - Gridox Fashion`,
+        text: `Thank you for your order!\n\nOrder placed by ${userEmail}.\nPhone: ${address.phone}\nDelivery Address: ${address.addressLine}, ${address.pincode}\nTotal Amount: ₹${totalAmount}\n\nItems Ordered:\n${items.map(i => `- ${i.name} (Qty: ${i.quantity})`).join('\n')}\n\nYour order will be processed shortly.`,
       };
       await transporter.sendMail(mailOptions);
     } catch(err) {
