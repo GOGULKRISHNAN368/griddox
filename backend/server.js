@@ -154,6 +154,7 @@ const Lead = mongoose.model('Lead', LeadSchema);
 const authRoutes = require('./routes/auth');
 const { verifyToken } = require('./middleware/auth');
 const User = require('./models/User');
+const Order = require('./models/Order');
 
 app.use('/api/auth', authRoutes);
 
@@ -219,6 +220,52 @@ app.get('/api/dashboard', verifyToken, async (req, res) => {
     res.status(200).json({ message: 'Welcome to your dashboard', user });
   } catch (error) {
     res.status(500).json({ message: 'Error fetching user data' });
+  }
+});
+
+// Create Order
+app.post('/api/orders', verifyToken, async (req, res) => {
+  try {
+    const { userEmail, items, address, paymentMethod, totalAmount } = req.body;
+    const newOrder = new Order({
+      userEmail, items, address, paymentMethod, totalAmount
+    });
+    await newOrder.save();
+
+    // Optional email notification
+    try {
+      const nodemailer = require('nodemailer');
+      const transporter = nodemailer.createTransport({
+        service: 'gmail',
+        auth: {
+          user: process.env.SMTP_EMAIL,
+          pass: process.env.SMTP_PASSWORD
+        }
+      });
+      const mailOptions = {
+        from: process.env.SMTP_EMAIL,
+        to: process.env.SMTP_EMAIL, // Send copy to owner
+        subject: `New Order from ${address.name} (Gridox)`,
+        text: `New order placed by ${userEmail}.\nPhone: ${address.phone}\nAddress: ${address.addressLine}, ${address.pincode}\nTotal: ₹${totalAmount}\nItems: ${items.map(i => `${i.name} (Qty: ${i.quantity})`).join(', ')}`
+      };
+      await transporter.sendMail(mailOptions);
+    } catch(err) {
+      console.error('Email notification failed, but order saved:', err);
+    }
+
+    res.status(201).json({ message: 'Order placed successfully', orderId: newOrder._id });
+  } catch (error) {
+    res.status(500).json({ message: 'Error placing order', error: error.message });
+  }
+});
+
+// Get User Orders
+app.get('/api/orders/:email', verifyToken, async (req, res) => {
+  try {
+    const orders = await Order.find({ userEmail: req.params.email }).sort({ createdAt: -1 });
+    res.status(200).json(orders);
+  } catch (error) {
+    res.status(500).json({ message: 'Error fetching orders' });
   }
 });
 
