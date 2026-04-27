@@ -269,6 +269,16 @@ app.get('/api/orders/:email', verifyToken, async (req, res) => {
   }
 });
 
+// Get ALL Orders for Admin
+app.get('/api/admin/orders', async (req, res) => {
+  try {
+    const orders = await Order.find().sort({ createdAt: -1 });
+    res.status(200).json(orders);
+  } catch (error) {
+    res.status(500).json({ message: 'Error fetching all orders' });
+  }
+});
+
 app.get('/api/check-auth', verifyToken, (req, res) => {
   res.status(200).json({ authenticated: true, user: req.user });
 });

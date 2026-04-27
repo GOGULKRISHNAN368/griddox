@@ -51,7 +51,7 @@ interface Lead {
 }
 
 const App = () => {
-  const [activeTab, setActiveTab] = useState<'banners' | 'categories' | 'dresses' | 'reels' | 'instagram' | 'leads'>('banners');
+  const [activeTab, setActiveTab] = useState<'banners' | 'categories' | 'dresses' | 'reels' | 'instagram' | 'leads' | 'orders'>('banners');
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [status, setStatus] = useState<{ message: string, type: 'success' | 'error' } | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -62,6 +62,7 @@ const App = () => {
   const [categories, setCategories] = useState<Category[]>([]);
   const [reels, setReels] = useState<any[]>([]);
   const [leads, setLeads] = useState<Lead[]>([]);
+  const [orders, setOrders] = useState<any[]>([]);
   const [editingId, setEditingId] = useState<string | null>(null);
 
 
@@ -126,8 +127,22 @@ const App = () => {
       fetchInstagramPosts();
     } else if (activeTab === 'leads') {
       fetchLeads();
+    } else if (activeTab === 'orders') {
+      fetchOrders();
     }
   }, [activeTab]);
+
+  const fetchOrders = async () => {
+    try {
+      const response = await fetch(`${API_BASE}/api/admin/orders`);
+      if (response.ok) {
+        const data = await response.json();
+        setOrders(data);
+      }
+    } catch (error) {
+      console.error('Error fetching orders:', error);
+    }
+  };
 
   const showStatus = (message: string, type: 'success' | 'error' = 'success') => {
     setStatus({ message, type });
@@ -693,6 +708,9 @@ const App = () => {
             <li className={activeTab === 'leads' ? 'active' : ''} onClick={() => { setActiveTab('leads'); resetForms(); setIsMobileMenuOpen(false); }}>
               <span className="icon">📋</span> Leads
             </li>
+            <li className={activeTab === 'orders' ? 'active' : ''} onClick={() => { setActiveTab('orders'); resetForms(); setIsMobileMenuOpen(false); }}>
+              <span className="icon">📦</span> Orders
+            </li>
           </ul>
         </nav>
 
@@ -1071,6 +1089,60 @@ const App = () => {
                             <button className="primary-btn" style={{width: 'auto', padding: '8px 16px'}} onClick={() => handleDeleteLead(lead._id)}>
                                 Mark Verified
                             </button>
+                        </div>
+                    ))}
+                 </div>
+             </div>
+          </div>
+        )}
+
+        {activeTab === 'orders' && (
+          <div className="fade-in">
+             <div className="glass-card">
+                 <h2 className="form-section-title">Customer Orders</h2>
+                 <p style={{color: 'var(--text-muted)', fontSize: '14px', marginBottom: '24px'}}>
+                    Manage all incoming customer orders.
+                 </p>
+                 <div style={{display: 'flex', flexDirection: 'column', gap: '16px'}}>
+                    {orders.length === 0 ? (
+                        <div style={{textAlign: 'center', padding: '40px', opacity: 0.5}}>
+                            <p>No orders received yet.</p>
+                        </div>
+                    ) : orders.map((order: any) => (
+                        <div key={order._id} className="lead-item" style={{display: 'block', padding: '20px'}}>
+                            <div style={{display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid #eee', paddingBottom: '10px', marginBottom: '10px'}}>
+                              <div>
+                                <h3 style={{fontSize: '16px', margin: 0}}>Order: {order._id.substring(0, 8).toUpperCase()}</h3>
+                                <p style={{color: 'var(--text-muted)', fontSize: '12px'}}>Email: {order.userEmail}</p>
+                              </div>
+                              <div style={{textAlign: 'right'}}>
+                                <h3 style={{fontSize: '18px', color: '#10b981', margin: 0}}>₹{order.totalAmount}</h3>
+                                <span style={{display: 'inline-block', background: '#fef3c7', color: '#d97706', padding: '2px 8px', borderRadius: '4px', fontSize: '12px', fontWeight: 600, marginTop: '4px'}}>
+                                  {order.status || 'Pending'}
+                                </span>
+                              </div>
+                            </div>
+                            
+                            <div style={{display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px'}}>
+                              <div>
+                                <h4 style={{fontSize: '13px', color: '#64748b', marginBottom: '6px'}}>Delivery Address</h4>
+                                <p style={{fontSize: '14px', margin: 0}}><strong>{order.address?.name}</strong> ({order.address?.phone})</p>
+                                <p style={{fontSize: '13px', margin: '4px 0 0 0', color: '#333'}}>{order.address?.addressLine}, {order.address?.pincode}</p>
+                              </div>
+                              <div>
+                                <h4 style={{fontSize: '13px', color: '#64748b', marginBottom: '6px'}}>Items Ordered</h4>
+                                <ul style={{listStyle: 'none', padding: 0, margin: 0, fontSize: '13px'}}>
+                                  {order.items?.map((item: any, i: number) => (
+                                    <li key={i} style={{marginBottom: '4px'}}>
+                                      {item.quantity}x {item.name} <span style={{color: '#888'}}>(Size: {item.size})</span>
+                                    </li>
+                                  ))}
+                                </ul>
+                              </div>
+                            </div>
+                            <div className="lead-meta" style={{marginTop: '16px', paddingTop: '10px', borderTop: '1px dashed #eee'}}>
+                              🕒 {new Date(order.createdAt).toLocaleString()} • Payment: {order.paymentMethod}
+                            </div>
                         </div>
                     ))}
                  </div>
