@@ -683,7 +683,7 @@ app.post('/api/leads', async (req, res) => {
       // Fire and forget lead notification to avoid UI lag
       transporter.sendMail({
         from: `"Gridox Notification" <${smtpUser}>`,
-        to: 'gogulpvt@gmail.com',
+        to: smtpUser, // Send to gridoxclothing@gmail.com
         subject: "🎉 New Verified Lead Captured",
         html: `<div style="font-family: sans-serif; padding: 20px; border: 1px solid #eee; max-width: 500px;">
                 <h2 style="color: #d11243; margin-top: 0;">New Lead Alert</h2>
