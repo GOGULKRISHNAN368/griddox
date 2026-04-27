@@ -51,10 +51,10 @@ const CartPage = () => {
       if (response.ok) {
         navigate('/checkout');
       } else {
-        toast.error("Please login first to place an order");
+        navigate('/auth?redirect=checkout');
       }
     } catch (e) {
-      toast.error("Please login first to place an order");
+      navigate('/auth?redirect=checkout');
     }
   };
 

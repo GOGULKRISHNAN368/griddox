@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ShoppingBag, ArrowLeft, CheckCircle, MapPin, CreditCard } from 'lucide-react';
+import { ShoppingBag, ArrowLeft, CheckCircle, MapPin, CreditCard, ChevronRight, Check } from 'lucide-react';
 import Header from '@/components/Header';
 import BottomNav from '@/components/BottomNav';
 
@@ -16,7 +16,9 @@ interface CartItem {
 const CheckoutPage = () => {
   const navigate = useNavigate();
   
-  const [isOrderComplete, setIsOrderComplete] = useState(false);
+  // Steps: 2 = Address, 3 = Payment, 4 = Success
+  const [step, setStep] = useState<number>(2);
+  
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const [subtotal, setSubtotal] = useState(0);
   
@@ -41,10 +43,11 @@ const CheckoutPage = () => {
           const data = await response.json();
           setUser(data.user);
         } else {
-          navigate('/cart');
+          // If not logged in, they shouldn't be here. Send them to auth to complete Step 1.
+          navigate('/auth?redirect=checkout');
         }
       } catch (error) {
-        navigate('/cart');
+        navigate('/auth?redirect=checkout');
       } finally {
         setAuthLoading(false);
       }
@@ -88,7 +91,7 @@ const CheckoutPage = () => {
       });
 
       if (response.ok) {
-        setIsOrderComplete(true);
+        setStep(4); // Success Step
         localStorage.removeItem('gridox_cart');
         window.dispatchEvent(new Event('cartUpdated'));
       } else {
@@ -99,6 +102,13 @@ const CheckoutPage = () => {
       alert("An error occurred. Please try again.");
     } finally {
       setIsPlacingOrder(false);
+    }
+  };
+
+  const handleAddressSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (address.name && address.phone && address.addressLine && address.pincode) {
+      setStep(3);
     }
   };
 
@@ -114,7 +124,7 @@ const CheckoutPage = () => {
   }
 
   // If no items in cart and not on success page
-  if (cartItems.length === 0 && !isOrderComplete) {
+  if (cartItems.length === 0 && step !== 4) {
     return (
       <div className="min-h-screen bg-background flex flex-col">
         <Header />
@@ -133,20 +143,51 @@ const CheckoutPage = () => {
     <div className="min-h-screen bg-gray-50 pb-20">
       <Header />
       
-      {!isOrderComplete && (
-        <div className="bg-white border-b border-border sticky top-0 z-10 hidden md:block">
-          <div className="max-w-4xl mx-auto px-4 py-4 flex items-center justify-between text-sm">
-            <button onClick={() => navigate('/cart')} className="flex items-center text-muted-foreground hover:text-black">
-              <ArrowLeft size={16} className="mr-2" /> Back to Cart
+      {step !== 4 && (
+        <div className="bg-white border-b border-border sticky top-0 z-10">
+          <div className="max-w-4xl mx-auto px-4 py-4 flex flex-col md:flex-row items-center justify-between text-sm">
+            <button onClick={() => step === 3 ? setStep(2) : navigate('/cart')} className="flex items-center text-muted-foreground hover:text-black mb-4 md:mb-0 hidden md:flex">
+              <ArrowLeft size={16} className="mr-2" /> {step === 3 ? 'Back to Address' : 'Back to Cart'}
             </button>
-            <div className="font-medium">Secure Checkout</div>
-            <div className="w-24"></div>
+
+            {/* Stepper Header matches Nykaa style */}
+            <div className="flex items-center justify-center w-full md:w-auto">
+              {/* Step 1: Login */}
+              <div className="flex items-center">
+                <div className="w-6 h-6 rounded-full bg-[#1e293b] text-white flex items-center justify-center text-xs">
+                  <Check size={14} />
+                </div>
+                <span className="ml-2 font-medium text-[#1e293b] text-xs uppercase tracking-wide">Sign Up</span>
+              </div>
+              
+              <div className="w-8 md:w-16 h-px bg-gray-300 mx-2 md:mx-4"></div>
+              
+              {/* Step 2: Address */}
+              <div className="flex items-center">
+                <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs ${step >= 2 ? (step > 2 ? 'bg-[#1e293b] text-white' : 'bg-black text-white') : 'bg-gray-200 text-gray-500'}`}>
+                  {step > 2 ? <Check size={14} /> : '2'}
+                </div>
+                <span className={`ml-2 text-xs uppercase tracking-wide ${step >= 2 ? 'font-medium text-black' : 'text-gray-500'}`}>Address</span>
+              </div>
+
+              <div className="w-8 md:w-16 h-px bg-gray-300 mx-2 md:mx-4"></div>
+
+              {/* Step 3: Payment */}
+              <div className="flex items-center">
+                <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs ${step === 3 ? 'bg-black text-white' : 'bg-gray-200 text-gray-500'}`}>
+                  3
+                </div>
+                <span className={`ml-2 text-xs uppercase tracking-wide ${step === 3 ? 'font-medium text-black' : 'text-gray-500'}`}>Payment</span>
+              </div>
+            </div>
+
+            <div className="w-24 hidden md:block"></div>
           </div>
         </div>
       )}
 
-      <div className="max-w-4xl mx-auto px-4 py-8">
-        {isOrderComplete ? (
+      <div className="max-w-5xl mx-auto px-4 py-8">
+        {step === 4 ? (
           // SUCCESS PAGE
           <div className="bg-white p-8 md:p-12 text-center border border-border mt-8 flex flex-col items-center">
             <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mb-6">
@@ -175,92 +216,121 @@ const CheckoutPage = () => {
           <div className="flex flex-col lg:flex-row gap-8">
             {/* MAIN CONTENT AREA */}
             <div className="flex-1">
-              <div className="bg-white p-6 border border-border mb-8">
-                <h2 className="text-xl font-medium mb-6 flex items-center">
-                  <MapPin className="mr-2" size={20} /> Shipping Address
-                </h2>
-                <form id="checkout-form" onSubmit={placeOrder} className="space-y-4">
-                  <div>
-                    <label className="block text-sm text-muted-foreground mb-1">Full Name *</label>
-                    <input 
-                      required 
-                      type="text" 
-                      value={address.name}
-                      onChange={e => setAddress({...address, name: e.target.value})}
-                      className="w-full border border-border p-3 focus:outline-none focus:border-black"
-                    />
+              {step === 2 && (
+                <div className="bg-white p-6 border border-border mb-8">
+                  <div className="mb-6">
+                    <h1 className="text-2xl font-serif text-[#1e293b]">Choose Address</h1>
+                    <p className="text-sm text-muted-foreground mt-1">Detailed address will help our delivery partner reach your doorstep quickly</p>
                   </div>
-                  <div>
-                    <label className="block text-sm text-muted-foreground mb-1">Mobile Number *</label>
-                    <input 
-                      required 
-                      type="tel" 
-                      pattern="[0-9]{10}"
-                      title="10 digit mobile number"
-                      value={address.phone}
-                      onChange={e => setAddress({...address, phone: e.target.value})}
-                      className="w-full border border-border p-3 focus:outline-none focus:border-black"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm text-muted-foreground mb-1">Address Line *</label>
-                    <textarea 
-                      required 
-                      rows={3}
-                      value={address.addressLine}
-                      onChange={e => setAddress({...address, addressLine: e.target.value})}
-                      className="w-full border border-border p-3 focus:outline-none focus:border-black"
-                    ></textarea>
-                  </div>
-                  <div>
-                    <label className="block text-sm text-muted-foreground mb-1">Pincode *</label>
-                    <input 
-                      required 
-                      type="text" 
-                      pattern="[0-9]{6}"
-                      title="6 digit pincode"
-                      value={address.pincode}
-                      onChange={e => setAddress({...address, pincode: e.target.value})}
-                      className="w-full border border-border p-3 focus:outline-none focus:border-black"
-                    />
-                  </div>
-                </form>
-              </div>
 
-              <div className="bg-white p-6 border border-border">
-                <h2 className="text-xl font-medium mb-6 flex items-center">
-                  <CreditCard className="mr-2" size={20} /> Payment Method
-                </h2>
-                
-                <div className="border border-black p-4 bg-gray-50 flex items-center justify-between mb-8">
-                  <div className="flex items-center">
-                    <div className="w-4 h-4 rounded-full bg-black mr-3 flex items-center justify-center">
-                      <div className="w-1.5 h-1.5 rounded-full bg-white"></div>
+                  <form id="address-form" onSubmit={handleAddressSubmit} className="space-y-4">
+                    <div>
+                      <label className="block text-sm text-muted-foreground mb-1">Full Name *</label>
+                      <input 
+                        required 
+                        type="text" 
+                        value={address.name}
+                        onChange={e => setAddress({...address, name: e.target.value})}
+                        className="w-full border border-border p-3 focus:outline-none focus:border-black"
+                      />
                     </div>
-                    <span className="font-medium">Cash on Delivery (COD)</span>
-                  </div>
-                  <span className="text-sm text-muted-foreground">Pay when you receive</span>
-                </div>
+                    <div>
+                      <label className="block text-sm text-muted-foreground mb-1">Mobile Number *</label>
+                      <input 
+                        required 
+                        type="tel" 
+                        pattern="[0-9]{10}"
+                        title="10 digit mobile number"
+                        value={address.phone}
+                        onChange={e => setAddress({...address, phone: e.target.value})}
+                        className="w-full border border-border p-3 focus:outline-none focus:border-black"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm text-muted-foreground mb-1">Address Line *</label>
+                      <textarea 
+                        required 
+                        rows={3}
+                        value={address.addressLine}
+                        onChange={e => setAddress({...address, addressLine: e.target.value})}
+                        className="w-full border border-border p-3 focus:outline-none focus:border-black"
+                      ></textarea>
+                    </div>
+                    <div>
+                      <label className="block text-sm text-muted-foreground mb-1">Pincode *</label>
+                      <input 
+                        required 
+                        type="text" 
+                        pattern="[0-9]{6}"
+                        title="6 digit pincode"
+                        value={address.pincode}
+                        onChange={e => setAddress({...address, pincode: e.target.value})}
+                        className="w-full border border-border p-3 focus:outline-none focus:border-black"
+                      />
+                    </div>
 
-                <div className="border-t border-border pt-6">
-                  <button 
-                    type="submit"
-                    form="checkout-form"
-                    disabled={isPlacingOrder}
-                    className="w-full py-4 bg-black text-white font-medium tracking-wider hover:bg-gray-800 transition-colors disabled:opacity-50"
-                  >
-                    {isPlacingOrder ? 'PLACING ORDER...' : `PLACE ORDER • ₹${subtotal.toLocaleString()}`}
-                  </button>
+                    <div className="pt-4">
+                      <button 
+                        type="submit"
+                        className="px-8 py-3 bg-[#001325] text-white font-medium text-sm tracking-wider hover:bg-gray-800 transition-colors"
+                      >
+                        DELIVER HERE
+                      </button>
+                    </div>
+                  </form>
                 </div>
-              </div>
+              )}
+
+              {step === 3 && (
+                <div className="bg-white p-6 border border-border">
+                  <div className="mb-6 flex justify-between items-center border-b border-border pb-4">
+                    <div>
+                      <h2 className="text-xl font-medium flex items-center">
+                        <MapPin className="mr-2" size={20} /> Delivery Address
+                      </h2>
+                      <p className="text-sm text-muted-foreground mt-2">{address.name}, {address.phone}</p>
+                      <p className="text-sm text-muted-foreground">{address.addressLine}, {address.pincode}</p>
+                    </div>
+                    <button onClick={() => setStep(2)} className="text-sm font-medium border border-border px-4 py-1.5 hover:bg-gray-50">Edit</button>
+                  </div>
+
+                  <h2 className="text-xl font-medium mb-6 flex items-center">
+                    <CreditCard className="mr-2" size={20} /> Choose Payment Mode
+                  </h2>
+                  
+                  <div className="border border-[#001325] p-4 bg-gray-50 flex items-center justify-between mb-8 cursor-pointer relative overflow-hidden">
+                    <div className="absolute left-0 top-0 bottom-0 w-1 bg-[#001325]"></div>
+                    <div className="flex items-center pl-2">
+                      <div className="w-4 h-4 rounded-full bg-[#001325] mr-3 flex items-center justify-center">
+                        <div className="w-1.5 h-1.5 rounded-full bg-white"></div>
+                      </div>
+                      <span className="font-medium text-[#001325]">Cash on Delivery (COD)</span>
+                    </div>
+                    <span className="text-xs font-medium text-green-600 bg-green-100 px-2 py-1 rounded">AVAILABLE</span>
+                  </div>
+
+                  <div className="border-t border-border pt-6">
+                    <button 
+                      onClick={placeOrder}
+                      disabled={isPlacingOrder}
+                      className="w-full py-4 bg-[#001325] text-white font-medium tracking-wider hover:bg-gray-800 transition-colors disabled:opacity-50"
+                    >
+                      {isPlacingOrder ? 'PLACING ORDER...' : `PLACE ORDER • ₹${subtotal.toLocaleString()}`}
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* ORDER SUMMARY SIDEBAR */}
-            <div className="lg:w-80">
-              <div className="bg-white p-6 border border-border sticky top-24">
-                <h3 className="font-medium text-lg mb-4">Order Summary</h3>
+            <div className="lg:w-[350px]">
+              <div className="bg-white p-5 border border-border sticky top-24">
+                <div className="flex justify-between items-center mb-4 border-b border-border pb-4">
+                  <h3 className="font-medium text-lg">Bag</h3>
+                  <span className="text-sm text-muted-foreground">{cartItems.length} Items</span>
+                </div>
                 
-                <div className="space-y-4 mb-6 max-h-[40vh] overflow-y-auto pr-2">
+                <div className="space-y-4 mb-6 max-h-[30vh] overflow-y-auto pr-2">
                   {cartItems.map(item => (
                     <div key={item.id} className="flex gap-4">
                       <img src={item.image} alt={item.name} className="w-16 h-20 object-cover bg-muted" />
@@ -273,19 +343,33 @@ const CheckoutPage = () => {
                   ))}
                 </div>
 
-                <div className="border-t border-border pt-4 space-y-3 text-sm">
-                  <div className="flex justify-between text-muted-foreground">
-                    <span>Subtotal ({cartItems.length} items)</span>
-                    <span>₹{subtotal.toLocaleString()}</span>
+                <div className="border-t border-border pt-4">
+                  <h3 className="font-medium text-sm mb-3">Price Details</h3>
+                  <div className="space-y-3 text-sm">
+                    <div className="flex justify-between text-muted-foreground">
+                      <span>Subtotal</span>
+                      <span>₹{subtotal.toLocaleString()}</span>
+                    </div>
+                    <div className="flex justify-between text-muted-foreground">
+                      <span>Shipping</span>
+                      <span className="text-green-600 font-medium">FREE</span>
+                    </div>
+                    <div className="bg-green-50 p-2 text-center text-green-700 text-xs font-medium border border-green-100 mt-2">
+                      You are enjoying FREE shipping!
+                    </div>
+                    <div className="border-t border-border pt-3 flex justify-between font-bold text-base mt-2">
+                      <span>Total Amount</span>
+                      <span>₹{subtotal.toLocaleString()}</span>
+                    </div>
                   </div>
-                  <div className="flex justify-between text-muted-foreground">
-                    <span>Shipping</span>
-                    <span className="text-green-600">FREE</span>
-                  </div>
-                  <div className="border-t border-border pt-3 flex justify-between font-bold text-base">
-                    <span>Total</span>
-                    <span>₹{subtotal.toLocaleString()}</span>
-                  </div>
+                </div>
+              </div>
+              
+              <div className="mt-4 flex items-center justify-center p-4 bg-gray-50 border border-border text-xs text-muted-foreground gap-3">
+                <img src="https://cdn-icons-png.flaticon.com/512/6062/6062646.png" alt="Secure" className="w-6 h-6 opacity-60" />
+                <div>
+                  <p className="font-medium text-black">Authentic Products. Secure Payments.</p>
+                  <p>Easy Return & Exchange</p>
                 </div>
               </div>
             </div>
