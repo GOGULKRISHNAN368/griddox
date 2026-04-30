@@ -1,6 +1,5 @@
 import Header from "@/components/Header";
 import AnnouncementBar from "@/components/AnnouncementBar";
-import Footer from "@/components/Footer";
 import BottomNav from "@/components/BottomNav";
 
 const TermsAndConditions = () => {
@@ -63,7 +62,6 @@ const TermsAndConditions = () => {
         </div>
       </main>
 
-      <Footer />
       <BottomNav />
     </div>
   );

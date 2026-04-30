@@ -14,7 +14,6 @@ const InstagramFeed = lazy(() => import("@/components/InstagramFeed"));
 const CustomerReviews = lazy(() => import("@/components/CustomerReviews"));
 const AboutUs = lazy(() => import("@/components/AboutUs"));
 const BottomNav = lazy(() => import("@/components/BottomNav"));
-const Footer = lazy(() => import("@/components/Footer"));
 const WhatsAppButton = lazy(() => import("@/components/WhatsAppButton"));
 
 const SectionSkeleton = () => <div className="h-[400px] w-full bg-muted/10 animate-pulse rounded-lg my-10" />;
@@ -59,7 +58,6 @@ const Index = () => {
         <InstagramFeed />
         <CustomerReviews />
         <div id="about"><AboutUs /></div>
-        <Footer />
         <BottomNav />
         <WhatsAppButton />
       </Suspense>
