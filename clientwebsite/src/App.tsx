@@ -18,6 +18,9 @@ const CoimbatoreStyleGuide = lazy(() => import("./pages/CoimbatoreStyleGuide.tsx
 const AuthPage = lazy(() => import("./pages/AuthPage.tsx"));
 const CheckoutPage = lazy(() => import("./pages/CheckoutPage.tsx"));
 const OrdersPage = lazy(() => import("./pages/OrdersPage.tsx"));
+const ContactUs = lazy(() => import("./pages/ContactUs.tsx"));
+const TermsAndConditions = lazy(() => import("./pages/TermsAndConditions.tsx"));
+const RefundPolicy = lazy(() => import("./pages/RefundPolicy.tsx"));
 // Dashboard removed as per user request
 
 // Simple loading fallback
@@ -49,6 +52,9 @@ const App = () => (
               <Route path="/auth" element={<AuthPage />} />
               <Route path="/checkout" element={<CheckoutPage />} />
               <Route path="/my-orders" element={<OrdersPage />} />
+              <Route path="/contact" element={<ContactUs />} />
+              <Route path="/terms-and-conditions" element={<TermsAndConditions />} />
+              <Route path="/refund-policy" element={<RefundPolicy />} />
               <Route path="*" element={<NotFound />} />
 
             </Routes>
