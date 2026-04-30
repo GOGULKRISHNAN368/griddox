@@ -99,12 +99,6 @@ const CuratedLooks: React.FC = () => {
             <SwiperSlide key={look._id} className="curated-slide">
               <div className="look-card" onClick={() => navigate(`/category/${look.category}/product/${look._id}`)}>
                 <img src={look.image} alt={look.name} className="look-image" />
-                <div className="look-overlay">
-                  <div className="look-info">
-                    <h3 className="look-name">{look.name}</h3>
-                    <p className="look-price">Rs. {look.price.toLocaleString()}</p>
-                  </div>
-                </div>
                 <button className="look-shop-btn" onClick={(e) => {
                   e.stopPropagation();
                   navigate(`/category/${look.category}/product/${look._id}`);
