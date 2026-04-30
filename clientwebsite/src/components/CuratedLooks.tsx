@@ -63,15 +63,15 @@ const CuratedLooks: React.FC = () => {
         <div className="title-underline"></div>
       </div>
 
-      <div className="curated-slider-container">
+      {/* MOBILE / TABLET VIEWS (Preserved exactly as original) */}
+      <div className="curated-slider-container lg:hidden">
         <Swiper
           effect={'coverflow'}
           grabCursor={true}
           centeredSlides={true}
-          slidesPerView={1.4} // Show 1.4 slides to see peeks on mobile
+          slidesPerView={1.4}
           breakpoints={{
-            640: { slidesPerView: 3 },
-            1024: { slidesPerView: 'auto' } // Use 'auto' to allow our 480px width to work
+            640: { slidesPerView: 3 }
           }}
           initialSlide={3}
           loop={true}
@@ -83,8 +83,8 @@ const CuratedLooks: React.FC = () => {
           }}
           coverflowEffect={{
             rotate: 0,
-            stretch: -10, // Reduced overlap so side images are more visible
-            depth: 350,   // Smooth pyramid height
+            stretch: -10,
+            depth: 350,
             modifier: 1,
             slideShadows: false,
           }}
@@ -117,11 +117,58 @@ const CuratedLooks: React.FC = () => {
           ))}
         </Swiper>
 
-        {/* Custom Navigation */}
         <button className="curated-nav-btn curated-prev">
           <ChevronLeft size={28} />
         </button>
         <button className="curated-nav-btn curated-next">
+          <ChevronRight size={28} />
+        </button>
+      </div>
+
+      {/* COMPLETELY NEW DESKTOP VIEW (1024px+) */}
+      <div className="desktop-curated-container hidden lg:block relative max-w-[1500px] mx-auto px-20">
+        <Swiper
+          effect={'coverflow'}
+          grabCursor={true}
+          centeredSlides={true}
+          slidesPerView={'auto'}
+          loop={true}
+          speed={800}
+          coverflowEffect={{
+            rotate: 0,
+            stretch: 0,
+            depth: 0,
+            modifier: 1,
+            scale: 0.8, // Perfectly scales without overlapping
+            slideShadows: false,
+          }}
+          navigation={{
+            nextEl: '.desktop-curated-next',
+            prevEl: '.desktop-curated-prev',
+          }}
+          modules={[EffectCoverflow, Navigation]}
+          className="desktop-curated-swiper py-10"
+        >
+          {looks.map((look) => (
+            <SwiperSlide key={`desktop-${look._id}`} className="desktop-curated-slide">
+              <div className="desktop-look-card group" onClick={() => navigate(`/category/${look.category}/product/${look._id}`)}>
+                <img src={look.image} alt={look.name} className="desktop-look-image" />
+                <button className="desktop-shop-btn" onClick={(e) => {
+                  e.stopPropagation();
+                  navigate(`/category/${look.category}/product/${look._id}`);
+                }}>
+                  <ShoppingBag size={14} />
+                  <span>Shop All</span>
+                </button>
+              </div>
+            </SwiperSlide>
+          ))}
+        </Swiper>
+
+        <button className="desktop-nav-btn desktop-curated-prev absolute left-4 top-1/2 -translate-y-1/2 z-20">
+          <ChevronLeft size={28} />
+        </button>
+        <button className="desktop-nav-btn desktop-curated-next absolute right-4 top-1/2 -translate-y-1/2 z-20">
           <ChevronRight size={28} />
         </button>
       </div>
