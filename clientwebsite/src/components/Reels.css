@@ -113,8 +113,8 @@
 }
 
 .shop-now-btn {
-  background-color: #DBBBA9; /* Premium beige/sand color */
-  color: #1a1a1a;
+  background-color: #8b231a;
+  color: #ffffff;
   border: none;
   padding: 8px 20px; 
   border-radius: 4px;
@@ -128,7 +128,7 @@
 }
 
 .shop-now-btn:hover {
-  background-color: #e5cdbf;
+  background-color: #a51d1d;
   transform: translateY(-2px);
 }
 
@@ -244,8 +244,8 @@
 .reel-shop-now-modal {
   width: auto;
   min-width: 140px;
-  background-color: #DBBBA9; /* Premium beige/sand color */
-  color: #1a1a1a;
+  background-color: #8b231a;
+  color: #ffffff;
   border: none;
   padding: 0.75rem 1.75rem;
   border-radius: 4px;
@@ -259,7 +259,7 @@
 }
 
 .reel-shop-now-modal:hover {
-  background-color: #e5cdbf;
+  background-color: #a51d1d;
   transform: translateY(-2px);
   box-shadow: 0 6px 25px rgba(0, 0, 0, 0.6);
 }

@@ -127,7 +127,7 @@ const NewIn = () => {
           <div className="mt-12 flex justify-center">
             <button 
               onClick={() => navigate('/category/new-arrivals')}
-              className="px-10 py-3.5 bg-white border border-[#1a1a1a] text-[#1a1a1a] text-[10px] font-bold uppercase tracking-[0.2em] rounded-md hover:bg-[#1a1a1a] hover:text-white transition-all duration-300 shadow-sm active:scale-95"
+              className="px-10 py-3.5 bg-[#8b231a] border-none text-white text-[10px] font-bold uppercase tracking-[0.2em] rounded-md hover:bg-[#a51d1d] transition-all duration-300 shadow-lg active:scale-95"
             >
               View More Collection
             </button>

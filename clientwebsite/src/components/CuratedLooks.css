@@ -103,8 +103,8 @@
   position: absolute;
   bottom: 16px;
   right: 16px;
-  background-color: #fff;
-  color: #1a1a1a;
+  background-color: #8b231a;
+  color: #ffffff;
   padding: 8px 16px;
   border-radius: 8px;
   /* Square with slight roundness like Pantaloons */
@@ -124,7 +124,7 @@
 }
 
 .look-shop-btn:hover {
-  background-color: #1a1a1a;
+  background-color: #a51d1d;
   color: #fff;
   transform: translateY(-2px);
 }
@@ -260,8 +260,8 @@
     position: absolute;
     bottom: 15px;
     right: 15px;
-    background-color: #fff;
-    color: #1a1a1a;
+    background-color: #8b231a;
+    color: #ffffff;
     padding: 8px 16px;
     border-radius: 50px;
     font-size: 11px;
@@ -277,8 +277,8 @@
   }
 
   .desktop-shop-btn:hover {
+    background-color: #a51d1d;
     transform: translateY(-2px);
-    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
   }
 
   .desktop-nav-btn {
