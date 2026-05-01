@@ -1033,7 +1033,7 @@ const App = () => {
                       >
                         <option value="">{reelForm.category ? 'Select a dress...' : 'Choose category first'}</option>
                         {products
-                          .filter(p => !reelForm.category || p.category === reelForm.category)
+                          .filter(p => !reelForm.category || (Array.isArray(p.category) ? p.category.includes(reelForm.category) : p.category === reelForm.category))
                           .map(p => <option key={p._id} value={p._id}>{p.name} (Rs. {p.price})</option>)
                         }
                       </select>
