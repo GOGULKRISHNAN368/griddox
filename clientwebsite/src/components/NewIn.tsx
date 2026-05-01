@@ -71,31 +71,36 @@ const NewIn = () => {
           className="flex overflow-x-auto snap-x snap-mandatory gap-3 px-4 pb-4 md:grid md:grid-cols-4 md:gap-6 md:px-6 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
         >
           {activeProducts.length > 0 ? (
-            activeProducts.map((product: any) => (
+            activeProducts.slice(0, 8).map((product: any) => (
               <div 
                 key={product._id || product.id} 
                 className="w-[38vw] sm:w-[32vw] md:w-full snap-start shrink-0 flex flex-col group cursor-pointer"
                 onClick={() => { 
-                  const categorySlug = product.category || 'new-arrivals';
+                  const categorySlug = (Array.isArray(product.category) ? product.category[0] : product.category) || 'new-arrivals';
                   const productId = product._id;
                   navigate(`/category/${categorySlug}/product/${productId}`);
                 }}
               >
                 {/* Image Container */}
-                <div className="relative aspect-[3/4] w-full rounded-xl overflow-hidden bg-white">
+                <div className="relative aspect-[3/4] w-full rounded-xl overflow-hidden bg-white shadow-sm border border-black/5">
                   <OptimizedImage 
                     src={product.image} 
                     alt={product.name} 
-                    className="w-full h-full object-cover transition-transform duration-500"
+                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                     isProductImage
                   />
+                  {product.discount && (
+                    <div className="absolute top-2 left-2 bg-[#8b231a] text-white text-[9px] font-bold px-2 py-1 rounded-sm uppercase tracking-tighter">
+                      {product.discount}
+                    </div>
+                  )}
                 </div>
 
                 {/* Product Info */}
                 <div className="mt-4 text-center">
-                  <h3 className="text-sm text-foreground font-medium">{product.name}</h3>
+                  <h3 className="text-sm text-foreground font-medium line-clamp-1">{product.name}</h3>
                   <div className="mt-1.5 flex items-center justify-center gap-2">
-                    <span className="text-primary font-medium text-[15px]">Rs. {product.price.toLocaleString()}</span>
+                    <span className="text-primary font-bold text-[15px]">Rs. {product.price.toLocaleString()}</span>
                     {product.originalPrice && (
                       <span className="text-muted-foreground line-through text-[13px]">Rs. {product.originalPrice.toLocaleString()}</span>
                     )}
@@ -117,9 +122,21 @@ const NewIn = () => {
           )}
         </div>
 
+        {/* View More Button */}
+        {activeProducts.length > 8 && (
+          <div className="mt-12 flex justify-center">
+            <button 
+              onClick={() => navigate('/category/new-arrivals')}
+              className="px-10 py-3.5 bg-white border border-[#1a1a1a] text-[#1a1a1a] text-[10px] font-bold uppercase tracking-[0.2em] rounded-md hover:bg-[#1a1a1a] hover:text-white transition-all duration-300 shadow-sm active:scale-95"
+            >
+              View More Collection
+            </button>
+          </div>
+        )}
+
         {/* Pagination Dots (Mobile Only) */}
-        <div className="flex justify-center gap-2 mt-4 md:hidden">
-          {activeProducts.map((_, idx) => (
+        <div className="flex justify-center gap-2 mt-8 md:hidden">
+          {activeProducts.slice(0, 8).map((_, idx) => (
             <button
               key={idx}
               onClick={() => scrollTo(idx)}
