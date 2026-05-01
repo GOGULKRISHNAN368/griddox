@@ -74,7 +74,7 @@ const BestSellers = () => {
                 key={product._id} 
                 className="w-[38vw] sm:w-[32vw] md:w-full snap-start shrink-0 flex flex-col group cursor-pointer"
                 onClick={() => { 
-                  const categorySlug = product.category || 'new-arrivals';
+                  const categorySlug = (Array.isArray(product.category) ? product.category[0] : product.category) || 'new-arrivals';
                   const productId = product._id;
                   navigate(`/category/${categorySlug}/product/${productId}`);
                 }}

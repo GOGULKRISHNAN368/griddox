@@ -21,7 +21,7 @@ interface Product {
   gallery: string[];
   sizes: string[];
   details: string;
-  category: string;
+  category: string[];
 }
 
 const ProductDetailPage = () => {
@@ -43,7 +43,8 @@ const ProductDetailPage = () => {
 
         // Fetch similar products from same category
         if (found && found.category) {
-          const simResp = await fetch(`/api/products?category=${found.category}`);
+          const mainCat = Array.isArray(found.category) ? found.category[0] : found.category;
+          const simResp = await fetch(`/api/products?category=${mainCat}`);
           const simData = await simResp.json();
           setSimilarProducts(simData);
         }
@@ -78,7 +79,8 @@ const ProductDetailPage = () => {
   }
 
   const allImages = [product.image, ...(product.gallery || [])].filter(Boolean);
-  const categoryName = product.category.replace(/-/g, ' ').toUpperCase();
+  const mainCat = Array.isArray(product.category) ? product.category[0] : product.category;
+  const categoryName = (mainCat || "").replace(/-/g, ' ').toUpperCase();
 
   const handleAddToBag = () => {
     if (!selectedSize && product.sizes?.length > 0) {
@@ -140,7 +142,7 @@ const ProductDetailPage = () => {
         <div className="flex items-center gap-2 text-[10px] text-gray-400 uppercase tracking-widest font-bold">
           <Link to="/" className="hover:text-black transition-colors">HOME</Link>
           <span>/</span>
-          <Link to={`/category/${product.category}`} className="hover:text-black transition-colors">
+          <Link to={`/category/${mainCat}`} className="hover:text-black transition-colors">
             {categoryName}
           </Link>
           <span>/</span>
@@ -286,7 +288,7 @@ const ProductDetailPage = () => {
         <SimilarProducts
           products={similarProducts}
           currentProductId={product._id}
-          categorySlug={product.category}
+          categorySlug={mainCat}
         />
       )}
 

@@ -17,7 +17,7 @@ interface Look {
   name: string;
   price: number;
   image: string;
-  category: string;
+  category: string[];
 }
 
 const CuratedLooks: React.FC = () => {
@@ -97,11 +97,15 @@ const CuratedLooks: React.FC = () => {
         >
           {looks.map((look) => (
             <SwiperSlide key={look._id} className="curated-slide">
-              <div className="look-card" onClick={() => navigate(`/category/${look.category}/product/${look._id}`)}>
+              <div className="look-card" onClick={() => {
+                const mainCat = Array.isArray(look.category) ? look.category[0] : look.category;
+                navigate(`/category/${mainCat}/product/${look._id}`);
+              }}>
                 <img src={look.image} alt={look.name} className="look-image" />
                 <button className="look-shop-btn" onClick={(e) => {
                   e.stopPropagation();
-                  navigate(`/category/${look.category}/product/${look._id}`);
+                  const mainCat = Array.isArray(look.category) ? look.category[0] : look.category;
+                  navigate(`/category/${mainCat}/product/${look._id}`);
                 }}>
                   <ShoppingBag size={14} />
                   <span>Shop All</span>
@@ -145,11 +149,15 @@ const CuratedLooks: React.FC = () => {
         >
           {looks.map((look) => (
             <SwiperSlide key={`desktop-${look._id}`} className="desktop-curated-slide">
-              <div className="desktop-look-card group" onClick={() => navigate(`/category/${look.category}/product/${look._id}`)}>
+              <div className="desktop-look-card group" onClick={() => {
+                const mainCat = Array.isArray(look.category) ? look.category[0] : look.category;
+                navigate(`/category/${mainCat}/product/${look._id}`);
+              }}>
                 <img src={look.image} alt={look.name} className="desktop-look-image" />
                 <button className="desktop-shop-btn" onClick={(e) => {
                   e.stopPropagation();
-                  navigate(`/category/${look.category}/product/${look._id}`);
+                  const mainCat = Array.isArray(look.category) ? look.category[0] : look.category;
+                  navigate(`/category/${mainCat}/product/${look._id}`);
                 }}>
                   <ShoppingBag size={14} />
                   <span>Shop All</span>

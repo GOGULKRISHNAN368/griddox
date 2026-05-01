@@ -107,7 +107,7 @@ const ProductSchema = new mongoose.Schema({
   gallery: [String], // Array of 5 look images (Base64)
   sizes: [String], // Array of available sizes (e.g. S, M, L, XL)
   details: String, // Rich text or long description
-  category: { type: String, default: 'new-arrivals', index: true }, // Added index for faster filtering
+  category: { type: [String], default: [], index: true }, // Changed to array for multiple categories
   createdAt: { type: Date, default: Date.now, index: true } // Added index for faster sorting
 });
 

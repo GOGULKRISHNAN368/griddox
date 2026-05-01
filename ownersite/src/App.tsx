@@ -27,7 +27,7 @@ interface Product {
   gallery: string[];
   sizes: string[];
   details: string;
-  category: string;
+  category: string[];
   isCuratedLook?: boolean;
   createdAt: string;
 }
@@ -77,7 +77,7 @@ const App = () => {
     gallery: [] as string[],
     sizes: [] as string[],
     details: '',
-    category: '',
+    category: [] as string[],
     isNewArrival: false,
     isBestSeller: false,
     isCuratedLook: false
@@ -470,7 +470,7 @@ const App = () => {
           gallery: fullProduct.gallery || [],
           sizes: fullProduct.sizes || [],
           details: fullProduct.details || '',
-          category: fullProduct.category,
+          category: Array.isArray(fullProduct.category) ? fullProduct.category : (fullProduct.category ? [fullProduct.category] : []),
           isNewArrival: fullProduct.isNewArrival || false,
           isBestSeller: fullProduct.isBestSeller || false,
           isCuratedLook: fullProduct.isCuratedLook || false
@@ -654,7 +654,7 @@ const App = () => {
     setEditingId(null);
     setProductForm({ 
       name: '', price: '', originalPrice: '', discount: '', image: '', 
-      gallery: [], sizes: [], details: '', category: '',
+      gallery: [], sizes: [], details: '', category: [],
       isNewArrival: false, isBestSeller: false, isCuratedLook: false
     });
     setCategoryForm({ name: '', description: '', fullImage: '', thumbnailImage: '' });
@@ -898,11 +898,25 @@ const App = () => {
                                 </div>
                             </div>
                             <div className="form-group">
-                                <label>Category</label>
-                                <select className="select-styled" value={productForm.category} onChange={e => setProductForm({...productForm, category: e.target.value})} required>
-                                    <option value="">Choose category</option>
-                                    {categories.map(c => <option key={c._id} value={c.slug}>{c.name}</option>)}
-                                </select>
+                                <label>Categories</label>
+                                <div className="size-pills-container">
+                                    {categories.map(c => (
+                                        <div key={c._id} className="size-pill">
+                                            <input 
+                                                type="checkbox" 
+                                                id={`cat-${c._id}`}
+                                                checked={productForm.category.includes(c.slug)} 
+                                                onChange={e => {
+                                                    const newCats = e.target.checked 
+                                                        ? [...productForm.category, c.slug] 
+                                                        : productForm.category.filter(s => s !== c.slug);
+                                                    setProductForm({...productForm, category: newCats});
+                                                }} 
+                                            />
+                                            <label htmlFor={`cat-${c._id}`}>{c.name}</label>
+                                        </div>
+                                    ))}
+                                </div>
                             </div>
                             <div className="form-group">
                                 <label>Sizes</label>
@@ -957,7 +971,9 @@ const App = () => {
                 {products.map(p => (
                     <div key={p._id} className="item-card">
                         <div className="item-image" style={{backgroundImage: `url("${p.image}")`}}>
-                            {p.category && <span className="badge-tag">{p.category}</span>}
+                            {p.category && (Array.isArray(p.category) ? p.category[0] : p.category) && (
+                                <span className="badge-tag">{Array.isArray(p.category) ? p.category[0] : p.category}</span>
+                            )}
                         </div>
                         <div className="item-body">
                             <h3>{p.name}</h3>
