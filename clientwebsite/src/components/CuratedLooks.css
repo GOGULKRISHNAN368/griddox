@@ -12,8 +12,16 @@
   font-weight: 700;
   color: #1a1a1a;
   letter-spacing: -0.01em;
-  margin-bottom: 2rem;
+  margin-bottom: 12px;
   text-transform: capitalize;
+}
+
+.title-underline {
+  width: 50px;
+  height: 3px;
+  background-color: #8b231a;
+  margin: 0 auto;
+  border-radius: 10px;
 }
 
 .curated-slider-container {

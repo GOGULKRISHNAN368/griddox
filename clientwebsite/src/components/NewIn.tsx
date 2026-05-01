@@ -7,6 +7,7 @@ const NewIn = () => {
   const navigate = useNavigate(); // fix: home product links
   const [activeProducts, setActiveProducts] = useState<any[]>([]);
   const [activeIndex, setActiveIndex] = useState(0);
+  const [isExpanded, setIsExpanded] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
 
   // Fetch from unified backend
@@ -58,7 +59,8 @@ const NewIn = () => {
   return (
     <section className="py-10 md:py-16 w-full max-w-5xl mx-auto">
       <div className="text-center px-4 mb-8">
-        <h2 className="font-heading text-3xl md:text-4xl font-normal mb-3 text-foreground">New Arrivals</h2>
+        <h2 className="font-heading text-3xl md:text-4xl font-normal mb-3 text-foreground italic">New Arrivals</h2>
+        <div className="w-12 h-[3px] bg-[#8b231a] mx-auto rounded-full mb-3"></div>
         <p className="text-sm md:text-base text-muted-foreground max-w-md mx-auto">
           Discover the latest trends and fresh picks in our new collection.
         </p>
@@ -71,7 +73,7 @@ const NewIn = () => {
           className="flex overflow-x-auto snap-x snap-mandatory gap-3 px-4 pb-4 md:grid md:grid-cols-4 md:gap-6 md:px-6 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
         >
           {activeProducts.length > 0 ? (
-            activeProducts.slice(0, 8).map((product: any) => (
+            (isExpanded ? activeProducts : activeProducts.slice(0, 8)).map((product: any) => (
               <div 
                 key={product._id || product.id} 
                 className="w-[38vw] sm:w-[32vw] md:w-full snap-start shrink-0 flex flex-col group cursor-pointer"
@@ -123,10 +125,10 @@ const NewIn = () => {
         </div>
 
         {/* View More Button */}
-        {activeProducts.length > 8 && (
+        {activeProducts.length > 8 && !isExpanded && (
           <div className="mt-12 flex justify-center">
             <button 
-              onClick={() => navigate('/category/new-arrivals')}
+              onClick={() => setIsExpanded(true)}
               className="px-10 py-3.5 bg-[#8b231a] border-none text-white text-[10px] font-bold uppercase tracking-[0.2em] rounded-md hover:bg-[#a51d1d] transition-all duration-300 shadow-lg active:scale-95"
             >
               View More Collection
@@ -136,7 +138,7 @@ const NewIn = () => {
 
         {/* Pagination Dots (Mobile Only) */}
         <div className="flex justify-center gap-2 mt-8 md:hidden">
-          {activeProducts.slice(0, 8).map((_, idx) => (
+          {(isExpanded ? activeProducts : activeProducts.slice(0, 8)).map((_, idx) => (
             <button
               key={idx}
               onClick={() => scrollTo(idx)}
