@@ -39,7 +39,7 @@ const CategoryPage = () => {
   const categoryName = slug?.replace(/-/g, ' ').toUpperCase();
 
   return (
-    <div className="min-h-screen bg-white text-[#1a1a1a] pb-16 md:pb-0 font-body">
+    <div className="min-h-screen bg-background text-[#1a1a1a] pb-16 md:pb-0 font-body">
       <Helmet>
         <title>{`${categoryName} | Women's Fashion | Gridox`}</title>
         <meta name="description" content={`Discover the latest ${categoryName} collection at Gridox. Shop high-quality designer wear.`} />

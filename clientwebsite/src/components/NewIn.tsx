@@ -84,7 +84,7 @@ const NewIn = () => {
                 }}
               >
                 {/* Image Container */}
-                <div className="relative aspect-[3/4] w-full rounded-xl overflow-hidden bg-white shadow-sm border border-black/5">
+                <div className="relative aspect-[3/4] w-full rounded-xl overflow-hidden bg-background shadow-sm border border-black/5">
                   <OptimizedImage 
                     src={product.image} 
                     alt={product.name} 

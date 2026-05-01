@@ -5,7 +5,7 @@ import BottomNav from "@/components/BottomNav";
 
 const ContactUs = () => {
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-background">
       <AnnouncementBar />
       <Header />
       
@@ -20,7 +20,7 @@ const ContactUs = () => {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
             <div className="space-y-8">
-              <div className="flex items-start gap-4 p-6 bg-gray-50 rounded-2xl border border-gray-100 hover:shadow-md transition-shadow">
+              <div className="flex items-start gap-4 p-6 bg-black/5 rounded-2xl border border-black/5 hover:shadow-md transition-shadow">
                 <div className="w-12 h-12 bg-[#8b231a] rounded-xl flex items-center justify-center text-white shrink-0">
                   <Mail size={24} />
                 </div>
@@ -31,7 +31,7 @@ const ContactUs = () => {
                 </div>
               </div>
 
-              <div className="flex items-start gap-4 p-6 bg-gray-50 rounded-2xl border border-gray-100 hover:shadow-md transition-shadow">
+              <div className="flex items-start gap-4 p-6 bg-black/5 rounded-2xl border border-black/5 hover:shadow-md transition-shadow">
                 <div className="w-12 h-12 bg-[#8b231a] rounded-xl flex items-center justify-center text-white shrink-0">
                   <Phone size={24} />
                 </div>
@@ -44,7 +44,7 @@ const ContactUs = () => {
             </div>
 
             <div className="space-y-8">
-              <div className="flex items-start gap-4 p-6 bg-gray-50 rounded-2xl border border-gray-100 hover:shadow-md transition-shadow">
+              <div className="flex items-start gap-4 p-6 bg-black/5 rounded-2xl border border-black/5 hover:shadow-md transition-shadow">
                 <div className="w-12 h-12 bg-[#8b231a] rounded-xl flex items-center justify-center text-white shrink-0">
                   <MapPin size={24} />
                 </div>
@@ -58,7 +58,7 @@ const ContactUs = () => {
                 </div>
               </div>
 
-              <div className="flex items-start gap-4 p-6 bg-gray-50 rounded-2xl border border-gray-100 hover:shadow-md transition-shadow">
+              <div className="flex items-start gap-4 p-6 bg-black/5 rounded-2xl border border-black/5 hover:shadow-md transition-shadow">
                 <div className="w-12 h-12 bg-[#8b231a] rounded-xl flex items-center justify-center text-white shrink-0">
                   <Clock size={24} />
                 </div>

@@ -10,7 +10,7 @@ const StoreLocator = () => {
   const mapEmbedUrl = `https://maps.google.com/maps?q=${encodeURIComponent(address)}&t=&z=17&ie=UTF8&iwloc=&output=embed`;
 
   return (
-    <div className="min-h-screen bg-white pb-20 md:pb-0 font-body">
+    <div className="min-h-screen bg-background pb-20 md:pb-0 font-body">
       <Header />
 
       {/* Hero Section - Sleeker and more minimalist */}
@@ -89,7 +89,7 @@ const StoreLocator = () => {
                   </div>
 
                   {/* Hours - Neat Table */}
-                  <div className="p-6 md:p-8 bg-white border border-[#8b231a]/5 shadow-sm space-y-4 md:space-y-6">
+                  <div className="p-6 md:p-8 bg-background border border-[#8b231a]/5 shadow-sm space-y-4 md:space-y-6">
                     <div className="flex items-center gap-3">
                       <Clock size={16} className="text-[#8b231a]" />
                       <p className="text-[10px] uppercase tracking-[0.3em] font-bold text-[#1a1a1a]">Boutique Hours</p>

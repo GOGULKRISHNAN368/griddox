@@ -139,8 +139,8 @@ const AuthPage = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-[#fafafa] p-4 font-outfit">
-      <div className="max-w-md w-full bg-white rounded-3xl shadow-2xl border border-gray-100 overflow-hidden flex flex-col md:flex-row shadow-rose-100/50">
+    <div className="min-h-screen flex items-center justify-center bg-background p-4 font-outfit">
+      <div className="max-w-md w-full bg-background rounded-3xl shadow-2xl border border-black/5 overflow-hidden flex flex-col md:flex-row shadow-rose-100/50">
         <div className="w-full p-8 md:p-12">
           <div className="text-center mb-10">
             <h1 className="text-4xl font-bold text-gray-900 mb-2 tracking-tight">
@@ -284,7 +284,7 @@ const AuthPage = () => {
                   <div className="w-full border-t border-gray-100"></div>
                 </div>
                 <div className="relative flex justify-center text-xs uppercase">
-                  <span className="bg-white px-2 text-gray-400 font-medium">Or continue with</span>
+                  <span className="bg-background px-2 text-gray-400 font-medium">Or continue with</span>
                 </div>
               </div>
 

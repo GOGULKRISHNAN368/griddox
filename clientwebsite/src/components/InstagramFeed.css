@@ -1,14 +1,14 @@
 .insta-feed-section {
   padding: 5rem 0;
-  background-color: #fdfdfd;
+  background-color: var(--background);
 }
 
 .insta-feed-title {
   text-align: center;
   font-family: 'Playfair Display', serif;
-  font-size: 1.5rem;
+  font-size: 2.2rem;
   font-weight: 400;
-  margin-bottom: 3rem;
+  margin-bottom: 0.5rem;
   color: #2c2c2c;
   letter-spacing: 0.25em;
   text-transform: uppercase;
@@ -65,10 +65,11 @@
 .insta-card {
   flex: 0 0 calc(25% - 1.2rem);
   min-width: 280px;
-  background: #fff;
-  border: 1px solid #e1e1e1;
-  border-radius: 8px;
+  background: var(--background);
+  border: 1px solid rgba(0,0,0,0.08);
+  border-radius: 12px;
   overflow: hidden;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.03);
 }
 
 .insta-card-header {

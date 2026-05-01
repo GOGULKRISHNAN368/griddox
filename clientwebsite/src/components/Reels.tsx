@@ -167,7 +167,8 @@ const Reels: React.FC = () => {
 
   return (
     <section className="reels-container">
-      <h2 className="reels-title">Feel the Reel</h2>
+      <h2 className="reels-title text-[#1a1a1a]">Feel the Reel</h2>
+      <div className="title-underline mb-12"></div>
       
       <div className="reels-slider-wrapper">
         <div 

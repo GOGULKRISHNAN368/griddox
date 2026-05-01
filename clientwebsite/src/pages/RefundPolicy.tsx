@@ -4,7 +4,7 @@ import BottomNav from "@/components/BottomNav";
 
 const RefundPolicy = () => {
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-background">
       <AnnouncementBar />
       <Header />
       

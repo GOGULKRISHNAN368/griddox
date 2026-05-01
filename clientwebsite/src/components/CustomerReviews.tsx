@@ -80,7 +80,7 @@ const CustomerReviews = () => {
   };
 
   return (
-    <section className="py-20 bg-white overflow-hidden">
+    <section className="py-20 bg-background overflow-hidden">
       <div className="container mx-auto px-4">
         <div className="text-center space-y-8 mb-16">
           <h2 className="font-heading text-3xl md:text-4xl text-[#1a1a1a] font-normal tracking-tight">
@@ -132,7 +132,7 @@ const CustomerReviews = () => {
             {reviews.map((review) => (
               <div 
                 key={review.id} 
-                className="flex-shrink-0 w-[190px] md:w-[220px] snap-start bg-white overflow-hidden"
+                className="flex-shrink-0 w-[190px] md:w-[220px] snap-start bg-background overflow-hidden"
               >
                 <div className="aspect-[1/1.2] overflow-hidden rounded-md mb-4 shadow-sm">
                   <img 

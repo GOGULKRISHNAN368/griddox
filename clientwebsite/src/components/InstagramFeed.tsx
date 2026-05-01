@@ -39,6 +39,7 @@ const InstagramFeed: React.FC = () => {
   return (
     <section className="insta-feed-section">
       <h2 className="insta-feed-title">STYLED FOR EVERY MOMENT</h2>
+      <div className="title-underline mb-12"></div>
       
       <div className="insta-grid-wrapper">
         <div className="insta-posts-grid" ref={gridRef}>

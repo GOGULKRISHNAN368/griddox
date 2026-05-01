@@ -81,7 +81,7 @@ const BestSellers = () => {
                 }}
               >
                 {/* Image Container */}
-                <div className="relative aspect-[3/4] w-full rounded-xl overflow-hidden bg-white">
+                <div className="relative aspect-[3/4] w-full rounded-xl overflow-hidden bg-background">
                   <OptimizedImage 
                     src={product.image} 
                     alt={product.name} 

@@ -140,11 +140,11 @@ const CheckoutPage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 pb-20">
+    <div className="min-h-screen bg-background pb-20">
       <Header />
       
       {step !== 4 && (
-        <div className="bg-white border-b border-border sticky top-0 z-10">
+        <div className="bg-background border-b border-border sticky top-0 z-10">
           <div className="max-w-4xl mx-auto px-4 py-4 flex flex-col md:flex-row items-center justify-between text-sm">
             <button onClick={() => step === 3 ? setStep(2) : navigate('/cart')} className="flex items-center text-muted-foreground hover:text-black mb-4 md:mb-0 hidden md:flex">
               <ArrowLeft size={16} className="mr-2" /> {step === 3 ? 'Back to Address' : 'Back to Cart'}
@@ -189,7 +189,7 @@ const CheckoutPage = () => {
       <div className="max-w-5xl mx-auto px-4 py-8">
         {step === 4 ? (
           // SUCCESS PAGE
-          <div className="bg-white p-8 md:p-12 text-center border border-border mt-8 flex flex-col items-center">
+          <div className="bg-background p-8 md:p-12 text-center border border-border mt-8 flex flex-col items-center">
             <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mb-6">
               <CheckCircle size={32} className="text-green-600" />
             </div>
@@ -206,7 +206,7 @@ const CheckoutPage = () => {
               </button>
               <button 
                 onClick={() => navigate('/#categories')}
-                className="px-8 py-3 border border-border text-black text-sm font-medium tracking-wider w-full sm:w-auto hover:bg-gray-50 transition-colors"
+                className="px-8 py-3 border border-border text-black text-sm font-medium tracking-wider w-full sm:w-auto hover:bg-background transition-colors"
               >
                 CONTINUE SHOPPING
               </button>
@@ -217,7 +217,7 @@ const CheckoutPage = () => {
             {/* MAIN CONTENT AREA */}
             <div className="flex-1">
               {step === 2 && (
-                <div className="bg-white p-6 border border-border mb-8">
+                <div className="bg-background p-6 border border-border mb-8">
                   <div className="mb-6">
                     <h1 className="text-2xl font-serif text-[#1e293b]">Choose Address</h1>
                     <p className="text-sm text-muted-foreground mt-1">Detailed address will help our delivery partner reach your doorstep quickly</p>
@@ -282,7 +282,7 @@ const CheckoutPage = () => {
               )}
 
               {step === 3 && (
-                <div className="bg-white p-6 border border-border">
+                <div className="bg-background p-6 border border-border">
                   <div className="mb-6 flex justify-between items-center border-b border-border pb-4">
                     <div>
                       <h2 className="text-xl font-medium flex items-center">
@@ -291,18 +291,18 @@ const CheckoutPage = () => {
                       <p className="text-sm text-muted-foreground mt-2">{address.name}, {address.phone}</p>
                       <p className="text-sm text-muted-foreground">{address.addressLine}, {address.pincode}</p>
                     </div>
-                    <button onClick={() => setStep(2)} className="text-sm font-medium border border-border px-4 py-1.5 hover:bg-gray-50">Edit</button>
+                    <button onClick={() => setStep(2)} className="text-sm font-medium border border-border px-4 py-1.5 hover:bg-background">Edit</button>
                   </div>
 
                   <h2 className="text-xl font-medium mb-6 flex items-center">
                     <CreditCard className="mr-2" size={20} /> Choose Payment Mode
                   </h2>
                   
-                  <div className="border border-[#001325] p-4 bg-gray-50 flex items-center justify-between mb-8 cursor-pointer relative overflow-hidden">
+                  <div className="border border-[#001325] p-4 bg-background flex items-center justify-between mb-8 cursor-pointer relative overflow-hidden">
                     <div className="absolute left-0 top-0 bottom-0 w-1 bg-[#001325]"></div>
                     <div className="flex items-center pl-2">
                       <div className="w-4 h-4 rounded-full bg-[#001325] mr-3 flex items-center justify-center">
-                        <div className="w-1.5 h-1.5 rounded-full bg-white"></div>
+                        <div className="w-1.5 h-1.5 rounded-full bg-background"></div>
                       </div>
                       <span className="font-medium text-[#001325]">Cash on Delivery (COD)</span>
                     </div>
@@ -324,7 +324,7 @@ const CheckoutPage = () => {
 
             {/* ORDER SUMMARY SIDEBAR */}
             <div className="lg:w-[350px]">
-              <div className="bg-white p-5 border border-border sticky top-24">
+              <div className="bg-background p-5 border border-border sticky top-24">
                 <div className="flex justify-between items-center mb-4 border-b border-border pb-4">
                   <h3 className="font-medium text-lg">Bag</h3>
                   <span className="text-sm text-muted-foreground">{cartItems.length} Items</span>
@@ -365,7 +365,7 @@ const CheckoutPage = () => {
                 </div>
               </div>
               
-              <div className="mt-4 flex items-center justify-center p-4 bg-gray-50 border border-border text-xs text-muted-foreground gap-3">
+              <div className="mt-4 flex items-center justify-center p-4 bg-background border border-border text-xs text-muted-foreground gap-3">
                 <img src="https://cdn-icons-png.flaticon.com/512/6062/6062646.png" alt="Secure" className="w-6 h-6 opacity-60" />
                 <div>
                   <p className="font-medium text-black">Authentic Products. Secure Payments.</p>

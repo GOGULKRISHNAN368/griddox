@@ -1,6 +1,6 @@
 .reels-container {
   padding: 4rem 0;
-  background-color: #fff;
+  background-color: var(--background);
 }
 
 .reels-title {
@@ -8,7 +8,7 @@
   font-family: 'Outfit', sans-serif;
   font-size: 2.75rem;
   font-weight: 700;
-  margin-bottom: 3.5rem;
+  margin-bottom: 12px;
   color: #1a1a1a;
   letter-spacing: -0.01em;
 }

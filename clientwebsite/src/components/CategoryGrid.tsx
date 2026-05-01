@@ -54,6 +54,7 @@ const CategoryGrid: React.FC = () => {
   return (
     <section id="categories" className="category-grid-section">
       <h2 className="section-title">Shop by Category</h2>
+      <div className="title-underline mb-12"></div>
       <div className="category-grid">
         {categories.length > 0 ? (
           (isExpanded ? categories : categories.slice(0, limit)).map((cat) => (
