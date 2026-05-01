@@ -35,26 +35,28 @@ const ProductDetailPage = () => {
 
   useEffect(() => {
     window.scrollTo(0, 0);
-    const fetchProductAndSimilar = async () => {
+    const fetchProduct = async () => {
       try {
         const response = await fetch(`/api/products/${productId}`);
+        if (!response.ok) throw new Error('Product not found');
         const found = await response.json();
         setProduct(found);
-
-        // Fetch similar products from same category
+        setIsLoading(false); // Show product immediately
+        
+        // Fetch similar products in background
         if (found && found.category) {
           const mainCat = Array.isArray(found.category) ? found.category[0] : found.category;
-          const simResp = await fetch(`/api/products?category=${mainCat}`);
-          const simData = await simResp.json();
-          setSimilarProducts(simData);
+          fetch(`/api/products?category=${mainCat}`)
+            .then(res => res.json())
+            .then(data => setSimilarProducts(data))
+            .catch(err => console.error('Error fetching similar products:', err));
         }
       } catch (error) {
         console.error('Error fetching product details:', error);
-      } finally {
         setIsLoading(false);
       }
     };
-    fetchProductAndSimilar();
+    fetchProduct();
   }, [productId]);
 
   if (isLoading) {
