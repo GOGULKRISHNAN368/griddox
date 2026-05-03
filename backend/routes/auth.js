@@ -12,7 +12,10 @@ const transporter = nodemailer.createTransport({
   auth: {
     user: process.env.SMTP_EMAIL,
     pass: process.env.SMTP_PASSWORD
-  }
+  },
+  connectionTimeout: 20000, // 20 seconds
+  greetingTimeout: 20000,
+  socketTimeout: 20000
 });
 
 // Helper to send OTP
@@ -248,16 +251,16 @@ router.get('/google', (req, res, next) => {
   
   res.cookie('auth_redirect_to', targetFrontend, { 
     httpOnly: true, 
-    secure: process.env.NODE_ENV === 'production',
-    sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+    secure: true,
+    sameSite: 'none',
     maxAge: 5 * 60 * 1000 // 5 minutes
   });
 
   if (redirectPath) {
     res.cookie('auth_final_redirect', redirectPath, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+      secure: true,
+      sameSite: 'none',
       maxAge: 5 * 60 * 1000
     });
   }
@@ -308,8 +311,8 @@ router.get('/google/callback', (req, res, next) => {
     // Set a temporary cookie to identify the pending Google user
     res.cookie('pending_google_email', userEmail, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+      secure: true,
+      sameSite: 'none',
       maxAge: 10 * 60 * 1000 // 10 minutes
     });
 
@@ -323,8 +326,8 @@ router.get('/google/callback', (req, res, next) => {
     }
 
     res.clearCookie('auth_final_redirect', { 
-      secure: process.env.NODE_ENV === 'production', 
-      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax' 
+      secure: true, 
+      sameSite: 'none' 
     });
 
     res.redirect(url);

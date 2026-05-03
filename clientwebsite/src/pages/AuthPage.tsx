@@ -47,6 +47,14 @@ const AuthPage = () => {
         setFormData(prev => ({ ...prev, email: searchParams.get('email') || '' }));
       }
     }
+
+    // Handle error messages from redirects
+    const error = searchParams.get('error');
+    if (error) {
+      if (error === 'google_failed') toast.error('Google login failed. Please try again.');
+      else if (error === 'token_err') toast.error('Session error. Please try again.');
+      else toast.error('An error occurred. Please try again.');
+    }
   }, [navigate, searchParams]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
