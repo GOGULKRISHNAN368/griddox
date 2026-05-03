@@ -8,6 +8,8 @@ passport.use(new GoogleStrategy({
   callbackURL: process.env.GOOGLE_CALLBACK_URL || "/api/auth/google/callback",
   proxy: true
 },
+  async (accessToken, refreshToken, profile, done) => {
+    try {
       const email = profile.emails && profile.emails[0] ? profile.emails[0].value : null;
       console.log(`[PASSPORT] Google profile received: ${profile.displayName} (${email})`);
 
