@@ -194,7 +194,6 @@ router.post('/login', async (req, res) => {
     }
 
     // Verify OTP
-    const trimmedEmail = email.trim().toLowerCase();
     const trimmedOtp = otp.trim();
     
     console.log(`[AUTH] Verifying Login OTP for ${trimmedEmail}: ${trimmedOtp}`);
