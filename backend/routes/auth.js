@@ -141,24 +141,23 @@ router.post('/signup', async (req, res) => {
     user.refreshToken = tokens.refreshToken;
 
     await user.save();
+    console.log(`[AUTH] User saved successfully: ${trimmedEmail}`);
 
     // Delete OTP after successful signup
     await OTP.deleteOne({ email: trimmedEmail });
 
-    res.cookie('accessToken', tokens.accessToken, {
+    const isProd = process.env.NODE_ENV === 'production';
+    const cookieOptions = {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+      secure: true, // Always true for cross-site cookies in modern browsers
+      sameSite: 'none', // Required for cross-site cookies (Vercel -> Render)
       maxAge: 7 * 24 * 60 * 60 * 1000
-    });
+    };
 
-    res.cookie('refreshToken', tokens.refreshToken, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
-      maxAge: 7 * 24 * 60 * 60 * 1000
-    });
+    res.cookie('accessToken', tokens.accessToken, cookieOptions);
+    res.cookie('refreshToken', tokens.refreshToken, cookieOptions);
 
+    console.log(`[AUTH] Signup complete for ${trimmedEmail}. Cookies set.`);
     res.status(201).json({ message: 'User created successfully', user: { name: user.name, email: user.email } });
   } catch (error) {
     res.status(500).json({ message: 'Server error', error: error.message });
@@ -210,22 +209,19 @@ router.post('/login', async (req, res) => {
     await user.save();
 
     // Delete OTP after successful login
-    await OTP.deleteOne({ email });
+    await OTP.deleteOne({ email: trimmedEmail });
 
-    res.cookie('accessToken', tokens.accessToken, {
+    const cookieOptions = {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+      secure: true,
+      sameSite: 'none',
       maxAge: 7 * 24 * 60 * 60 * 1000
-    });
+    };
 
-    res.cookie('refreshToken', tokens.refreshToken, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
-      maxAge: 7 * 24 * 60 * 60 * 1000
-    });
+    res.cookie('accessToken', tokens.accessToken, cookieOptions);
+    res.cookie('refreshToken', tokens.refreshToken, cookieOptions);
 
+    console.log(`[AUTH] Login complete for ${trimmedEmail}. Cookies set.`);
     res.status(200).json({ message: 'Login successful', user: { name: user.name, email: user.email } });
   } catch (error) {
     res.status(500).json({ message: 'Server error', error: error.message });
@@ -380,20 +376,17 @@ router.post('/google/verify-otp', async (req, res) => {
     await OTP.deleteOne({ email });
     res.clearCookie('pending_google_email', { secure: true, sameSite: 'none' });
 
-    res.cookie('accessToken', tokens.accessToken, {
+    const cookieOptions = {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+      secure: true,
+      sameSite: 'none',
       maxAge: 7 * 24 * 60 * 60 * 1000
-    });
+    };
 
-    res.cookie('refreshToken', tokens.refreshToken, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
-      maxAge: 7 * 24 * 60 * 60 * 1000
-    });
+    res.cookie('accessToken', tokens.accessToken, cookieOptions);
+    res.cookie('refreshToken', tokens.refreshToken, cookieOptions);
 
+    console.log(`[GOOGLE AUTH] Verification complete for ${email}. Cookies set.`);
     res.status(200).json({ message: 'Login successful', user: { name: user.name, email: user.email } });
   } catch (error) {
     res.status(500).json({ message: 'Server error', error: error.message });
