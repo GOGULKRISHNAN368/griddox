@@ -198,7 +198,7 @@ router.post('/login', async (req, res) => {
 
     // Verify OTP
     const trimmedOtp = otp.trim();
-    
+
     console.log(`[AUTH] Verifying Login OTP for ${trimmedEmail}: ${trimmedOtp}`);
     const otpRecord = await OTP.findOne({ email: trimmedEmail, otp: trimmedOtp });
     if (!otpRecord) {
@@ -235,7 +235,7 @@ router.post('/login', async (req, res) => {
 router.get('/google', (req, res, next) => {
   const referer = req.headers.referer || '';
   let targetFrontend = process.env.FRONTEND_URL || 'https://griddox.vercel.app';
-  
+
   if (referer.includes('localhost') || referer.includes('127.0.0.1')) {
     try {
       const refUrl = new URL(referer);
@@ -248,9 +248,9 @@ router.get('/google', (req, res, next) => {
   }
 
   const redirectPath = req.query.redirect || '';
-  
-  res.cookie('auth_redirect_to', targetFrontend, { 
-    httpOnly: true, 
+
+  res.cookie('auth_redirect_to', targetFrontend, {
+    httpOnly: true,
     secure: true,
     sameSite: 'none',
     maxAge: 5 * 60 * 1000 // 5 minutes
@@ -271,7 +271,7 @@ router.get('/google', (req, res, next) => {
   }
   const callbackURL = process.env.GOOGLE_CALLBACK_URL || `${req.protocol}://${host}/api/auth/google/callback`;
 
-  passport.authenticate('google', { 
+  passport.authenticate('google', {
     scope: ['profile', 'email'],
     prompt: 'select_account',
     callbackURL
@@ -286,8 +286,8 @@ router.get('/google/callback', (req, res, next) => {
   }
   const callbackURL = process.env.GOOGLE_CALLBACK_URL || `${req.protocol}://${host}/api/auth/google/callback`;
 
-  passport.authenticate('google', { 
-    failureRedirect: `${process.env.FRONTEND_URL || 'http://localhost:8080'}/auth?error=google_failed`, 
+  passport.authenticate('google', {
+    failureRedirect: `${process.env.FRONTEND_URL || 'http://localhost:8080'}/auth?error=google_failed`,
     session: false,
     callbackURL
   })(req, res, next);
@@ -299,7 +299,7 @@ router.get('/google/callback', (req, res, next) => {
     // Generate and send OTP
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
     const trimmedEmail = userEmail.trim().toLowerCase();
-    
+
     console.log(`[GOOGLE AUTH] Saving OTP for ${trimmedEmail}`);
     await OTP.findOneAndUpdate(
       { email: trimmedEmail },
@@ -319,15 +319,15 @@ router.get('/google/callback', (req, res, next) => {
     console.log(`Redirecting to frontend with google_otp=true for ${userEmail}`);
     const redirectTo = req.cookies.auth_redirect_to || process.env.FRONTEND_URL || 'http://localhost:8080';
     const finalRedirect = req.cookies.auth_final_redirect || '';
-    
+
     let url = `${redirectTo}/auth?google_otp=true&email=${encodeURIComponent(userEmail)}`;
     if (finalRedirect) {
       url += `&redirect=${encodeURIComponent(finalRedirect)}`;
     }
 
-    res.clearCookie('auth_final_redirect', { 
-      secure: true, 
-      sameSite: 'none' 
+    res.clearCookie('auth_final_redirect', {
+      secure: true,
+      sameSite: 'none'
     });
 
     res.redirect(url);
@@ -363,8 +363,8 @@ router.post('/google/verify-otp', async (req, res) => {
     let user = await User.findOne({ email });
     if (!user) {
       // Auto-create user for Google sign-in if they don't exist
-      user = new User({ 
-        email, 
+      user = new User({
+        email,
         name: email.split('@')[0], // Fallback name
         password: Math.random().toString(36).slice(-10) // Random password
       });
