@@ -60,14 +60,14 @@ const generateTokens = (user) => {
 router.post('/send-otp', async (req, res) => {
   try {
     const { email, type } = req.body;
-
     if (!email) {
       return res.status(400).json({ message: 'Email is required' });
     }
+    const trimmedEmail = email.trim().toLowerCase();
 
     // If login, check if user exists
     if (type === 'login') {
-      const user = await User.findOne({ email });
+      const user = await User.findOne({ email: trimmedEmail });
       if (!user) {
         return res.status(404).json({ message: 'No account found with this email' });
       }
@@ -75,7 +75,7 @@ router.post('/send-otp', async (req, res) => {
 
     // If signup, check if user already exists
     if (type === 'signup') {
-      const user = await User.findOne({ email });
+      const user = await User.findOne({ email: trimmedEmail });
       if (user) {
         return res.status(400).json({ message: 'User already exists' });
       }
@@ -86,18 +86,24 @@ router.post('/send-otp', async (req, res) => {
 
     // Save OTP to DB
     await OTP.findOneAndUpdate(
-      { email },
+      { email: trimmedEmail },
       { otp, createdAt: Date.now() },
       { upsert: true, new: true }
     );
 
     // Send Email
-    console.log(`Sending OTP ${otp} to ${email}...`);
-    await sendOTPEmail(email, otp);
+    console.log(`[AUTH] Sending OTP ${otp} to ${trimmedEmail}...`);
+    try {
+      await sendOTPEmail(trimmedEmail, otp);
+      console.log(`[AUTH] OTP email sent successfully to ${trimmedEmail}`);
+    } catch (mailError) {
+      console.error(`[AUTH] Failed to send OTP email to ${trimmedEmail}:`, mailError);
+      return res.status(500).json({ message: 'Failed to send OTP email. Please check your SMTP settings.', error: mailError.message });
+    }
 
     res.status(200).json({ message: 'OTP sent successfully to your email' });
   } catch (error) {
-    console.error('OTP SEND ERROR:', error);
+    console.error('[AUTH] /send-otp global error:', error);
     res.status(500).json({ message: 'Error sending OTP', error: error.message });
   }
 });
@@ -106,26 +112,38 @@ router.post('/send-otp', async (req, res) => {
 router.post('/signup', async (req, res) => {
   try {
     const { name, email, password, otp } = req.body;
+    console.log(`[AUTH] Signup attempt: email=${email}, name=${name}, hasPassword=${!!password}, hasOtp=${!!otp}`);
 
-    if (!otp) return res.status(400).json({ message: 'OTP is required' });
+    if (!name || !email || !password || !otp) {
+      return res.status(400).json({ message: 'All fields (Name, Email, Password, OTP) are required' });
+    }
+
+    const trimmedEmail = email.trim().toLowerCase();
+    const trimmedOtp = otp.trim();
 
     // Verify OTP
-    const otpRecord = await OTP.findOne({ email, otp });
+    console.log(`[AUTH] Verifying OTP for signup: ${trimmedEmail} -> ${trimmedOtp}`);
+    const otpRecord = await OTP.findOne({ email: trimmedEmail, otp: trimmedOtp });
     if (!otpRecord) {
+      console.log(`[AUTH] OTP verification failed for ${trimmedEmail}`);
       return res.status(400).json({ message: 'Invalid or expired OTP' });
     }
 
-    let user = await User.findOne({ email });
-    if (user) return res.status(400).json({ message: 'User already exists' });
+    let user = await User.findOne({ email: trimmedEmail });
+    if (user) {
+      console.log(`[AUTH] Signup failed: User already exists (${trimmedEmail})`);
+      return res.status(400).json({ message: 'User already exists' });
+    }
 
-    user = new User({ name, email, password });
+    console.log(`[AUTH] Creating new user: ${trimmedEmail}`);
+    user = new User({ name, email: trimmedEmail, password });
     const tokens = generateTokens(user);
     user.refreshToken = tokens.refreshToken;
 
     await user.save();
 
     // Delete OTP after successful signup
-    await OTP.deleteOne({ email });
+    await OTP.deleteOne({ email: trimmedEmail });
 
     res.cookie('accessToken', tokens.accessToken, {
       httpOnly: true,
@@ -151,7 +169,8 @@ router.post('/signup', async (req, res) => {
 router.post('/login', async (req, res) => {
   try {
     const { email, password, otp } = req.body;
-    const user = await User.findOne({ email });
+    const trimmedEmail = email.trim().toLowerCase();
+    const user = await User.findOne({ email: trimmedEmail });
 
     if (!user) {
       return res.status(404).json({ message: 'No account found with this email' });
@@ -166,20 +185,23 @@ router.post('/login', async (req, res) => {
       // Generate and send OTP
       const generatedOtp = Math.floor(100000 + Math.random() * 900000).toString();
       await OTP.findOneAndUpdate(
-        { email },
+        { email: trimmedEmail },
         { otp: generatedOtp, createdAt: Date.now() },
         { upsert: true, new: true }
       );
-      await sendOTPEmail(email, generatedOtp);
-      console.log(`Login OTP sent to ${email}`);
+      await sendOTPEmail(trimmedEmail, generatedOtp);
+      console.log(`Login OTP sent to ${trimmedEmail}`);
       return res.status(200).json({ message: 'OTP sent to your email', otpRequired: true });
     }
 
     // Verify OTP
-    console.log(`Verifying Login OTP for ${email}: ${otp}`);
-    const otpRecord = await OTP.findOne({ email, otp });
+    const trimmedEmail = email.trim().toLowerCase();
+    const trimmedOtp = otp.trim();
+    
+    console.log(`[AUTH] Verifying Login OTP for ${trimmedEmail}: ${trimmedOtp}`);
+    const otpRecord = await OTP.findOne({ email: trimmedEmail, otp: trimmedOtp });
     if (!otpRecord) {
-      console.log(`Invalid OTP for ${email}`);
+      console.log(`[AUTH] Invalid OTP for ${trimmedEmail}`);
       return res.status(400).json({ message: 'Invalid or expired OTP' });
     }
 
@@ -278,12 +300,15 @@ router.get('/google/callback', (req, res, next) => {
 
     // Generate and send OTP
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
+    const trimmedEmail = userEmail.trim().toLowerCase();
+    
+    console.log(`[GOOGLE AUTH] Saving OTP for ${trimmedEmail}`);
     await OTP.findOneAndUpdate(
-      { email: userEmail },
+      { email: trimmedEmail },
       { otp, createdAt: Date.now() },
       { upsert: true, new: true }
     );
-    await sendOTPEmail(userEmail, otp);
+    await sendOTPEmail(trimmedEmail, otp);
 
     // Set a temporary cookie to identify the pending Google user
     res.cookie('pending_google_email', userEmail, {
@@ -319,17 +344,21 @@ router.get('/google/callback', (req, res, next) => {
 router.post('/google/verify-otp', async (req, res) => {
   try {
     const { otp, email: emailFromBody } = req.body;
-    const email = req.cookies.pending_google_email || emailFromBody;
+    const rawEmail = req.cookies.pending_google_email || emailFromBody;
 
-    console.log(`Verifying Google OTP for ${email}: ${otp}`);
-
-    if (!email) {
-      console.log('No email found in session or body');
+    if (!rawEmail) {
+      console.log('[GOOGLE AUTH] No email found in session or body');
       return res.status(400).json({ message: 'Email session missing. Please try again.' });
     }
 
-    const otpRecord = await OTP.findOne({ email, otp });
+    const email = rawEmail.trim().toLowerCase();
+    const trimmedOtp = otp ? otp.trim() : '';
+
+    console.log(`[GOOGLE AUTH] Verifying OTP for ${email}: ${trimmedOtp}`);
+
+    const otpRecord = await OTP.findOne({ email, otp: trimmedOtp });
     if (!otpRecord) {
+      console.log(`[GOOGLE AUTH] Invalid OTP for ${email}`);
       return res.status(400).json({ message: 'Invalid or expired OTP' });
     }
 
