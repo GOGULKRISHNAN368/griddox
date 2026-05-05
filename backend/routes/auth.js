@@ -192,11 +192,27 @@ router.post('/login', async (req, res) => {
     const user = await User.findOne({ email: trimmedEmail });
 
     if (!user) {
-      return res.status(404).json({ message: 'No account found with this email' });
+      console.log(`[AUTH] Login failed: User ${trimmedEmail} not found`);
+      return res.status(404).json({ 
+        message: 'No account found with this email',
+        debug: {
+          db: mongoose.connection.name,
+          host: mongoose.connection.host,
+          timestamp: new Date().toISOString()
+        }
+      });
     }
 
-    if (!(await user.comparePassword(password))) {
-      return res.status(401).json({ message: 'Incorrect password. Please try again.' });
+    const isMatch = await user.comparePassword(password);
+    if (!isMatch) {
+      console.log(`[AUTH] Login failed: Incorrect password for ${trimmedEmail}`);
+      return res.status(401).json({ 
+        message: 'Incorrect password. Please try again.',
+        debug: {
+          db: mongoose.connection.name,
+          timestamp: new Date().toISOString()
+        }
+      });
     }
 
     // If OTP is not provided, it's the first step of login
