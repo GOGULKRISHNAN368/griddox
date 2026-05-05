@@ -1,4 +1,4 @@
-import { Search, ShoppingCart, Menu, X, MapPin, User, LogOut, Package, Truck } from "lucide-react";
+import { Search, ShoppingCart, Menu, X, MapPin, User, LogOut, Package, Truck, ChevronRight } from "lucide-react";
 
 import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
@@ -103,7 +103,7 @@ const Header = () => {
       <div className="container mx-auto flex items-center justify-between px-4 py-3 md:py-4">
         {/* Mobile menu button */}
         <button
-          className="md:hidden text-foreground"
+          className="md:hidden text-foreground flex items-center justify-center bg-transparent border-none"
           onClick={() => setMenuOpen(!menuOpen)}
           aria-label="Toggle menu"
         >
@@ -133,7 +133,7 @@ const Header = () => {
           <button
             aria-label="Search"
             onClick={() => setSearchOpen(true)}
-            className="hidden md:block text-foreground hover:text-accent transition-colors"
+            className="hidden md:block text-foreground hover:text-accent transition-colors bg-transparent border-none"
           >
             <Search size={20} />
           </button>
@@ -185,13 +185,13 @@ const Header = () => {
             <button
               aria-label="Account"
               onClick={() => navigate("/auth")}
-              className="text-foreground hover:text-accent transition-colors"
+              className="text-foreground hover:text-accent transition-colors bg-transparent border-none cursor-pointer"
             >
               <User size={20} />
             </button>
           )}
 
-          <button aria-label="Cart" onClick={() => navigate("/cart")} className="text-foreground hover:text-accent transition-colors relative"> {/* fix: cart route */}
+          <button aria-label="Cart" onClick={() => navigate("/cart")} className="text-foreground hover:text-accent transition-colors relative bg-transparent border-none cursor-pointer"> {/* fix: cart route */}
             <ShoppingCart size={20} />
             {cartCount > 0 && (
               <span className="absolute -top-2 -right-2 bg-[#8b231a] text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center">
@@ -203,21 +203,103 @@ const Header = () => {
         </div>
       </div>
 
-      {/* Mobile menu */}
+      {/* Mobile Menu Side Drawer */}
       {menuOpen && (
-        <nav className="md:hidden bg-background border-t border-border px-4 pb-4">
-          {navLinks
-            .filter(link => link.name !== "ADDRESS")
-            .map((link) => (
-              <button
-                key={link.name}
-                onClick={() => { handleNavClick(link.name, navigate); setMenuOpen(false); }} // fix: nav scroll links
-                className="block w-full text-left py-3 text-sm font-medium tracking-wider text-foreground hover:text-accent border-b border-border last:border-b-0 bg-transparent cursor-pointer"
-              >
-                {link.name}
+        <div className="md:hidden fixed inset-0 z-[2000] flex">
+          {/* Dark Overlay */}
+          <div 
+            className="fixed inset-0 bg-black/60 backdrop-blur-sm animate-in fade-in duration-300" 
+            onClick={() => setMenuOpen(false)}
+          />
+          
+          {/* Drawer Panel */}
+          <div className="relative w-[85%] max-w-[340px] bg-white h-full shadow-2xl flex flex-col animate-in slide-in-from-left duration-300 overflow-y-auto">
+            
+            {/* Close Button Inside Drawer */}
+            <button 
+              className="absolute top-3 right-3 p-2 bg-gray-100 rounded-full z-10 border-none cursor-pointer"
+              onClick={() => setMenuOpen(false)}
+            >
+              <X size={20} className="text-gray-800" />
+            </button>
+
+            {/* Top Promotional Banner */}
+            <div 
+              className="bg-[#eedfcb] p-5 flex items-center justify-between cursor-pointer border-b border-[#d2c4b3]" 
+              onClick={() => { 
+                setMenuOpen(false); 
+                window.dispatchEvent(new CustomEvent('openPromoModal', { detail: { src: 'https://images.unsplash.com/photo-1445205170230-053b83016050?w=800&auto=format&fit=crop&q=60' } })); 
+              }}
+            >
+              <div>
+                <span className="inline-block bg-[#8b231a] text-white text-[10px] font-extrabold px-2 py-0.5 rounded-sm mb-1.5 tracking-wider shadow-sm">10% OFF</span>
+                <h3 className="text-[#2a1b15] font-black text-lg leading-none tracking-tight">FLAT 10% OFF</h3>
+                <p className="text-[11px] text-[#5c4a3d] mt-1 font-bold tracking-wide">ON YOUR 1ST ORDER</p>
+                <p className="text-[10px] font-bold text-[#8b231a] mt-2 tracking-wider flex items-center">
+                  SIGN UP. LOGIN <ChevronRight size={12} className="ml-0.5" />
+                </p>
+              </div>
+              <img 
+                src="https://images.unsplash.com/photo-1483985988355-763728e1935b?w=200&auto=format&fit=crop&q=60" 
+                alt="Promo" 
+                className="w-[72px] h-[72px] object-cover rounded-full shadow-md border-2 border-white" 
+              />
+            </div>
+
+            {/* Primary Navigation Links */}
+            <div className="py-2">
+              {['HOME', 'CATEGORIES', 'BULK QUERIES', 'ABOUT US'].map((name) => (
+                <button 
+                  key={name}
+                  onClick={() => { handleNavClick(name, navigate); setMenuOpen(false); }}
+                  className="w-full flex items-center justify-between px-6 py-4 bg-white border-none cursor-pointer hover:bg-gray-50 active:bg-gray-100 transition-colors"
+                >
+                  <span className="font-bold text-gray-900 text-[15px] tracking-wide capitalize">{name.toLowerCase()}</span>
+                  <ChevronRight size={18} className="text-gray-400" />
+                </button>
+              ))}
+            </div>
+
+            <div className="h-2 bg-gray-50 border-y border-gray-100"></div>
+
+            {/* Secondary Navigation Links */}
+            <div className="py-2">
+              <button onClick={() => setMenuOpen(false)} className="w-full flex items-center px-6 py-3.5 bg-white border-none cursor-pointer hover:bg-gray-50 active:bg-gray-100 text-left">
+                <span className="text-gray-600 text-[14px] font-medium tracking-wide">Gridox Studio</span>
+                <span className="ml-3 text-[9px] text-[#8b2b25] font-bold border border-[#8b2b25] px-1.5 py-0.5 rounded-sm bg-[#ebd2be]">NEW</span>
               </button>
-            ))}
-        </nav>
+              <button onClick={() => setMenuOpen(false)} className="w-full flex items-center px-6 py-3.5 bg-white border-none cursor-pointer hover:bg-gray-50 active:bg-gray-100 text-left">
+                <span className="text-gray-600 text-[14px] font-medium tracking-wide">Gridox Mall</span>
+                <span className="ml-3 text-[9px] text-[#8b2b25] font-bold border border-[#8b2b25] px-1.5 py-0.5 rounded-sm bg-[#ebd2be]">NEW</span>
+              </button>
+              
+              {['Gridox Insider', 'Gift Cards', 'Contact Us', 'FAQs', 'Legal'].map((item) => (
+                <button 
+                  key={item} 
+                  onClick={() => setMenuOpen(false)} 
+                  className="w-full flex items-center px-6 py-3.5 bg-white border-none cursor-pointer hover:bg-gray-50 active:bg-gray-100 text-left"
+                >
+                  <span className="text-gray-600 text-[14px] font-medium tracking-wide">{item}</span>
+                </button>
+              ))}
+            </div>
+
+            <div className="flex-1"></div>
+
+            {/* Bottom Promotional Banner */}
+            <div 
+              className="bg-[#eedfcb] p-6 mt-4 flex items-center justify-center cursor-pointer border-t border-[#d2c4b3]/50"
+              onClick={() => { handleNavClick('CATEGORIES', navigate); setMenuOpen(false); }}
+            >
+              <div className="flex flex-col items-center text-center">
+                <img src="https://cdn-icons-png.flaticon.com/512/3081/3081559.png" alt="Shop" className="w-8 h-8 mb-2 opacity-60" />
+                <h4 className="font-extrabold text-[#2a1b15] text-[13px] tracking-widest uppercase">Enjoy The Best</h4>
+                <h4 className="font-extrabold text-[#2a1b15] text-[13px] tracking-widest uppercase mt-0.5">Shopping Experience!</h4>
+              </div>
+            </div>
+
+          </div>
+        </div>
       )}
 
       {/* Search Modal */}
