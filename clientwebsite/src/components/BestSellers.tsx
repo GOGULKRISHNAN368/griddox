@@ -64,17 +64,17 @@ const BestSellers = () => {
       </div>
 
       <div className="relative">
-        <div 
+        <div
           ref={scrollRef}
           onScroll={handleScroll}
           className="flex overflow-x-auto snap-x snap-mandatory gap-3 px-4 pb-4 md:grid md:grid-cols-4 md:gap-6 md:px-6 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
         >
           {activeProducts.length > 0 ? (
             activeProducts.map((product: any) => (
-              <div 
-                key={product._id} 
+              <div
+                key={product._id}
                 className="w-[38vw] sm:w-[32vw] md:w-full snap-start shrink-0 flex flex-col group cursor-pointer"
-                onClick={() => { 
+                onClick={() => {
                   const categorySlug = (Array.isArray(product.category) ? product.category[0] : product.category) || 'new-arrivals';
                   const productId = product._id;
                   navigate(`/category/${categorySlug}/product/${productId}`);
@@ -82,9 +82,9 @@ const BestSellers = () => {
               >
                 {/* Image Container */}
                 <div className="relative aspect-[3/4] w-full rounded-xl overflow-hidden bg-background">
-                  <OptimizedImage 
-                    src={product.image} 
-                    alt={`Gridox Fashion - ${product.name}`} 
+                  <OptimizedImage
+                    src={product.image}
+                    alt={`Gridox Fashion - ${product.name}`}
                     className="w-full h-full object-cover transition-transform duration-500"
                     isProductImage
                   />
@@ -122,9 +122,8 @@ const BestSellers = () => {
             <button
               key={idx}
               onClick={() => scrollTo(idx)}
-              className={`w-1.5 h-1.5 rounded-full transition-colors ${
-                activeIndex === idx ? "bg-primary" : "bg-[#D8B7A6]"
-              }`}
+              className={`w-1.5 h-1.5 rounded-full transition-colors ${activeIndex === idx ? "bg-primary" : "bg-[#D8B7A6]"
+                }`}
               aria-label={`Go to slide ${idx + 1}`}
             />
           ))}

@@ -6,7 +6,7 @@ const reviews = [
     id: 1,
     name: "Sneha",
     image: "/reviews/review7.avif",
-    text: "Judge.me Shop\nReviews",
+    text: "Gridox Verified\nReview",
     rating: 5,
     tag: "Gridox!"
   },
@@ -14,7 +14,7 @@ const reviews = [
     id: 2,
     name: "Ritika",
     image: "/reviews/revire2.avif",
-    text: "Judge.me Shop\nReviews",
+    text: "Gridox Verified\nReview",
     rating: 5,
     tag: "Gridox!"
   },
@@ -22,7 +22,7 @@ const reviews = [
     id: 3,
     name: "Nisha",
     image: "/reviews/review1.avif",
-    text: "Judge.me Shop\nReviews",
+    text: "Gridox Verified\nReview",
     rating: 5,
     tag: "Gridox!"
   },
@@ -30,7 +30,7 @@ const reviews = [
     id: 4,
     name: "Nisha",
     image: "/reviews/review5.avif",
-    text: "Judge.me Shop\nReviews",
+    text: "Gridox Verified\nReview",
     rating: 4,
     tag: "Gridox!"
   },
@@ -38,7 +38,7 @@ const reviews = [
     id: 5,
     name: "Anjali",
     image: "/reviews/review4.avif",
-    text: "Judge.me Shop\nReviews",
+    text: "Gridox Verified\nReview",
     rating: 5,
     tag: "Gridox!"
   },
@@ -46,23 +46,23 @@ const reviews = [
     id: 6,
     name: "Vidhya",
     image: "/reviews/review3.avif",
-    text: "Judge.me Shop\nReviews",
+    text: "Gridox Verified\nReview",
     rating: 5,
     tag: "Gridox!"
   },
   {
     id: 7,
-    name: "Megha (Coimbatore)",
+    name: "Megha",
     image: "/reviews/review6.avif",
-    text: "Received my Peplum set within 24 hours in Coimbatore. Perfect fit!",
+    text: "Received my Peplum set within 24 hours. Perfect fit!",
     rating: 5,
     tag: "Gridox!"
   },
   {
     id: 8,
-    name: "Kavya (Tirupur)",
+    name: "Kavya",
     image: "/reviews/revire8.avif",
-    text: "The raw silk quality is amazing. Best festive wear collection in Tirupur.",
+    text: "The raw silk quality is amazing. Best festive wear collection.",
     rating: 5,
     tag: "Gridox!"
   }
@@ -86,7 +86,7 @@ const CustomerReviews = () => {
           <h2 className="font-heading text-3xl md:text-4xl text-[#1a1a1a] font-normal tracking-tight">
             Loved by 4 Lakh+ Women
           </h2>
-          
+
           <div className="flex items-center justify-center gap-2 md:gap-4 flex-wrap">
             <div className="flex gap-0.5">
               {[...Array(5)].map((_, i) => (
@@ -107,15 +107,15 @@ const CustomerReviews = () => {
 
         <div className="relative group max-w-6xl mx-auto">
           {/* Controls */}
-          <button 
+          <button
             onClick={() => scroll('left')}
             className="absolute -left-12 top-[40%] z-20 text-gray-400 hover:text-black transition-colors hidden lg:block"
             aria-label="Previous"
           >
             <ChevronLeft size={48} strokeWidth={1} />
           </button>
-          
-          <button 
+
+          <button
             onClick={() => scroll('right')}
             className="absolute -right-12 top-[40%] z-20 text-gray-400 hover:text-black transition-colors hidden lg:block"
             aria-label="Next"
@@ -124,19 +124,19 @@ const CustomerReviews = () => {
           </button>
 
           {/* Slider */}
-          <div 
+          <div
             ref={scrollRef}
             className="flex gap-4 md:gap-4 overflow-x-auto snap-x snap-mandatory scrollbar-hide pb-12"
             style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
           >
             {reviews.map((review) => (
-              <div 
-                key={review.id} 
+              <div
+                key={review.id}
                 className="flex-shrink-0 w-[190px] md:w-[220px] snap-start bg-background overflow-hidden"
               >
                 <div className="aspect-[1/1.2] overflow-hidden rounded-md mb-4 shadow-sm">
-                  <img 
-                    src={review.image} 
+                  <img
+                    src={review.image}
                     alt={review.name}
                     className="w-full h-full object-cover"
                   />
@@ -147,13 +147,13 @@ const CustomerReviews = () => {
                       {review.text}
                     </p>
                   </div>
-                  
+
                   <div className="flex gap-0.5">
                     {[...Array(5)].map((_, i) => (
-                      <Star 
-                        key={i} 
-                        size={18} 
-                        className={`${i < review.rating ? 'fill-[#108548] text-[#108548]' : 'text-[#108548]'}`} 
+                      <Star
+                        key={i}
+                        size={18}
+                        className={`${i < review.rating ? 'fill-[#108548] text-[#108548]' : 'text-[#108548]'}`}
                         strokeWidth={1.5}
                       />
                     ))}

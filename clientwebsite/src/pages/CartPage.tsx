@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import Header from "@/components/Header";
 import BottomNav from "@/components/BottomNav";
+import Footer from "@/components/Footer";
 
 // TODO: Replace with real cart items fetched from MongoDB
 interface CartItem {
@@ -124,7 +125,7 @@ const CartPage = () => {
                 <span>Total</span>
                 <span>₹{subtotal.toLocaleString()}</span>
               </div>
-              <button 
+              <button
                 onClick={handleCheckoutClick}
                 className="w-full py-3 bg-black text-white text-sm font-medium tracking-wider hover:opacity-80 transition-opacity"
               >
@@ -135,6 +136,7 @@ const CartPage = () => {
         )}
       </div>
       <BottomNav />
+      <Footer />
     </div>
   );
 };

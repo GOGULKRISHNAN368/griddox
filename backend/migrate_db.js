@@ -2,18 +2,18 @@ const mongoose = require('mongoose');
 require('dotenv').config({ path: '../.env' });
 
 // URIs
-const SOURCE_URI = process.env.MONGODB_URI;
-const DEST_URI = "mongodb+srv://gogul:admin123@cluster0.ycdwfuv.mongodb.net/gridox?retryWrites=true&w=majority";
+const SOURCE_URI = "mongodb+srv://gogul:admin123@cluster0.ycdwfuv.mongodb.net/gridox?retryWrites=true&w=majority";
+const DEST_URI = "mongodb+srv://gridoxclothing_db_user:gridoxadmin@cluster0.vaka2ak.mongodb.net/gridox?retryWrites=true&w=majority";
 
 async function migrate() {
   let sourceConn, destConn;
   try {
-    console.log('Connecting to Source DB...');
+    console.log('Connecting to Source DB (ycdwfuv)...');
     sourceConn = await mongoose.createConnection(SOURCE_URI).asPromise();
-    console.log('Connecting to Destination DB...');
+    console.log('Connecting to Destination DB (vaka2ak)...');
     destConn = await mongoose.createConnection(DEST_URI).asPromise();
 
-    const collections = ['users', 'products', 'categories', 'banners', 'orders', 'otps', 'reels', 'instagramposts'];
+    const collections = ['users', 'products', 'categories', 'banners', 'orders', 'otps', 'reels', 'instagramposts', 'leads', 'new_arrivals'];
 
     for (const colName of collections) {
       console.log(`Migrating collection: ${colName}...`);

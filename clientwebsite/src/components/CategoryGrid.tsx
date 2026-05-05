@@ -25,7 +25,7 @@ const CategoryGrid: React.FC = () => {
         setLimit(8); // 4 columns * 2 rows = 8 items
       }
     };
-    
+
     updateLimit();
     window.addEventListener('resize', updateLimit);
     return () => window.removeEventListener('resize', updateLimit);
@@ -65,9 +65,9 @@ const CategoryGrid: React.FC = () => {
                   alt={cat.name} 
                   className="category-img"
                 />
-                <div className="category-overlay">
-                  <h3 className="category-name">{cat.name}</h3>
-                </div>
+              </div>
+              <div className="category-info">
+                <h3 className="category-name">{cat.name}</h3>
               </div>
             </Link>
           ))
@@ -84,10 +84,10 @@ const CategoryGrid: React.FC = () => {
           ))
         )}
       </div>
-      
+
       {categories.length > limit && (
         <div className="view-more-container">
-          <button 
+          <button
             className="view-more-btn"
             onClick={() => setIsExpanded(!isExpanded)}
           >

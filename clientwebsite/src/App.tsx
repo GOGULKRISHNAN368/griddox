@@ -21,7 +21,6 @@ const OrdersPage = lazy(() => import("./pages/OrdersPage.tsx"));
 const ContactUs = lazy(() => import("./pages/ContactUs.tsx"));
 const TermsAndConditions = lazy(() => import("./pages/TermsAndConditions.tsx"));
 const RefundPolicy = lazy(() => import("./pages/RefundPolicy.tsx"));
-import Footer from "@/components/Footer";
 // Dashboard removed as per user request
 
 // Simple loading fallback
@@ -59,7 +58,6 @@ const App = () => (
               <Route path="*" element={<NotFound />} />
 
             </Routes>
-            <Footer />
           </Suspense>
         </BrowserRouter>
       </TooltipProvider>
