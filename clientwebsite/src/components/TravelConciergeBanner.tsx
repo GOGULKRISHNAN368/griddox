@@ -7,7 +7,7 @@ const TravelConciergeBanner: React.FC = () => {
       <div className="travel-banner-overlay">
         <div className="travel-banner-content">
           <div className="travel-banner-left">
-            <h2>TRAVEL CONCIERGE</h2>
+            <h2>GRIDOX TRAVEL CONCIERGE</h2>
           </div>
           <div className="travel-banner-center">
             <h3>NOW LIVE</h3>

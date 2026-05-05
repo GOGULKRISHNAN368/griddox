@@ -54,9 +54,9 @@ const BestSellers = () => {
   };
 
   return (
-    <section className="py-10 md:py-16 w-full max-w-5xl mx-auto">
+    <section id="best-sellers" className="py-10 md:py-16 w-full max-w-5xl mx-auto">
       <div className="text-center px-4 mb-8">
-        <h2 className="font-heading text-3xl md:text-4xl font-normal mb-3 text-foreground italic">Best Sellers</h2>
+        <h2 className="font-heading text-3xl md:text-4xl font-normal mb-3 text-foreground italic">Gridox Best Sellers</h2>
         <div className="w-12 h-[3px] bg-[#8b231a] mx-auto rounded-full mb-3"></div>
         <p className="text-sm md:text-base text-muted-foreground max-w-md mx-auto">
           Our most loved designs, curated just for you.
@@ -84,7 +84,7 @@ const BestSellers = () => {
                 <div className="relative aspect-[3/4] w-full rounded-xl overflow-hidden bg-background">
                   <OptimizedImage 
                     src={product.image} 
-                    alt={product.name} 
+                    alt={`Gridox Fashion - ${product.name}`} 
                     className="w-full h-full object-cover transition-transform duration-500"
                     isProductImage
                   />

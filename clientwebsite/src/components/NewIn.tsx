@@ -59,7 +59,7 @@ const NewIn = () => {
   return (
     <section id="new-arrivals" className="py-10 md:py-16 w-full max-w-5xl mx-auto">
       <div className="text-center px-4 mb-8">
-        <h2 className="font-heading text-3xl md:text-4xl font-normal mb-3 text-foreground italic">New Arrivals</h2>
+        <h2 className="font-heading text-3xl md:text-4xl font-normal mb-3 text-foreground italic text-center">Gridox New Arrivals</h2>
         <div className="w-12 h-[3px] bg-[#8b231a] mx-auto rounded-full mb-3"></div>
         <p className="text-sm md:text-base text-muted-foreground max-w-md mx-auto">
           Discover the latest trends and fresh picks in our new collection.
@@ -87,7 +87,7 @@ const NewIn = () => {
                 <div className="relative aspect-[3/4] w-full rounded-xl overflow-hidden bg-background shadow-sm border border-black/5">
                   <OptimizedImage 
                     src={product.image} 
-                    alt={product.name} 
+                    alt={`Gridox Fashion - ${product.name}`} 
                     className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                     isProductImage
                   />
@@ -131,7 +131,7 @@ const NewIn = () => {
               onClick={() => setIsExpanded(true)}
               className="px-10 py-3.5 bg-[#8b231a] border-none text-white text-[10px] font-bold uppercase tracking-[0.2em] rounded-md hover:bg-[#a51d1d] transition-all duration-300 shadow-lg active:scale-95"
             >
-              View More Collection
+              View More Gridox Collection
             </button>
           </div>
         )}

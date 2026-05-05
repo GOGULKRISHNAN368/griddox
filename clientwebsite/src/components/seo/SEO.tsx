@@ -30,7 +30,7 @@ const defaultImage = `${siteUrl}/og-image.jpg`;
 export const SEO = ({
   title,
   description,
-  keywords = "women's fashion, designer clothing, premium dresses, ethnic wear, Gridox fashion",
+  keywords = "Gridox, Gridox Fashion, Gridox Clothing, Gridox Women's Wear, Gridox Ethnic Wear, Gridox Designer Collection, Gridox Boutique, Gridox Premium, Gridox Style, Gridox Dress",
   image = defaultImage,
   url,
   type = "website",
@@ -93,7 +93,7 @@ export const OrganizationSchema = () => {
     name: "Gridox",
     url: "https://gridox.com",
     logo: "https://gridox.com/logo.png",
-    description: "Premium women's fashion and designer clothing. Discover uniquely designed, high-quality dresses, ethnic wear, and contemporary styles.",
+    description: "Gridox - Premium designer women's fashion and clothing. Discover uniquely designed, high-quality dresses, ethnic wear, and contemporary styles by Gridox.",
     contactPoint: {
       "@type": "ContactPoint",
       telephone: "+91-11-41169005",
@@ -103,7 +103,6 @@ export const OrganizationSchema = () => {
     address: {
       "@type": "PostalAddress",
       addressCountry: "IN",
-      addressRegion: "Delhi",
     },
     sameAs: [
       "https://www.instagram.com/gridox",

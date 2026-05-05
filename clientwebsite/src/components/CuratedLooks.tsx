@@ -57,9 +57,9 @@ const CuratedLooks: React.FC = () => {
   if (!loading && looks.length === 0) return null;
 
   return (
-    <section className="curated-looks-section">
+    <section id="curated-looks" className="curated-looks-section">
       <div className="container mx-auto px-4 text-center mb-10">
-        <h2 className="curated-title">Curated Looks For You</h2>
+        <h2 className="curated-title">Curated Trending Looks</h2>
         <div className="title-underline"></div>
       </div>
 
@@ -101,7 +101,7 @@ const CuratedLooks: React.FC = () => {
                 const mainCat = Array.isArray(look.category) ? look.category[0] : look.category;
                 navigate(`/category/${mainCat}/product/${look._id}`);
               }}>
-                <img src={look.image} alt={look.name} className="look-image" />
+                <img src={look.image} alt={`Gridox Premium Ethnic Wear - ${look.name}`} title={`Gridox Fashion | ${look.name}`} className="look-image" />
                 <button className="look-shop-btn" onClick={(e) => {
                   e.stopPropagation();
                   const mainCat = Array.isArray(look.category) ? look.category[0] : look.category;
@@ -153,7 +153,7 @@ const CuratedLooks: React.FC = () => {
                 const mainCat = Array.isArray(look.category) ? look.category[0] : look.category;
                 navigate(`/category/${mainCat}/product/${look._id}`);
               }}>
-                <img src={look.image} alt={look.name} className="desktop-look-image" />
+                <img src={look.image} alt={`Gridox Premium Ethnic Wear - ${look.name}`} title={`Gridox Fashion | ${look.name}`} className="desktop-look-image" />
                 <button className="desktop-shop-btn" onClick={(e) => {
                   e.stopPropagation();
                   const mainCat = Array.isArray(look.category) ? look.category[0] : look.category;
