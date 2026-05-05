@@ -10,19 +10,44 @@ const mongoose = require('mongoose');
 console.log(`[AUTH] SMTP Config Check: user=${!!process.env.SMTP_EMAIL}, pass=${!!process.env.SMTP_PASSWORD}`);
 const transporter = nodemailer.createTransport({
   host: 'smtp.gmail.com',
-  port: 587,
-  secure: false,
-  requireTLS: true,
+  port: 465,
+  secure: true,
   auth: {
     user: process.env.SMTP_EMAIL,
     pass: process.env.SMTP_PASSWORD
   },
-  family: 4, // Force IPv4 to avoid Render network issues with IPv6
+  family: 4,
   logger: true,
   debug: true,
   connectionTimeout: 30000,
   greetingTimeout: 30000,
-  socketTimeout: 30000
+  socketTimeout: 30000,
+  tls: { rejectUnauthorized: false }
+});
+
+// SMTP Debug Route
+router.get('/debug-smtp', async (req, res) => {
+  console.log('[AUTH] Starting SMTP verification...');
+  try {
+    await transporter.verify();
+    console.log('[AUTH] SMTP verification successful');
+    res.json({ 
+      status: 'SMTP connection successful',
+      config: {
+        host: transporter.options.host,
+        port: transporter.options.port,
+        user: !!process.env.SMTP_EMAIL,
+        pass: !!process.env.SMTP_PASSWORD
+      }
+    });
+  } catch (error) {
+    console.error('[AUTH] SMTP verification failed:', error);
+    res.status(500).json({ 
+      status: 'SMTP connection failed', 
+      error: error.message,
+      stack: error.stack
+    });
+  }
 });
 
 // Helper to send OTP
@@ -115,15 +140,15 @@ router.post('/send-otp', async (req, res) => {
       console.error(`[AUTH] Failed to send OTP email to ${trimmedEmail}:`, mailError);
       // Still return 200 in development if SMTP fails, so developer can see the OTP in logs
       if (process.env.NODE_ENV !== 'production') {
-        return res.status(200).json({ 
-          message: 'OTP sent (Email failed, check server logs)', 
+        return res.status(200).json({
+          message: 'OTP sent (Email failed, check server logs)',
           devOtp: otp,
-          warning: 'SMTP error: ' + mailError.message 
+          warning: 'SMTP error: ' + mailError.message
         });
       }
-      return res.status(500).json({ 
-        message: 'Failed to send verification email. Please try again later.', 
-        error: mailError.message 
+      return res.status(500).json({
+        message: 'Failed to send verification email. Please try again later.',
+        error: mailError.message
       });
     }
 
@@ -200,7 +225,7 @@ router.post('/login', async (req, res) => {
 
     if (!user) {
       console.log(`[AUTH] Login failed: User ${trimmedEmail} not found`);
-      return res.status(404).json({ 
+      return res.status(404).json({
         message: 'No account found with this email',
         debug: {
           db: mongoose.connection.name,
@@ -210,13 +235,18 @@ router.post('/login', async (req, res) => {
       });
     }
 
+    console.log(`[AUTH] Comparing password for ${trimmedEmail}...`);
     const isMatch = await user.comparePassword(password);
     if (!isMatch) {
       console.log(`[AUTH] Login failed: Incorrect password for ${trimmedEmail}`);
+      // Log hash prefix for debugging (securely)
+      const hashPrefix = user.password ? user.password.substring(0, 7) : 'none';
+      
       return res.status(401).json({ 
         message: 'Incorrect password. Please try again.',
         debug: {
           db: mongoose.connection.name,
+          hashPrefix: hashPrefix,
           timestamp: new Date().toISOString()
         }
       });
@@ -231,20 +261,20 @@ router.post('/login', async (req, res) => {
         { otp: generatedOtp, createdAt: Date.now() },
         { upsert: true, new: true }
       );
-      
+
       console.log(`[AUTH] Login OTP for ${trimmedEmail}: ${generatedOtp}`);
-      
+
       try {
         await sendOTPEmail(trimmedEmail, generatedOtp);
         console.log(`Login OTP emailed successfully to ${trimmedEmail}`);
       } catch (mailError) {
         console.error(`[AUTH] Failed to email login OTP:`, mailError);
-        return res.status(500).json({ 
+        return res.status(500).json({
           message: 'Failed to send verification email. Please try again later.',
-          error: mailError.message 
+          error: mailError.message
         });
       }
-      
+
       return res.status(200).json({ message: 'OTP sent to your email', otpRequired: true });
     }
 
@@ -253,7 +283,7 @@ router.post('/login', async (req, res) => {
 
     console.log(`[AUTH] Verifying Login OTP for ${trimmedEmail}: ${trimmedOtp}`);
     const otpRecord = await OTP.findOne({ email: trimmedEmail, otp: trimmedOtp });
-    
+
     if (!otpRecord) {
       console.log(`[AUTH] Invalid OTP for ${trimmedEmail}. Entered: ${trimmedOtp}`);
       return res.status(400).json({ message: 'Invalid or expired OTP' });
@@ -261,7 +291,7 @@ router.post('/login', async (req, res) => {
 
     console.log(`[AUTH] OTP valid for ${trimmedEmail}. Generating tokens...`);
     const tokens = generateTokens(user);
-    
+
     console.log(`[AUTH] Tokens generated for ${trimmedEmail}. Updating user...`);
     user.refreshToken = tokens.refreshToken;
     await user.save();
@@ -325,7 +355,7 @@ router.get('/google', (req, res, next) => {
   }
 
   let host = req.get('host');
-  
+
   // If on localhost, try to use the referer's host (e.g. localhost:8080)
   // because Google will redirect to that host, and Vite proxy will forward it to us.
   // This is often what users have configured in their Google Console.
@@ -334,14 +364,14 @@ router.get('/google', (req, res, next) => {
       try {
         const refUrl = new URL(referer);
         host = refUrl.host;
-      } catch (e) {}
+      } catch (e) { }
     }
   }
 
   if (host.includes('127.0.0.1')) {
     host = host.replace('127.0.0.1', 'localhost');
   }
-  
+
   // Ensure we use https for callback URL in production (unless it's localhost)
   const protocol = (host.includes('localhost') || host.includes('127.0.0.1')) ? 'http' : 'https';
   const callbackURL = process.env.GOOGLE_CALLBACK_URL || `${protocol}://${host}/api/auth/google/callback`;
@@ -358,20 +388,20 @@ router.get('/google', (req, res, next) => {
 router.get('/google/callback', (req, res, next) => {
   const referer = req.headers.referer || '';
   let host = req.get('host');
-  
+
   if (host.includes('localhost') || host.includes('127.0.0.1')) {
     if (referer && (referer.includes('localhost') || referer.includes('127.0.0.1'))) {
       try {
         const refUrl = new URL(referer);
         host = refUrl.host;
-      } catch (e) {}
+      } catch (e) { }
     }
   }
 
   if (host.includes('127.0.0.1')) {
     host = host.replace('127.0.0.1', 'localhost');
   }
-  
+
   const protocol = (host.includes('localhost') || host.includes('127.0.0.1')) ? 'http' : 'https';
   const callbackURL = process.env.GOOGLE_CALLBACK_URL || `${protocol}://${host}/api/auth/google/callback`;
 
@@ -442,7 +472,7 @@ router.get('/google/callback', (req, res, next) => {
     }
 
     console.log(`[GOOGLE AUTH] Step 3: Redirecting user to frontend: ${url}`);
-    
+
     res.clearCookie('auth_final_redirect', { secure: true, sameSite: 'none', path: '/' });
     res.redirect(url);
   } catch (error) {
