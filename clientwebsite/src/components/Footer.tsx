@@ -94,8 +94,6 @@ const Footer = () => {
           <p>© {currentYear} Gridox Premium Fashion. All rights reserved by Gridox.</p>
           <div className="flex gap-4">
             <span className="hidden md:inline">Gridox Premium Brand</span>
-            <span className="hidden md:inline text-[#8b231a]">|</span>
-            <span>Designed with ❤️ by Gridox</span>
           </div>
         </div>
       </div>
