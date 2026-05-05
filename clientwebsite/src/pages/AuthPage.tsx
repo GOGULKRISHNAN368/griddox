@@ -64,6 +64,8 @@ const AuthPage = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
+    const trimmedEmail = formData.email.trim().toLowerCase();
+
     if (!isLogin && formData.password !== formData.confirmPassword) {
       toast.error('Passwords do not match');
       return;
@@ -76,8 +78,10 @@ const AuthPage = () => {
         // Step 1: Send OTP
         const endpoint = isLogin ? '/auth/login' : '/auth/send-otp';
         const payload = isLogin
-          ? { email: formData.email, password: formData.password }
-          : { email: formData.email, type: 'signup' };
+          ? { email: trimmedEmail, password: formData.password }
+          : { email: trimmedEmail, type: 'signup' };
+
+        console.log(`[AUTH] Step 1: Calling ${endpoint} for ${trimmedEmail}`);
 
         const response = await fetch(`${API_URL}${endpoint}`, {
           method: 'POST',
@@ -86,26 +90,38 @@ const AuthPage = () => {
           credentials: 'include'
         });
 
-        const data = await response.json();
+        let data;
+        try {
+          data = await response.json();
+        } catch (e) {
+          throw new Error('Invalid response from server');
+        }
 
         if (response.ok) {
           if (isLogin && data.otpRequired) {
             setShowOtp(true);
-            toast.success('Verification code sent to your email');
+            if (data.devOtp) {
+              setOtp(data.devOtp);
+              toast.info(`Development Mode: OTP is ${data.devOtp}`, { duration: 10000 });
+            } else {
+              toast.success('Verification code sent to your email');
+            }
           } else if (!isLogin) {
             setShowOtp(true);
-            toast.success('Verification code sent to your email');
+            if (data.devOtp) {
+              setOtp(data.devOtp);
+              toast.info(`Development Mode: OTP is ${data.devOtp}`, { duration: 10000 });
+            } else {
+              toast.success('Verification code sent to your email');
+            }
           } else {
             toast.success(data.message);
-            let redirectPath = searchParams.get('redirect') || '/';
-            navigate(redirectPath);
+            const redirectPath = searchParams.get('redirect') || '/';
+            // Use window.location.href for a full refresh to ensure all components update
+            window.location.href = redirectPath;
           }
         } else {
           toast.error(data.message || 'Error processing request');
-          // If login fails because user doesn't exist, offer to switch to signup
-          if (isLogin && response.status === 404) {
-            // Optional: setIsLogin(false);
-          }
         }
       } else {
         // Step 2: Verify OTP
@@ -113,7 +129,13 @@ const AuthPage = () => {
           ? '/auth/google/verify-otp'
           : (isLogin ? '/auth/login' : '/auth/signup');
 
-        const payload = { ...formData, otp };
+        const payload = { 
+          ...formData, 
+          email: trimmedEmail,
+          otp: otp.trim() 
+        };
+
+        console.log(`[AUTH] Step 2: Verifying OTP via ${endpoint} for ${trimmedEmail}`);
 
         const response = await fetch(`${API_URL}${endpoint}`, {
           method: 'POST',
@@ -122,18 +144,25 @@ const AuthPage = () => {
           credentials: 'include'
         });
 
-        const data = await response.json();
+        let data;
+        try {
+          data = await response.json();
+        } catch (e) {
+          throw new Error('Verification failed: Invalid server response');
+        }
 
         if (response.ok) {
           toast.success(isLogin ? 'Login successful' : 'Account created successfully!');
-          let redirectPath = searchParams.get('redirect') || '/';
-          navigate(redirectPath);
+          const redirectPath = searchParams.get('redirect') || '/';
+          // Use window.location.href for a full refresh to ensure all components update
+          window.location.href = redirectPath;
         } else {
           toast.error(data.message || 'Verification failed');
         }
       }
-    } catch (error) {
-      toast.error('Connection error. Please try again.');
+    } catch (error: any) {
+      console.error('[AUTH] Submit error:', error);
+      toast.error(error.message || 'Connection error. Please try again.');
     } finally {
       setLoading(false);
     }

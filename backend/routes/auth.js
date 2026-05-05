@@ -44,6 +44,11 @@ const sendOTPEmail = async (email, otp) => {
 
 // Helper to generate tokens
 const generateTokens = (user) => {
+  if (!user || !user._id) {
+    console.error('[AUTH] Cannot generate tokens: Invalid user object', user);
+    throw new Error('Invalid user object for token generation');
+  }
+
   const accessToken = jwt.sign(
     { userId: user._id, email: user.email },
     process.env.JWT_SECRET,
@@ -101,13 +106,24 @@ router.post('/send-otp', async (req, res) => {
       console.log(`[AUTH] OTP email sent successfully to ${trimmedEmail}`);
     } catch (mailError) {
       console.error(`[AUTH] Failed to send OTP email to ${trimmedEmail}:`, mailError);
-      return res.status(500).json({ message: 'Failed to send OTP email. Please check your SMTP settings.', error: mailError.message });
+      // Still return 200 in development if SMTP fails, so developer can see the OTP in logs
+      if (process.env.NODE_ENV !== 'production') {
+        return res.status(200).json({ 
+          message: 'OTP sent (Email failed, check server logs)', 
+          devOtp: otp,
+          warning: 'SMTP error: ' + mailError.message 
+        });
+      }
+      return res.status(500).json({ 
+        message: 'Failed to send verification email. Please try again later.', 
+        error: mailError.message 
+      });
     }
 
     res.status(200).json({ message: 'OTP sent successfully to your email' });
   } catch (error) {
     console.error('[AUTH] /send-otp global error:', error);
-    res.status(500).json({ message: 'Error sending OTP', error: error.message });
+    res.status(500).json({ message: 'Error processing request', error: error.message });
   }
 });
 
@@ -149,12 +165,12 @@ router.post('/signup', async (req, res) => {
     // Delete OTP after successful signup
     await OTP.deleteOne({ email: trimmedEmail });
 
-    const isProd = process.env.NODE_ENV === 'production';
     const cookieOptions = {
       httpOnly: true,
-      secure: true, // Always true for cross-site cookies in modern browsers
-      sameSite: 'none', // Required for cross-site cookies (Vercel -> Render)
-      maxAge: 7 * 24 * 60 * 60 * 1000
+      secure: true,
+      sameSite: 'none',
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+      path: '/'
     };
 
     res.cookie('accessToken', tokens.accessToken, cookieOptions);
@@ -163,7 +179,8 @@ router.post('/signup', async (req, res) => {
     console.log(`[AUTH] Signup complete for ${trimmedEmail}. Cookies set.`);
     res.status(201).json({ message: 'User created successfully', user: { name: user.name, email: user.email } });
   } catch (error) {
-    res.status(500).json({ message: 'Server error', error: error.message });
+    console.error('[AUTH] Signup error:', error);
+    res.status(500).json({ message: 'Server error during signup', error: error.message });
   }
 });
 
@@ -191,8 +208,25 @@ router.post('/login', async (req, res) => {
         { otp: generatedOtp, createdAt: Date.now() },
         { upsert: true, new: true }
       );
-      await sendOTPEmail(trimmedEmail, generatedOtp);
-      console.log(`Login OTP sent to ${trimmedEmail}`);
+      
+      console.log(`[AUTH] Login OTP for ${trimmedEmail}: ${generatedOtp}`);
+      
+      try {
+        await sendOTPEmail(trimmedEmail, generatedOtp);
+        console.log(`Login OTP emailed successfully to ${trimmedEmail}`);
+      } catch (mailError) {
+        console.error(`[AUTH] Failed to email login OTP:`, mailError);
+        if (process.env.NODE_ENV !== 'production') {
+          return res.status(200).json({ 
+            message: 'OTP sent (Email failed, check server logs)', 
+            otpRequired: true,
+            devOtp: generatedOtp,
+            warning: 'SMTP error: ' + mailError.message 
+          });
+        }
+        return res.status(500).json({ message: 'Failed to send verification email. Please try again later.' });
+      }
+      
       return res.status(200).json({ message: 'OTP sent to your email', otpRequired: true });
     }
 
@@ -217,7 +251,8 @@ router.post('/login', async (req, res) => {
       httpOnly: true,
       secure: true,
       sameSite: 'none',
-      maxAge: 7 * 24 * 60 * 60 * 1000
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+      path: '/'
     };
 
     res.cookie('accessToken', tokens.accessToken, cookieOptions);
@@ -226,7 +261,8 @@ router.post('/login', async (req, res) => {
     console.log(`[AUTH] Login complete for ${trimmedEmail}. Cookies set.`);
     res.status(200).json({ message: 'Login successful', user: { name: user.name, email: user.email } });
   } catch (error) {
-    res.status(500).json({ message: 'Server error', error: error.message });
+    console.error('[AUTH] Login error:', error);
+    res.status(500).json({ message: 'Server error during login', error: error.message });
   }
 });
 
@@ -266,10 +302,28 @@ router.get('/google', (req, res, next) => {
   }
 
   let host = req.get('host');
+  
+  // If on localhost, try to use the referer's host (e.g. localhost:8080)
+  // because Google will redirect to that host, and Vite proxy will forward it to us.
+  // This is often what users have configured in their Google Console.
+  if (host.includes('localhost') || host.includes('127.0.0.1')) {
+    if (referer && (referer.includes('localhost') || referer.includes('127.0.0.1'))) {
+      try {
+        const refUrl = new URL(referer);
+        host = refUrl.host;
+      } catch (e) {}
+    }
+  }
+
   if (host.includes('127.0.0.1')) {
     host = host.replace('127.0.0.1', 'localhost');
   }
-  const callbackURL = process.env.GOOGLE_CALLBACK_URL || `${req.protocol}://${host}/api/auth/google/callback`;
+  
+  // Ensure we use https for callback URL in production (unless it's localhost)
+  const protocol = (host.includes('localhost') || host.includes('127.0.0.1')) ? 'http' : 'https';
+  const callbackURL = process.env.GOOGLE_CALLBACK_URL || `${protocol}://${host}/api/auth/google/callback`;
+
+  console.log(`[AUTH] Google Login Attempt - Host: ${req.get('host')}, Referer: ${referer}, Constructed Callback: ${callbackURL}`);
 
   passport.authenticate('google', {
     scope: ['profile', 'email'],
@@ -279,15 +333,29 @@ router.get('/google', (req, res, next) => {
 });
 
 router.get('/google/callback', (req, res, next) => {
-  console.log('--- GOOGLE AUTH CALLBACK RECEIVED ---');
+  const referer = req.headers.referer || '';
   let host = req.get('host');
+  
+  if (host.includes('localhost') || host.includes('127.0.0.1')) {
+    if (referer && (referer.includes('localhost') || referer.includes('127.0.0.1'))) {
+      try {
+        const refUrl = new URL(referer);
+        host = refUrl.host;
+      } catch (e) {}
+    }
+  }
+
   if (host.includes('127.0.0.1')) {
     host = host.replace('127.0.0.1', 'localhost');
   }
-  const callbackURL = process.env.GOOGLE_CALLBACK_URL || `${req.protocol}://${host}/api/auth/google/callback`;
+  
+  const protocol = (host.includes('localhost') || host.includes('127.0.0.1')) ? 'http' : 'https';
+  const callbackURL = process.env.GOOGLE_CALLBACK_URL || `${protocol}://${host}/api/auth/google/callback`;
+
+  console.log(`[AUTH] Google Callback Received - Host: ${req.get('host')}, Constructed Callback: ${callbackURL}`);
 
   passport.authenticate('google', {
-    failureRedirect: `${process.env.FRONTEND_URL || 'http://localhost:8080'}/auth?error=google_failed`,
+    failureRedirect: `${process.env.FRONTEND_URL || 'https://griddox.vercel.app'}/auth?error=google_failed`,
     session: false,
     callbackURL
   })(req, res, next);
@@ -306,7 +374,17 @@ router.get('/google/callback', (req, res, next) => {
       { otp, createdAt: Date.now() },
       { upsert: true, new: true }
     );
-    await sendOTPEmail(trimmedEmail, otp);
+    
+    console.log(`[GOOGLE AUTH] Login OTP for ${trimmedEmail}: ${otp}`);
+    try {
+      await sendOTPEmail(trimmedEmail, otp);
+    } catch (mailError) {
+      console.error(`[GOOGLE AUTH] Failed to email OTP:`, mailError);
+      if (process.env.NODE_ENV === 'production') {
+        const fallback = req.cookies.auth_redirect_to || process.env.FRONTEND_URL;
+        return res.redirect(`${fallback}/auth?error=email_failed`);
+      }
+    }
 
     // Set a temporary cookie to identify the pending Google user
     res.cookie('pending_google_email', userEmail, {
@@ -327,7 +405,8 @@ router.get('/google/callback', (req, res, next) => {
 
     res.clearCookie('auth_final_redirect', {
       secure: true,
-      sameSite: 'none'
+      sameSite: 'none',
+      path: '/'
     });
 
     res.redirect(url);
@@ -376,19 +455,20 @@ router.post('/google/verify-otp', async (req, res) => {
 
     // Cleanup
     await OTP.deleteOne({ email });
-    res.clearCookie('pending_google_email', { secure: true, sameSite: 'none' });
+    res.clearCookie('pending_google_email', { secure: true, sameSite: 'none', path: '/' });
 
     const cookieOptions = {
       httpOnly: true,
       secure: true,
       sameSite: 'none',
-      maxAge: 7 * 24 * 60 * 60 * 1000
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+      path: '/'
     };
 
     res.cookie('accessToken', tokens.accessToken, cookieOptions);
     res.cookie('refreshToken', tokens.refreshToken, cookieOptions);
 
-    console.log(`[GOOGLE AUTH] Verification complete for ${email}. Cookies set.`);
+    console.log(`[AUTH] Verification complete for ${email}. Cookies set.`);
     res.status(200).json({ message: 'Login successful', user: { name: user.name, email: user.email } });
   } catch (error) {
     res.status(500).json({ message: 'Server error', error: error.message });
@@ -423,19 +503,16 @@ router.post('/admin-login', async (req, res) => {
     user.refreshToken = tokens.refreshToken;
     await user.save();
 
-    res.cookie('accessToken', tokens.accessToken, {
+    const cookieOptions = {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
-      maxAge: 15 * 60 * 1000
-    });
+      secure: true,
+      sameSite: 'none',
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+      path: '/'
+    };
 
-    res.cookie('refreshToken', tokens.refreshToken, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
-      maxAge: 7 * 24 * 60 * 60 * 1000
-    });
+    res.cookie('accessToken', tokens.accessToken, cookieOptions);
+    res.cookie('refreshToken', tokens.refreshToken, cookieOptions);
 
     res.status(200).json({
       message: 'Admin login successful',
