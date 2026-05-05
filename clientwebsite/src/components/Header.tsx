@@ -1,4 +1,4 @@
-import { Search, ShoppingCart, Menu, X, MapPin, User, LogOut, Package, Truck, ChevronRight } from "lucide-react";
+import { Search, ShoppingCart, Menu, X, MapPin, User, LogOut, Package, Truck, ChevronRight, Instagram } from "lucide-react";
 
 import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
@@ -264,16 +264,44 @@ const Header = () => {
 
             {/* Secondary Navigation Links */}
             <div className="py-2">
-              <button onClick={() => setMenuOpen(false)} className="w-full flex items-center px-6 py-3.5 bg-white border-none cursor-pointer hover:bg-gray-50 active:bg-gray-100 text-left">
-                <span className="text-gray-600 text-[14px] font-medium tracking-wide">Gridox Studio</span>
+              <button onClick={() => {
+                setMenuOpen(false);
+                if (window.location.pathname !== "/") {
+                  navigate("/");
+                  setTimeout(() => document.getElementById('best-sellers')?.scrollIntoView({ behavior: "smooth" }), 100);
+                } else {
+                  document.getElementById('best-sellers')?.scrollIntoView({ behavior: "smooth" });
+                }
+              }} className="w-full flex items-center px-6 py-3.5 bg-white border-none cursor-pointer hover:bg-gray-50 active:bg-gray-100 text-left">
+                <span className="text-gray-600 text-[14px] font-medium tracking-wide">Best Sellers</span>
                 <span className="ml-3 text-[9px] text-[#8b2b25] font-bold border border-[#8b2b25] px-1.5 py-0.5 rounded-sm bg-[#ebd2be]">NEW</span>
               </button>
-              <button onClick={() => setMenuOpen(false)} className="w-full flex items-center px-6 py-3.5 bg-white border-none cursor-pointer hover:bg-gray-50 active:bg-gray-100 text-left">
-                <span className="text-gray-600 text-[14px] font-medium tracking-wide">Gridox Mall</span>
+              <button onClick={() => {
+                setMenuOpen(false);
+                if (window.location.pathname !== "/") {
+                  navigate("/");
+                  setTimeout(() => document.getElementById('curated-looks')?.scrollIntoView({ behavior: "smooth" }), 100);
+                } else {
+                  document.getElementById('curated-looks')?.scrollIntoView({ behavior: "smooth" });
+                }
+              }} className="w-full flex items-center px-6 py-3.5 bg-white border-none cursor-pointer hover:bg-gray-50 active:bg-gray-100 text-left">
+                <span className="text-gray-600 text-[14px] font-medium tracking-wide">Trending</span>
                 <span className="ml-3 text-[9px] text-[#8b2b25] font-bold border border-[#8b2b25] px-1.5 py-0.5 rounded-sm bg-[#ebd2be]">NEW</span>
+              </button>
+
+              <button onClick={() => {
+                setMenuOpen(false);
+                if (window.location.pathname !== "/") {
+                  navigate("/");
+                  setTimeout(() => document.getElementById('new-arrivals')?.scrollIntoView({ behavior: "smooth" }), 100);
+                } else {
+                  document.getElementById('new-arrivals')?.scrollIntoView({ behavior: "smooth" });
+                }
+              }} className="w-full flex items-center px-6 py-3.5 bg-white border-none cursor-pointer hover:bg-gray-50 active:bg-gray-100 text-left">
+                <span className="text-gray-600 text-[14px] font-medium tracking-wide">New Arrival</span>
               </button>
               
-              {['Gridox Insider', 'Gift Cards', 'Contact Us', 'FAQs', 'Legal'].map((item) => (
+              {['Gift Cards', 'Contact Us', 'FAQs', 'Legal'].map((item) => (
                 <button 
                   key={item} 
                   onClick={() => setMenuOpen(false)} 
@@ -282,6 +310,17 @@ const Header = () => {
                   <span className="text-gray-600 text-[14px] font-medium tracking-wide">{item}</span>
                 </button>
               ))}
+
+              <a 
+                href="#" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                onClick={() => setMenuOpen(false)}
+                className="w-full flex items-center px-6 py-3.5 bg-white border-none cursor-pointer hover:bg-gray-50 active:bg-gray-100 text-left decoration-transparent"
+              >
+                <Instagram size={18} className="text-[#E1306C] mr-3" />
+                <span className="text-gray-600 text-[14px] font-medium tracking-wide">Follow on Instagram</span>
+              </a>
             </div>
 
             <div className="flex-1"></div>
