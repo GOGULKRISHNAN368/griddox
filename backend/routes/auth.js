@@ -360,26 +360,41 @@ router.get('/google/callback', (req, res, next) => {
     callbackURL
   })(req, res, next);
 }, async (req, res) => {
+  console.log('--- GOOGLE AUTH SUCCESS CALLBACK ---');
   try {
-    const userEmail = req.user.email || (req.user._json && req.user._json.email);
-    console.log(`Google Auth Success for ${userEmail}. Sending OTP...`);
+    if (!req.user) {
+      console.error('[GOOGLE AUTH] No user object found in request');
+      const fallback = req.cookies.auth_redirect_to || process.env.FRONTEND_URL || 'https://griddox.vercel.app';
+      return res.redirect(`${fallback}/auth?error=no_user`);
+    }
 
-    // Generate and send OTP
+    const userEmail = req.user.email || (req.user._json && req.user._json.email);
+    console.log(`[GOOGLE AUTH] Authenticated user: ${userEmail}`);
+
+    if (!userEmail) {
+      console.error('[GOOGLE AUTH] No email found in Google profile');
+      const fallback = req.cookies.auth_redirect_to || process.env.FRONTEND_URL;
+      return res.redirect(`${fallback}/auth?error=no_email`);
+    }
+
+    // Generate and save OTP
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
     const trimmedEmail = userEmail.trim().toLowerCase();
 
-    console.log(`[GOOGLE AUTH] Saving OTP for ${trimmedEmail}`);
+    console.log(`[GOOGLE AUTH] Step 1: Saving OTP ${otp} for ${trimmedEmail}`);
     await OTP.findOneAndUpdate(
       { email: trimmedEmail },
       { otp, createdAt: Date.now() },
       { upsert: true, new: true }
     );
-    
-    console.log(`[GOOGLE AUTH] Login OTP for ${trimmedEmail}: ${otp}`);
+
+    console.log(`[GOOGLE AUTH] Step 2: Attempting to email OTP...`);
     try {
       await sendOTPEmail(trimmedEmail, otp);
+      console.log(`[GOOGLE AUTH] Email sent successfully to ${trimmedEmail}`);
     } catch (mailError) {
-      console.error(`[GOOGLE AUTH] Failed to email OTP:`, mailError);
+      console.error(`[GOOGLE AUTH] Email failed:`, mailError.message);
+      // Don't block the user if email fails in dev
       if (process.env.NODE_ENV === 'production') {
         const fallback = req.cookies.auth_redirect_to || process.env.FRONTEND_URL;
         return res.redirect(`${fallback}/auth?error=email_failed`);
@@ -391,11 +406,11 @@ router.get('/google/callback', (req, res, next) => {
       httpOnly: true,
       secure: true,
       sameSite: 'none',
-      maxAge: 10 * 60 * 1000 // 10 minutes
+      maxAge: 10 * 60 * 1000, // 10 minutes
+      path: '/'
     });
 
-    console.log(`Redirecting to frontend with google_otp=true for ${userEmail}`);
-    const redirectTo = req.cookies.auth_redirect_to || process.env.FRONTEND_URL || 'http://localhost:8080';
+    const redirectTo = req.cookies.auth_redirect_to || process.env.FRONTEND_URL || 'https://griddox.vercel.app';
     const finalRedirect = req.cookies.auth_final_redirect || '';
 
     let url = `${redirectTo}/auth?google_otp=true&email=${encodeURIComponent(userEmail)}`;
@@ -403,17 +418,14 @@ router.get('/google/callback', (req, res, next) => {
       url += `&redirect=${encodeURIComponent(finalRedirect)}`;
     }
 
-    res.clearCookie('auth_final_redirect', {
-      secure: true,
-      sameSite: 'none',
-      path: '/'
-    });
-
+    console.log(`[GOOGLE AUTH] Step 3: Redirecting user to frontend: ${url}`);
+    
+    res.clearCookie('auth_final_redirect', { secure: true, sameSite: 'none', path: '/' });
     res.redirect(url);
   } catch (error) {
-    console.error('GOOGLE CALLBACK ERROR:', error);
+    console.error('[GOOGLE AUTH] CRITICAL CALLBACK ERROR:', error);
     const fallback = req.cookies.auth_redirect_to || process.env.FRONTEND_URL;
-    res.redirect(`${fallback}/auth?error=token_err`);
+    res.redirect(`${fallback}/auth?error=callback_err&msg=${encodeURIComponent(error.message)}`);
   }
 });
 
