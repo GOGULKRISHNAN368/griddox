@@ -6,6 +6,9 @@ const OTP = require('../models/OTP');
 const passport = require('passport');
 const nodemailer = require('nodemailer');
 const mongoose = require('mongoose');
+const { Resend } = require('resend');
+
+const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
 
 console.log(`[AUTH] SMTP Config Check: user=${!!process.env.SMTP_EMAIL}, pass=${!!process.env.SMTP_PASSWORD}`);
 const transporter = nodemailer.createTransport({
@@ -32,8 +35,9 @@ router.get('/debug-smtp', async (req, res) => {
     await transporter.verify();
     console.log('[AUTH] SMTP verification successful');
     res.json({ 
-      status: 'SMTP connection successful',
+      status: 'Diagnostic check',
       db: mongoose.connection.name,
+      resendEnabled: !!resend,
       config: {
         host: transporter.options.host,
         port: transporter.options.port,
@@ -53,6 +57,40 @@ router.get('/debug-smtp', async (req, res) => {
 
 // Helper to send OTP
 const sendOTPEmail = async (email, otp) => {
+  // Try Resend first (Production)
+  if (resend) {
+    try {
+      console.log(`[AUTH] Using Resend to send OTP to ${email}`);
+      const { data, error } = await resend.emails.send({
+        from: 'Gridox <onboarding@resend.dev>', // You can update this to your verified domain later
+        to: email,
+        subject: 'Gridox - Your Verification Code',
+        html: `
+          <div style="font-family: Arial, sans-serif; padding: 20px; border: 1px solid #eee; border-radius: 10px; max-width: 500px; margin: auto;">
+            <h2 style="color: #ff0000; text-align: center;">Gridox Verification</h2>
+            <p>Hello,</p>
+            <p>Your verification code is:</p>
+            <div style="font-size: 32px; font-weight: bold; text-align: center; padding: 10px; background: #f9f9f9; border-radius: 5px; color: #333; letter-spacing: 5px;">
+              ${otp}
+            </div>
+            <p style="color: #666; font-size: 14px; text-align: center; margin-top: 20px;">
+              This code will expire in 10 minutes. If you didn't request this, please ignore this email.
+            </p>
+          </div>
+        `
+      });
+
+      if (error) {
+        console.error('[AUTH] Resend Error:', error);
+        throw new Error(error.message);
+      }
+      return data;
+    } catch (resendError) {
+      console.warn('[AUTH] Resend failed, falling back to SMTP:', resendError.message);
+    }
+  }
+
+  // Fallback to Nodemailer (Development)
   const mailOptions = {
     from: `"Gridox Fashion" <${process.env.SMTP_EMAIL}>`,
     to: email,
