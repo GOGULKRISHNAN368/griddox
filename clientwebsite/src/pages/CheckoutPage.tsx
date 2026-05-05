@@ -21,6 +21,11 @@ const CheckoutPage = () => {
   
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const [subtotal, setSubtotal] = useState(0);
+  const [promoCode, setPromoCode] = useState('');
+  const [discount, setDiscount] = useState(0);
+  const [promoError, setPromoError] = useState('');
+  
+  const finalTotal = Math.max(0, subtotal - discount);
   
   const [authLoading, setAuthLoading] = useState(true);
   const [user, setUser] = useState<any>(null);
@@ -64,6 +69,19 @@ const CheckoutPage = () => {
     checkAuth();
   }, [navigate]);
 
+  const handleApplyPromo = () => {
+    setPromoError('');
+    if (!promoCode.trim()) return;
+    
+    if (promoCode.trim().toUpperCase() === 'GRIDOX10') {
+      const discountAmount = Math.round(subtotal * 0.10);
+      setDiscount(discountAmount);
+    } else {
+      setPromoError('Invalid coupon code');
+      setDiscount(0);
+    }
+  };
+
   const placeOrder = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsPlacingOrder(true);
@@ -80,7 +98,7 @@ const CheckoutPage = () => {
         })),
         address: address,
         paymentMethod: "COD",
-        totalAmount: subtotal
+        totalAmount: finalTotal
       };
 
       const response = await fetch('/api/orders', {
@@ -315,7 +333,7 @@ const CheckoutPage = () => {
                       disabled={isPlacingOrder}
                       className="w-full py-4 bg-[#001325] text-white font-medium tracking-wider hover:bg-gray-800 transition-colors disabled:opacity-50"
                     >
-                      {isPlacingOrder ? 'PLACING ORDER...' : `PLACE ORDER • ₹${subtotal.toLocaleString()}`}
+                      {isPlacingOrder ? 'PLACING ORDER...' : `PLACE ORDER • ₹${finalTotal.toLocaleString()}`}
                     </button>
                   </div>
                 </div>
@@ -343,6 +361,26 @@ const CheckoutPage = () => {
                   ))}
                 </div>
 
+                <div className="border-t border-border pt-4 mb-4">
+                  <div className="flex gap-2">
+                    <input 
+                      type="text" 
+                      value={promoCode}
+                      onChange={(e) => setPromoCode(e.target.value.toUpperCase())}
+                      placeholder="Coupon Code" 
+                      className="flex-1 border border-border px-3 py-2 text-sm focus:outline-none focus:border-black uppercase"
+                    />
+                    <button 
+                      onClick={handleApplyPromo}
+                      className="px-4 py-2 bg-black text-white text-xs font-medium tracking-wider hover:bg-gray-800 transition-colors"
+                    >
+                      APPLY
+                    </button>
+                  </div>
+                  {promoError && <p className="text-red-500 text-xs mt-1">{promoError}</p>}
+                  {discount > 0 && <p className="text-green-600 text-xs mt-1 font-medium">Coupon applied! 10% discount added.</p>}
+                </div>
+
                 <div className="border-t border-border pt-4">
                   <h3 className="font-medium text-sm mb-3">Price Details</h3>
                   <div className="space-y-3 text-sm">
@@ -354,12 +392,18 @@ const CheckoutPage = () => {
                       <span>Shipping</span>
                       <span className="text-green-600 font-medium">FREE</span>
                     </div>
+                    {discount > 0 && (
+                      <div className="flex justify-between text-green-600">
+                        <span>Discount (10%)</span>
+                        <span>-₹{discount.toLocaleString()}</span>
+                      </div>
+                    )}
                     <div className="bg-green-50 p-2 text-center text-green-700 text-xs font-medium border border-green-100 mt-2">
                       You are enjoying FREE shipping!
                     </div>
                     <div className="border-t border-border pt-3 flex justify-between font-bold text-base mt-2">
                       <span>Total Amount</span>
-                      <span>₹{subtotal.toLocaleString()}</span>
+                      <span>₹{finalTotal.toLocaleString()}</span>
                     </div>
                   </div>
                 </div>
