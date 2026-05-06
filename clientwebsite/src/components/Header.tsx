@@ -111,9 +111,16 @@ const Header = () => {
         </button>
 
         {/* Logo */}
-        <h1 className="font-heading text-2xl md:text-3xl font-bold tracking-tight text-foreground m-0">
-          Gridox<span className="text-accent">!</span>
-        </h1>
+        <div className="flex items-center gap-2 cursor-pointer" onClick={() => navigate("/")}>
+          <img 
+            src="/logo.jpeg" 
+            alt="Gridox Logo" 
+            className="h-8 md:h-10 w-auto object-contain"
+          />
+          <h1 className="font-heading text-xl md:text-2xl font-bold tracking-tight text-foreground m-0">
+            Gridox
+          </h1>
+        </div>
 
         {/* Desktop nav */}
         <nav className="hidden md:flex items-center gap-8">

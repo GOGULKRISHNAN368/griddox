@@ -23,7 +23,7 @@ interface SEOProps {
   breadcrumbs?: { name: string; url: string }[];
 }
 
-const siteUrl = "https://gridox.com";
+const siteUrl = "https://gridox.in";
 const siteName = "Gridox";
 const defaultImage = `${siteUrl}/og-image.jpg`;
 
@@ -91,8 +91,8 @@ export const OrganizationSchema = () => {
     "@context": "https://schema.org",
     "@type": "Organization",
     name: "Gridox",
-    url: "https://gridox.com",
-    logo: "https://gridox.com/logo.png",
+    url: "https://gridox.in",
+    logo: "https://gridox.in/logo.jpeg",
     description: "Gridox - Premium designer women's fashion and clothing. Discover uniquely designed, high-quality dresses, ethnic wear, and contemporary styles by Gridox.",
     contactPoint: {
       "@type": "ContactPoint",
@@ -124,12 +124,12 @@ export const WebSiteSchema = () => {
     "@context": "https://schema.org",
     "@type": "WebSite",
     name: "Gridox",
-    url: "https://gridox.com",
+    url: "https://gridox.in",
     potentialAction: {
       "@type": "SearchAction",
       target: {
         "@type": "EntryPoint",
-        urlTemplate: "https://gridox.com/search?q={search_term_string}",
+        urlTemplate: "https://gridox.in/search?q={search_term_string}",
       },
       "query-input": "required name=search_term_string",
     },
@@ -172,7 +172,7 @@ export const ProductSchema = ({
     "@type": "Product",
     name: productData.name,
     description: productData.description,
-    image: productData.images.map((img) => (img.startsWith("http") ? img : `https://gridox.com${img}`)),
+    image: productData.images.map((img) => (img.startsWith("http") ? img : `https://gridox.in${img}`)),
     sku: productData.name.toLowerCase().replace(/\s+/g, "-"),
     brand: {
       "@type": "Brand",

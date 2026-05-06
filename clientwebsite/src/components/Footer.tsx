@@ -23,9 +23,16 @@ const Footer = () => {
 
           {/* Gridox Brand Column */}
           <div className="space-y-6">
-            <h2 className="font-heading text-3xl font-bold tracking-tight text-[#8b231a]">
-              Gridox<span className="text-gray-400">.</span>
-            </h2>
+            <div className="flex items-center gap-3 cursor-pointer" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
+              <img 
+                src="/logo.jpeg" 
+                alt="Gridox Logo" 
+                className="h-8 w-auto object-contain"
+              />
+              <h2 className="font-heading text-2xl font-bold tracking-tight text-[#8b231a]">
+                Gridox
+              </h2>
+            </div>
             <p className="text-[#5c4a3d] text-xs leading-relaxed font-medium">
               Gridox is the ultimate destination for premium women's fashion. The Gridox brand is dedicated to curating the finest ethnic wear and modern contemporary clothing. When you think premium fashion, think Gridox.
             </p>
