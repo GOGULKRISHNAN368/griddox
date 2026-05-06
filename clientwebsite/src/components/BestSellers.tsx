@@ -6,6 +6,7 @@ const BestSellers = () => {
   const navigate = useNavigate();
   const [activeProducts, setActiveProducts] = useState<any[]>([]);
   const [activeIndex, setActiveIndex] = useState(0);
+  const [isExpanded, setIsExpanded] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
 
   // Fetch Best Sellers (isBestSeller=true) from unified backend
@@ -70,7 +71,7 @@ const BestSellers = () => {
           className="flex overflow-x-auto snap-x snap-mandatory gap-3 px-4 pb-4 md:grid md:grid-cols-4 md:gap-6 md:px-6 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
         >
           {activeProducts.length > 0 ? (
-            activeProducts.map((product: any) => (
+            (isExpanded ? activeProducts : activeProducts.slice(0, 8)).map((product: any) => (
               <div
                 key={product._id}
                 className="w-[38vw] sm:w-[32vw] md:w-full snap-start shrink-0 flex flex-col group cursor-pointer"
@@ -116,9 +117,22 @@ const BestSellers = () => {
           )}
         </div>
 
+        
+        {/* View More Button */}
+        {activeProducts.length > 8 && !isExpanded && (
+          <div className="mt-12 flex justify-center">
+            <button 
+              onClick={() => setIsExpanded(true)}
+              className="px-10 py-3.5 bg-[#8b231a] border-none text-white text-[10px] font-bold uppercase tracking-[0.2em] rounded-md hover:bg-[#a51d1d] transition-all duration-300 shadow-lg active:scale-95"
+            >
+              View More Best Sellers
+            </button>
+          </div>
+        )}
+
         {/* Pagination Dots (Mobile Only) */}
         <div className="flex justify-center gap-2 mt-4 md:hidden">
-          {activeProducts.map((_, idx) => (
+          {(isExpanded ? activeProducts : activeProducts.slice(0, 8)).map((_, idx) => (
             <button
               key={idx}
               onClick={() => scrollTo(idx)}
