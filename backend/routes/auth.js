@@ -332,7 +332,7 @@ router.post('/login', async (req, res) => {
 
 router.get('/google', (req, res, next) => {
   const referer = req.headers.referer || '';
-  let targetFrontend = process.env.FRONTEND_URL || 'https://griddox.vercel.app';
+  let targetFrontend = process.env.FRONTEND_URL || 'https://gridox.in';
 
   if (referer.includes('localhost') || referer.includes('127.0.0.1')) {
     try {
@@ -417,7 +417,7 @@ router.get('/google/callback', (req, res, next) => {
   console.log(`[AUTH] Google Callback Received - Host: ${req.get('host')}, Constructed Callback: ${callbackURL}`);
 
   passport.authenticate('google', {
-    failureRedirect: `${process.env.FRONTEND_URL || 'https://griddox.vercel.app'}/auth?error=google_failed`,
+    failureRedirect: `${process.env.FRONTEND_URL || 'https://gridox.in'}/auth?error=google_failed`,
     session: false,
     callbackURL
   })(req, res, next);
@@ -426,7 +426,7 @@ router.get('/google/callback', (req, res, next) => {
   try {
     if (!req.user) {
       console.error('[GOOGLE AUTH] No user object found in request');
-      const fallback = req.cookies.auth_redirect_to || process.env.FRONTEND_URL || 'https://griddox.vercel.app';
+      const fallback = req.cookies.auth_redirect_to || process.env.FRONTEND_URL || 'https://gridox.in';
       return res.redirect(`${fallback}/auth?error=no_user`);
     }
 
@@ -472,7 +472,7 @@ router.get('/google/callback', (req, res, next) => {
       path: '/'
     });
 
-    const redirectTo = req.cookies.auth_redirect_to || process.env.FRONTEND_URL || 'https://griddox.vercel.app';
+    const redirectTo = req.cookies.auth_redirect_to || process.env.FRONTEND_URL || 'https://gridox.in';
     const finalRedirect = req.cookies.auth_final_redirect || '';
 
     let url = `${redirectTo}/auth?google_otp=true&email=${encodeURIComponent(userEmail)}`;

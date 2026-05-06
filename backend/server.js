@@ -22,10 +22,9 @@ const corsOptions = {
     'http://127.0.0.1:5174',
     'https://gridox-store.vercel.app',
     'https://gridox-owner.vercel.app',
-    'https://griddox.vercel.app',
-    'https://ownersite-psi.vercel.app',
+    'https://gridox.in',
     'https://www.gridox.in',
-    'https://gridox.in'
+    'https://ownersite-psi.vercel.app'
   ],
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
