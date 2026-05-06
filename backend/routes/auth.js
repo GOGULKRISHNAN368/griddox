@@ -383,7 +383,7 @@ router.get('/google', (req, res, next) => {
 
   // Ensure we use https for callback URL in production (unless it's localhost)
   const protocol = (host.includes('localhost') || host.includes('127.0.0.1')) ? 'http' : 'https';
-  const callbackURL = process.env.GOOGLE_CALLBACK_URL || `${protocol}://${host}/api/auth/google/callback`;
+  const callbackURL = process.env.GOOGLE_CALLBACK_URL || (protocol === 'https' ? `https://gridox.in/api/auth/google/callback` : `${protocol}://${host}/api/auth/google/callback`);
 
   console.log(`[AUTH] Google Login Attempt - Host: ${req.get('host')}, Referer: ${referer}, Constructed Callback: ${callbackURL}`);
 
@@ -412,7 +412,7 @@ router.get('/google/callback', (req, res, next) => {
   }
 
   const protocol = (host.includes('localhost') || host.includes('127.0.0.1')) ? 'http' : 'https';
-  const callbackURL = process.env.GOOGLE_CALLBACK_URL || `${protocol}://${host}/api/auth/google/callback`;
+  const callbackURL = process.env.GOOGLE_CALLBACK_URL || (protocol === 'https' ? `https://gridox.in/api/auth/google/callback` : `${protocol}://${host}/api/auth/google/callback`);
 
   console.log(`[AUTH] Google Callback Received - Host: ${req.get('host')}, Constructed Callback: ${callbackURL}`);
 
