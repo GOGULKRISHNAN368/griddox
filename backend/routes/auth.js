@@ -332,8 +332,8 @@ router.post('/login', async (req, res) => {
 
 router.get('/google', (req, res, next) => {
   const referer = req.headers.referer || '';
+  // Determine the frontend URL for redirection after auth
   let targetFrontend = process.env.FRONTEND_URL || 'https://gridox.in';
-
   if (referer.includes('localhost') || referer.includes('127.0.0.1')) {
     try {
       const refUrl = new URL(referer);
@@ -341,51 +341,39 @@ router.get('/google', (req, res, next) => {
     } catch (e) {
       targetFrontend = 'http://localhost:8080';
     }
-  } else if (referer.includes('ownersite') || referer.includes('owner')) {
-    targetFrontend = 'https://ownersite-psi.vercel.app';
   }
 
-  const redirectPath = req.query.redirect || '';
+  // Determine the callback URL for Google
+  let host = req.get('host');
+  const protocol = (req.secure || req.headers['x-forwarded-proto'] === 'https') ? 'https' : 'http';
+  
+  // Standard callback construction
+  let callbackURL = process.env.GOOGLE_CALLBACK_URL;
+  if (!callbackURL) {
+    if (host.includes('localhost') || host.includes('127.0.0.1')) {
+      callbackURL = `http://${host}/api/auth/google/callback`;
+    } else {
+      callbackURL = `https://gridox.in/api/auth/google/callback`;
+    }
+  }
+
+  console.log(`[AUTH] Google Login - Host: ${host}, Callback: ${callbackURL}, Frontend: ${targetFrontend}`);
 
   res.cookie('auth_redirect_to', targetFrontend, {
     httpOnly: true,
     secure: true,
     sameSite: 'none',
-    maxAge: 5 * 60 * 1000 // 5 minutes
+    maxAge: 5 * 60 * 1000
   });
 
-  if (redirectPath) {
-    res.cookie('auth_final_redirect', redirectPath, {
+  if (req.query.redirect) {
+    res.cookie('auth_final_redirect', req.query.redirect, {
       httpOnly: true,
       secure: true,
       sameSite: 'none',
       maxAge: 5 * 60 * 1000
     });
   }
-
-  let host = req.get('host');
-
-  // If on localhost, try to use the referer's host (e.g. localhost:8080)
-  // because Google will redirect to that host, and Vite proxy will forward it to us.
-  // This is often what users have configured in their Google Console.
-  if (host.includes('localhost') || host.includes('127.0.0.1')) {
-    if (referer && (referer.includes('localhost') || referer.includes('127.0.0.1'))) {
-      try {
-        const refUrl = new URL(referer);
-        host = refUrl.host;
-      } catch (e) { }
-    }
-  }
-
-  if (host.includes('127.0.0.1')) {
-    host = host.replace('127.0.0.1', 'localhost');
-  }
-
-  // Ensure we use https for callback URL in production (unless it's localhost)
-  const protocol = (host.includes('localhost') || host.includes('127.0.0.1')) ? 'http' : 'https';
-  const callbackURL = process.env.GOOGLE_CALLBACK_URL || (protocol === 'https' ? `https://gridox.in/api/auth/google/callback` : `${protocol}://${host}/api/auth/google/callback`);
-
-  console.log(`[AUTH] Google Login Attempt - Host: ${req.get('host')}, Referer: ${referer}, Constructed Callback: ${callbackURL}`);
 
   passport.authenticate('google', {
     scope: ['profile', 'email'],
@@ -395,26 +383,15 @@ router.get('/google', (req, res, next) => {
 });
 
 router.get('/google/callback', (req, res, next) => {
-  const referer = req.headers.referer || '';
   let host = req.get('host');
-
-  if (host.includes('localhost') || host.includes('127.0.0.1')) {
-    if (referer && (referer.includes('localhost') || referer.includes('127.0.0.1'))) {
-      try {
-        const refUrl = new URL(referer);
-        host = refUrl.host;
-      } catch (e) { }
+  let callbackURL = process.env.GOOGLE_CALLBACK_URL;
+  if (!callbackURL) {
+    if (host.includes('localhost') || host.includes('127.0.0.1')) {
+      callbackURL = `http://${host}/api/auth/google/callback`;
+    } else {
+      callbackURL = `https://gridox.in/api/auth/google/callback`;
     }
   }
-
-  if (host.includes('127.0.0.1')) {
-    host = host.replace('127.0.0.1', 'localhost');
-  }
-
-  const protocol = (host.includes('localhost') || host.includes('127.0.0.1')) ? 'http' : 'https';
-  const callbackURL = process.env.GOOGLE_CALLBACK_URL || (protocol === 'https' ? `https://gridox.in/api/auth/google/callback` : `${protocol}://${host}/api/auth/google/callback`);
-
-  console.log(`[AUTH] Google Callback Received - Host: ${req.get('host')}, Constructed Callback: ${callbackURL}`);
 
   passport.authenticate('google', {
     failureRedirect: `${process.env.FRONTEND_URL || 'https://gridox.in'}/auth?error=google_failed`,
