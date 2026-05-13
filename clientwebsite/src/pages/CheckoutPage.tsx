@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { ShoppingBag, ArrowLeft, CheckCircle, MapPin, CreditCard, ChevronRight, Check } from 'lucide-react';
 import Header from '@/components/Header';
 import BottomNav from '@/components/BottomNav';
+import Footer from '@/components/Footer';
 
 interface CartItem {
   id: string;
@@ -422,6 +423,7 @@ const CheckoutPage = () => {
         )}
       </div>
       <BottomNav />
+      <Footer />
     </div>
   );
 };

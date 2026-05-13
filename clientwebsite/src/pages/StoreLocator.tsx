@@ -1,6 +1,7 @@
 import Header from "@/components/Header";
 import BottomNav from "@/components/BottomNav";
 import WhatsAppButton from "@/components/WhatsAppButton";
+import Footer from "@/components/Footer";
 import { MapPin, Phone, Mail, Clock, Navigation, Star, Sparkles, Shirt } from "lucide-react";
 
 // Colors: Mahogany (#8b231a), Ivory (#fcfaf7), Charcoal (#000000)
@@ -145,6 +146,7 @@ const StoreLocator = () => {
 
       <BottomNav />
       <WhatsAppButton />
+      <Footer />
     </div>
   );
 };

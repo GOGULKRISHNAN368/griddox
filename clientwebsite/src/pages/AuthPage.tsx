@@ -391,6 +391,7 @@ const AuthPage = () => {
           {/* Footer area */}
           <div className="mt-8 pt-4 border-t border-border/30 shrink-0">
             <p className="text-center text-[9px] text-muted-foreground uppercase tracking-[0.15em] leading-loose">
+              © {new Date().getFullYear()} GridOx Ecommerce. Operated by MKG OCEANS <br />
               By continuing, you agree to our <br />
               <a href="/terms" className="text-foreground hover:text-primary underline">Terms of Service & Privacy Policy</a>
             </p>

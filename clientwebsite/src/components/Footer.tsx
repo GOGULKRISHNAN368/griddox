@@ -98,7 +98,7 @@ const Footer = () => {
 
         {/* GriDox Bottom Bar */}
         <div className="pt-8 border-t border-border flex flex-col md:flex-row justify-between items-center gap-4 text-muted-foreground font-bold text-[9px] tracking-widest">
-          <p className="opacity-70">© {currentYear} GriDox Premium Fashion. All rights reserved by GriDox.</p>
+          <p className="opacity-70">© {currentYear} GridOx Ecommerce. Operated by MKG OCEANS</p>
           <div className="flex gap-4 items-center">
             <span className="hidden md:inline opacity-70 tracking-[0.2em]">GriDox Premium Brand</span>
           </div>

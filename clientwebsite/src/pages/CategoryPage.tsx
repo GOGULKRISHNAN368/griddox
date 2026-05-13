@@ -4,6 +4,7 @@ import { Helmet } from "react-helmet-async";
 import { useEffect, useState } from "react";
 import Header from "@/components/Header";
 import BottomNav from "@/components/BottomNav";
+import Footer from "@/components/Footer";
 
 
 interface Product {
@@ -117,6 +118,7 @@ const CategoryPage = () => {
       </div>
 
       <BottomNav />
+      <Footer />
     </div>
   );
 };

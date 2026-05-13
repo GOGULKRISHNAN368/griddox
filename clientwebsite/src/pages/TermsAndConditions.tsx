@@ -1,6 +1,7 @@
 import Header from "@/components/Header";
 import AnnouncementBar from "@/components/AnnouncementBar";
 import BottomNav from "@/components/BottomNav";
+import Footer from "@/components/Footer";
 
 const TermsAndConditions = () => {
   return (
@@ -68,6 +69,7 @@ const TermsAndConditions = () => {
       </main>
 
       <BottomNav />
+      <Footer />
     </div>
   );
 };

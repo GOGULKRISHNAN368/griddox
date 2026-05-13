@@ -7,6 +7,7 @@ import Header from "@/components/Header";
 import SimilarProducts from "@/components/SimilarProducts";
 import BottomNav from "@/components/BottomNav";
 import WhatsAppButton from "@/components/WhatsAppButton";
+import Footer from "@/components/Footer";
 
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { toast } from "sonner";
@@ -293,6 +294,7 @@ const ProductDetailPage = () => {
 
       <BottomNav />
       <WhatsAppButton />
+      <Footer />
     </div>
   );
 };

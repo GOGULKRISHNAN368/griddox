@@ -4,6 +4,7 @@ import { Package, MapPin, Loader2, Search, SlidersHorizontal, ChevronRight, Arro
 import { toast } from 'sonner';
 import Header from '@/components/Header';
 import BottomNav from '@/components/BottomNav';
+import Footer from '@/components/Footer';
 
 interface OrderItem {
   productId: string;
@@ -173,6 +174,7 @@ const OrdersPage = () => {
       <div className="md:hidden">
         <BottomNav />
       </div>
+      <Footer />
     </div>
   );
 
@@ -330,6 +332,7 @@ const OrdersPage = () => {
         <div className="md:hidden">
           <BottomNav />
         </div>
+        <Footer />
       </div>
     );
   };

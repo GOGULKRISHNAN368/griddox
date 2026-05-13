@@ -2,6 +2,7 @@ import { Mail, Phone, MapPin, Clock } from "lucide-react";
 import Header from "@/components/Header";
 import AnnouncementBar from "@/components/AnnouncementBar";
 import BottomNav from "@/components/BottomNav";
+import Footer from "@/components/Footer";
 
 const ContactUs = () => {
   return (
@@ -80,6 +81,7 @@ const ContactUs = () => {
       </main>
 
       <BottomNav />
+      <Footer />
     </div>
   );
 };
